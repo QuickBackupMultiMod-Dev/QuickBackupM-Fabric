@@ -80,7 +80,7 @@ public class QuickBackupMultiCommandManager {
     }
 
     private static int setLang(ServerCommandSource commandSource, String lang) {
-        commandSource.sendMessage(Text.of(String.format(tr("quickbackupmulti.lang.get"), Config.INSTANCE.getLang())));
+        commandSource.sendMessage(Text.of(String.format(tr("quickbackupmulti.lang.set"), lang)));
         Translate.handleResourceReload(lang);
         Config.INSTANCE.setLang(lang);
         return 1;

@@ -129,7 +129,7 @@ public class QbmManager {
     }
 
     public static MutableText list() {
-        MutableText resultText = Text.literal("§l§d[槽位信息]");
+        MutableText resultText = Text.literal(tr("quickbackupmulti.list_backup.title"));
         long totalBackupSizeB = 0;
         for (int j=1;j<=Config.INSTANCE.getNumOfSlot();j++) {
             try {
@@ -140,30 +140,28 @@ public class QbmManager {
                 reader.close();
                 int finalJ = j;
                 backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.restore", finalJ))))));
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.restore"), finalJ)))));
                 deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.delete", finalJ))))));
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.delete"), finalJ)))));
                 String desc = result.desc;
-                if (Objects.equals(result.desc, "")) desc = "§8空";
+                if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
                 long backupSizeB = getDirSize(backupDir.resolve("Slot" + j).toFile());
                 totalBackupSizeB += backupSizeB;
                 double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
                 double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
                 String sizeString = (backupSizeMB >= 1000) ? String.format("%.2f GB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
-                resultText.append("\n" + String.format(tr("quickbackupmulti.list_backup.title", finalJ)))
+                resultText.append("\n" + String.format(tr("quickbackupmulti.list_backup.slot.header"), finalJ) + " ")
                     .append(backText)
                     .append(deleteText)
                     .append("§2§l" + sizeString)
-                    .append(String.format("§r日期: %s; 注释: %s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
-            } catch (FileNotFoundException e) {
-                resultText.append(Text.literal("\n"+ String.format(tr("quickbackupmulti.list_backup.title" + " §2[▷] §c[×] §rNone"))));
+                    .append(String.format(tr("quickbackupmulti.list_backup.slot.info"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                resultText.append(Text.literal("\n"+ String.format(tr("quickbackupmulti.list_backup.slot.header"), j) + " §2[▷] §c[×] §rNone"));
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
         double totalBackupSizeGB = (double) totalBackupSizeB / FileUtils.ONE_GB;
-        String sizeString = (totalBackupSizeMB >= 1000) ? String.format("%.2f GB", totalBackupSizeGB) : String.format("%.2fMB", totalBackupSizeMB);
+        String sizeString = (totalBackupSizeMB >= 1000) ? String.format("%.2fGB", totalBackupSizeGB) : String.format("%.2fMB", totalBackupSizeMB);
         resultText.append("\n" + String.format(tr("quickbackupmulti.list_backup.slot.total_space"), sizeString));
         return resultText;
     }
