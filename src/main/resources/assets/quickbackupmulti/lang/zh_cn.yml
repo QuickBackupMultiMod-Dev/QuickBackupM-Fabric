@@ -1,0 +1,41 @@
+quickbackupmulti:
+  empty_comment: §7空§r
+
+  lang:
+    get: "当前设置的§a语言§r为: §4§l%s§r"
+    set: "已将§a语言§r设置为: §4§l%s§r"
+
+  confirm_restore:
+    nothing_to_confirm: 没有什么需要确认的
+
+  init:
+    start: 初始化QuickBackupMulti中...
+    finish: 初始化QuickBackupMulti完成!
+
+  make:
+    start: §a备份§r中...请稍等
+    no_slot: 未找到可用槽位，§a备份§r中断!
+    success: §a备份§r完成，耗时§6%s§r秒
+    fail: §a备份§r失败，错误原因%s
+
+  delete:
+    success: 删除槽位§6%s§r§a完成§r
+    fail: 删除槽位§6%s§r§4失败§r
+
+  list_backup:
+    title: §d[槽位信息]§r
+    slot:
+      header: "[槽位§6%s§r]"
+      restore: 点击回档至槽位§6%s§r
+      delete: 点击删除槽位§6%s§r
+      total_space: "备份总占用空间: §a%s§r"
+
+  restore:
+    countdown:
+      intro: "%s 执行回档, 10秒后关闭服务器§c回档§r"
+      text: "还有%s秒，将§c回档§r为槽位§6%s§r, "
+      hover: 点击终止回档!
+    abort: 已取消§c回档§r任务!
+    fail: "回档§4失败§r: 槽位§4不存在§r!"
+    confirm_hint: 使用§7/qb confirm§r 确认§c回档§r
+    abort_hint: 已确认回档, 如需取消请输入§7/qb cancel§r

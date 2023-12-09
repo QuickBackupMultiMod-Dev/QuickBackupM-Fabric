@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "${id}",
+	"version": "${version}",
+	"name": "${name}",
+	"description": "A mod for creating world-save backups",
+	"authors": [
+		"SkyDynamic"
+	],
+	"contact": {
+		"sources": "https://github.com/SkyDynamic/fabric-QuickBackupM"
+	},
+	"license": "Apache License 2.0",
+	"icon": "assets/quickbackupmulti/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.skydynamic.quickbackupmulti.QuickBackupMulti"
+		]
+	},
+	"mixins": [
+		"quickbackupmulti.mixins.json"
+	],
+	"accessWidener" : "qbm.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.14.24",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}

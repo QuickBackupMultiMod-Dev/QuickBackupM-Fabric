@@ -1,0 +1,5 @@
+accessWidener v2 named
+
+accessible method net/minecraft/server/MinecraftServer runServer ()V
+accessible field net/minecraft/server/MinecraftServer stopped Z
+accessible field net/minecraft/server/MinecraftServer running Z

@@ -1,0 +1,41 @@
+quickbackupmulti:
+  empty_comment: §7Empty§r
+
+  lang:
+    get: "The current §alanguage§r set is: §4§l%s§r"
+    set: "§aLanguage§r has been set to: §4§l%s§r"
+
+  confirm_restore:
+    nothing_to_confirm: Nothing to confirm
+
+  init:
+    start: Initializing QuickBackupMulti...
+    finish: Initializing QuickBackupMulti completed!
+
+  make:
+    start: §aBackup§r now...Please wait a moment
+    no_slot: No available slots found, §abackup§r abort!
+    success: §aBackup §rcompleted, It takes§6%s§rs
+    fail: §a备份§r失败，错误原因%s
+
+  delete:
+    success: §aSuccess delete slot §6%s
+    fail: §4Fail§r to delete slot §6%s
+
+  list_backup:
+    title: §d[Slot Information]§r
+    slot:
+      header: "[Slot§6%s§r]"
+      restore: Click to restore to slot §6%s§r
+      delete: Click to delete slot §6%s§r
+      total_space: "Total space consumed: §a%s§r"
+
+  restore:
+    countdown:
+      intro: "%s execute restore backup, §cRestore§r after 10 second"
+      text: "%s second later the world will be §crestored§r to slot §6%s§r, "
+      hover: Click to ABORT restore!
+    abort: §cRestore§r aborted!
+    fail: "§4Fail§r ro restore: slot §4NotFount§r!"
+    confirm_hint: Use §7/qb confirm§r to confirm §crestore§r
+    abort_hint: Confirmed restore, If you want to abort, please enter §7/qb cancel§r
