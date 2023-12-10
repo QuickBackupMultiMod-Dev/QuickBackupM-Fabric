@@ -20,3 +20,6 @@ _✨ MC备份 / 回档插件 ✨_
 
 ## 指令
 `/qb` 或 `/quickbackupmulti`均可触发mod
+
+## 许可
+本项目遵循 [Apache-2.0 license](https://www.apache.org/licenses/LICENSE-2.0) 许可
