@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils;
+package dev.skydynamic.quickbackupmulti.utils.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

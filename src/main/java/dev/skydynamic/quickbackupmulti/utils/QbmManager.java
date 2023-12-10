@@ -2,6 +2,10 @@ package dev.skydynamic.quickbackupmulti.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import dev.skydynamic.quickbackupmulti.utils.config.Config;
+
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -10,6 +14,8 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.client.toast.SystemToast;
+import net.minecraft.client.toast.ToastManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -19,8 +25,11 @@ import org.apache.commons.io.filefilter.NotFileFilter;
 import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import static dev.skydynamic.quickbackupmulti.utils.Translate.tr;
 
@@ -70,6 +79,32 @@ public class QbmManager {
 
     private static boolean checkSlotExist(int slot) {
         return backupDir.resolve("Slot" + slot + "_info.json").toFile().exists();
+    }
+
+    public static void restoreClient(int slot) {
+        File targetBackupSlot = backupDir.resolve("Slot" + slot).toFile();
+        try {
+            savePath.resolve("level.dat").toFile().delete();
+            savePath.resolve("level.dat_old").toFile().delete();
+            File[] fileList = savePath.toFile().listFiles((FilenameFilter) fileFilter);
+            if (fileList != null) {
+                Arrays.sort(fileList, ((o1, o2) -> {
+                    if (o1.isDirectory() && o2.isDirectory()) {
+                        return -1;
+                    } else if (!o1.isDirectory() && o2.isDirectory()) {
+                        return 1;
+                    } else {
+                        return o1.compareTo(o2);
+                    }
+                }));
+                for (File file : fileList) {
+                    FileUtils.forceDelete(file);
+                }
+            }
+            FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
+        } catch (IOException e) {
+            restoreClient(slot);
+        }
     }
 
     public static void restore(int slot) {

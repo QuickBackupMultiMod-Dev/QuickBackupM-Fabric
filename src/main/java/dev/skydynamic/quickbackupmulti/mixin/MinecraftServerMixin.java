@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.mixin;
 
-import dev.skydynamic.quickbackupmulti.utils.Config;
+import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import dev.skydynamic.quickbackupmulti.utils.Translate;
 import net.minecraft.server.MinecraftServer;

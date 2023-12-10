@@ -1,6 +1,12 @@
 quickbackupmulti:
   empty_comment: §7空§r
 
+  toast:
+    start_title: 正在进行回档...请稍等!
+    start_content: 在此期间请勿进入存档!
+    end_title: 回档完成!
+    end_content: 你现在可以进入存档了!
+
   lang:
     get: "当前设置的§a语言§r为: §4§l%s§r"
     set: "已将§a语言§r设置为: §4§l%s§r"

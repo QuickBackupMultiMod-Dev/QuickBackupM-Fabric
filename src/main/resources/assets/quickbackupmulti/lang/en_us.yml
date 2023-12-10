@@ -1,6 +1,12 @@
 quickbackupmulti:
   empty_comment: §7Empty§r
 
+  toast:
+    start_title: Restoring now...Please wait a moment
+    start_content: Don't join world in this time!
+    end_title: Restore success!
+    end_content: Now you can join your save!
+
   lang:
     get: "The current §alanguage§r set is: §4§l%s§r"
     set: "§aLanguage§r has been set to: §4§l%s§r"

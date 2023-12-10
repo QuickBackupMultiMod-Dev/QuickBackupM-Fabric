@@ -1,14 +1,17 @@
 package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.skydynamic.quickbackupmulti.utils.LangSuggestionProvider;
 import dev.skydynamic.quickbackupmulti.utils.Translate;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.MessageScreen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -18,20 +21,21 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 
-import dev.skydynamic.quickbackupmulti.utils.Config;
+import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 import static dev.skydynamic.quickbackupmulti.utils.Translate.tr;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class QuickBackupMultiCommandManager {
-
     public static void RegisterCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> QuickBackupMultiShortCommand = dispatcher.register(literal("qb")
             .then(literal("list").executes(it -> listSaveBackups(it.getSource())))
@@ -120,6 +124,7 @@ public class QuickBackupMultiCommandManager {
                     QbDataHashMap.clear();
                     return 0;
                 }
+                EnvType env = FabricLoader.getInstance().getEnvironmentType();
                 String executePlayerName;
                 if (commandSource.isExecutedByPlayer()) {
                     executePlayerName = commandSource.getPlayer().getGameProfile().getName();
@@ -156,11 +161,36 @@ public class QuickBackupMultiCommandManager {
                     @Override
                     public void run() {
                         QbDataHashMap.clear();
-                        for (ServerPlayerEntity player : playerList) {
-                            player.networkHandler.disconnect(Text.of("Server restore backup"));
+                        if (env == EnvType.SERVER) {
+                            for (ServerPlayerEntity player : playerList) {
+                                player.networkHandler.disconnect(Text.of("Server restore backup"));
+                            }
+                            Config.TEMPCONFIG.setIsBackupValue(true);
+                            Config.TEMPCONFIG.server.stop(true);
+                        } else {
+                            MinecraftClient minecraftClient = MinecraftClient.getInstance();
+                            minecraftClient.execute(() -> {
+                                Config.TEMPCONFIG.setIsBackupValue(true);
+                                minecraftClient.world.disconnect();
+                                minecraftClient.disconnect(new MessageScreen(Text.of("Restore backup")));
+                                CompletableFuture.runAsync(() -> {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    minecraftClient.execute(() -> {
+                                        minecraftClient.setScreen(null);
+                                        restoreClient(slot);
+                                        Config.TEMPCONFIG.setIsBackupValue(false);
+                                        Text title = Text.of(tr("quickbackupmulti.toast.end_title"));
+                                        Text content = Text.of(tr("quickbackupmulti.toast.end_content"));
+                                        SystemToast.show(minecraftClient.toastManager, SystemToast.Type.PERIODIC_NOTIFICATION, title, content);
+                                    });
+                                });
+                            });
+
                         }
-                        Config.TEMPCONFIG.setIsBackupValue(true);
-                        Config.TEMPCONFIG.server.stop(false);
                     }
                 }, 10000);
             } else {
