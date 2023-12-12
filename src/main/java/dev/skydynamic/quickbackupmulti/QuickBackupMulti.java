@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restore;
-import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommandManager.RegisterCommand;
+import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
 
 public final class QuickBackupMulti implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("QuickBackupMulti");
@@ -23,15 +23,15 @@ public final class QuickBackupMulti implements ModInitializer {
 	public void onInitialize() {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> RegisterCommand(dispatcher));
 
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> Config.TEMPCONFIG.setServerValue(server));
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> Config.TEMP_CONFIG.setServerValue(server));
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			if (Config.TEMPCONFIG.isBackup) {
+			if (Config.TEMP_CONFIG.isBackup) {
 				if (env == EnvType.SERVER) {
-					restore(Config.TEMPCONFIG.backupSlot);
-					Config.TEMPCONFIG.setIsBackupValue(false);
-					Config.TEMPCONFIG.server.stopped = false;
-					Config.TEMPCONFIG.server.running = true;
-					Config.TEMPCONFIG.server.runServer();
+					restore(Config.TEMP_CONFIG.backupSlot);
+					Config.TEMP_CONFIG.setIsBackupValue(false);
+					Config.TEMP_CONFIG.server.stopped = false;
+					Config.TEMP_CONFIG.server.running = true;
+					Config.TEMP_CONFIG.server.runServer();
 				}
 			}
 		});

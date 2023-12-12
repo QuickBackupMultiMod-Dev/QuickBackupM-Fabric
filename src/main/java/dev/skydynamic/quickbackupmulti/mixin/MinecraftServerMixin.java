@@ -2,7 +2,7 @@ package dev.skydynamic.quickbackupmulti.mixin;
 
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
-import dev.skydynamic.quickbackupmulti.utils.Translate;
+import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.nio.file.Path;
 
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
-import static dev.skydynamic.quickbackupmulti.utils.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {

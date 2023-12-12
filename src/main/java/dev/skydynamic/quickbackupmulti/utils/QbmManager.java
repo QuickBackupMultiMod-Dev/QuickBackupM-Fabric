@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -14,8 +13,6 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.WorldSavePath;
-import net.minecraft.client.toast.SystemToast;
-import net.minecraft.client.toast.ToastManager;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -26,17 +23,15 @@ import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
-import static dev.skydynamic.quickbackupmulti.utils.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 
 public class QbmManager {
 
     public static Path backupDir = Path.of(System.getProperty("user.dir") + "/QuickBackupMulti/");
-    public static Path savePath = Config.TEMPCONFIG.server.getSavePath(WorldSavePath.ROOT);
+    public static Path savePath = Config.TEMP_CONFIG.server.getSavePath(WorldSavePath.ROOT);
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
 
     static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
@@ -151,14 +146,14 @@ public class QbmManager {
             FileUtils.copyDirectory(savePath.toFile(), backupDir.resolve("Slot" + slot).toFile(), fileFilter);
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;
-            commandSource.sendMessage(Text.of(String.format(tr("quickbackupmulti.make.success"), intervalTime)));
+            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.success", intervalTime)));
             writeBackupInfo(slot, desc);
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = false;
             }
         } catch (IOException e) {
-            commandSource.sendMessage(Text.of(String.format(tr("quickbackupmulti.make.fail"), e.getMessage())));
+            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.fail", e.getMessage())));
         }
         return 1;
     }
@@ -175,9 +170,9 @@ public class QbmManager {
                 reader.close();
                 int finalJ = j;
                 backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.restore"), finalJ)))));
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", finalJ)))));
                 deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(String.format(tr("quickbackupmulti.list_backup.slot.delete"), finalJ)))));
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", finalJ)))));
                 String desc = result.desc;
                 if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
                 long backupSizeB = getDirSize(backupDir.resolve("Slot" + j).toFile());
@@ -185,19 +180,19 @@ public class QbmManager {
                 double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
                 double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
                 String sizeString = (backupSizeMB >= 1000) ? String.format("%.2f GB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
-                resultText.append("\n" + String.format(tr("quickbackupmulti.list_backup.slot.header"), finalJ) + " ")
+                resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", finalJ) + " ")
                     .append(backText)
                     .append(deleteText)
                     .append("§2§l" + sizeString)
-                    .append(String.format(tr("quickbackupmulti.list_backup.slot.info"), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
+                    .append(tr("quickbackupmulti.list_backup.slot.info", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                resultText.append(Text.literal("\n"+ String.format(tr("quickbackupmulti.list_backup.slot.header"), j) + " §2[▷] §c[×] §rNone"));
+                resultText.append(Text.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §rNone"));
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
         double totalBackupSizeGB = (double) totalBackupSizeB / FileUtils.ONE_GB;
         String sizeString = (totalBackupSizeMB >= 1000) ? String.format("%.2fGB", totalBackupSizeGB) : String.format("%.2fMB", totalBackupSizeMB);
-        resultText.append("\n" + String.format(tr("quickbackupmulti.list_backup.slot.total_space"), sizeString));
+        resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.total_space", sizeString));
         return resultText;
     }
 
