@@ -40,9 +40,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew remapJar
 
+      - name: Move jars to root
+        run: mv ./versions/*/build/libs/*.jar .
+
       - name: Upload JAR file
         uses: actions/upload-artifact@v3
         with:
           name: QuickBackupMulti-Fabric
           path: |
-            ./versions/*/build/libs/
+            *.jar
