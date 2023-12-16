@@ -1,13 +1,17 @@
 name: build
 on:
-  push:
-    branches: [ 'main' ]
-    paths:
-      - src/**
-      - build.gradle
-      - gradle.properties
-      - settings.gradle
   workflow_dispatch:
+    inputs:
+      release:
+        type: boolean
+        required: false
+        description: ''
+        default: false
+      target_subproject:
+        description: The subproject name of the specified Minecraft version to be built. Leave it empty to build all
+        type: string
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -40,12 +44,28 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew remapJar
 
-      - name: Move jars to root
-        run: mv ./versions/*/build/libs/*.jar .
-
       - name: Upload JAR file
         uses: actions/upload-artifact@v3
         with:
           name: QuickBackupMulti-Fabric
           path: |
             *.jar
+
+  summary:
+    runs-on: ubuntu-22.04
+    needs:
+      - build
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: build-artifacts
+
+      - name: Make build summary
+        run: python3 .github/workflows/scripts/summary.py
+        env:
+          TARGET_SUBPROJECT: ${{ inputs.target_subproject }}
