@@ -21,10 +21,10 @@
 	"mixins": [
 		"quickbackupmulti.mixins.json"
 	],
-	"accessWidener" : "qbm.accesswidener",
+	"accessWidener": "qbm.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.14.24",
-		"minecraft": "~1.20.1",
+		"minecraft": "${minecraft_dependency}",
 		"java": ">=17",
 		"fabric-api": "*"
 	}

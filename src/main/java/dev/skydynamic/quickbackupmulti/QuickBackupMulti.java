@@ -4,7 +4,11 @@ import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+//#if MC>=11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+//#else
+//$$ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+//#endif
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import net.fabricmc.loader.api.FabricLoader;
@@ -21,8 +25,11 @@ public final class QuickBackupMulti implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		//#if MC>=11900
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> RegisterCommand(dispatcher));
-
+		//#else
+		//$$ CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> RegisterCommand(dispatcher));
+		//#endif
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> Config.TEMP_CONFIG.setServerValue(server));
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			if (Config.TEMP_CONFIG.isBackup) {

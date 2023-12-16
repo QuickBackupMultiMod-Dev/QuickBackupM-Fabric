@@ -130,11 +130,11 @@ public class QbmManager {
             if (slot == -1) slot = 1;
         }
         if (slot > Config.INSTANCE.getNumOfSlot() || slot < 1) {
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.no_slot")));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.no_slot")));
             return 0;
         }
         try {
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.start")));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.start")));
             MinecraftServer server = commandSource.getServer();
             server.saveAll(true, true, true);
             for (ServerWorld serverWorld : server.getWorlds()) {
@@ -146,25 +146,25 @@ public class QbmManager {
             FileUtils.copyDirectory(savePath.toFile(), backupDir.resolve("Slot" + slot).toFile(), fileFilter);
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.success", intervalTime)));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
             writeBackupInfo(slot, desc);
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = false;
             }
         } catch (IOException e) {
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.make.fail", e.getMessage())));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getMessage())));
         }
         return 1;
     }
 
     public static MutableText list() {
-        MutableText resultText = Text.literal(tr("quickbackupmulti.list_backup.title"));
+        MutableText resultText = Messenger.literal(tr("quickbackupmulti.list_backup.title"));
         long totalBackupSizeB = 0;
         for (int j=1;j<=Config.INSTANCE.getNumOfSlot();j++) {
             try {
-                MutableText backText = Text.literal("§2[▷] ");
-                MutableText deleteText = Text.literal("§c[×] ");
+                MutableText backText = Messenger.literal("§2[▷] ");
+                MutableText deleteText = Messenger.literal("§c[×] ");
                 var reader = new FileReader(backupDir.resolve("Slot" + j + "_info.json").toFile());
                 var result = gson.fromJson(reader, SlotInfoStorage.class);
                 reader.close();
@@ -186,7 +186,7 @@ public class QbmManager {
                     .append("§2§l" + sizeString)
                     .append(tr("quickbackupmulti.list_backup.slot.info", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                resultText.append(Text.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §rNone"));
+                resultText.append(Messenger.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §rNone"));
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;

@@ -1,12 +1,14 @@
 package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.skydynamic.quickbackupmulti.backup.RestoreTask;
 import dev.skydynamic.quickbackupmulti.i18n.LangSuggestionProvider;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
+import dev.skydynamic.quickbackupmulti.utils.Messenger;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
@@ -85,12 +87,12 @@ public class QuickBackupMultiCommand {
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> QbDataHashMap = new ConcurrentHashMap<>();
 
     private static int getLang(ServerCommandSource commandSource) {
-        commandSource.sendMessage(Text.of(tr("quickbackupmulti.lang.get", Config.INSTANCE.getLang())));
+        Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.get", Config.INSTANCE.getLang())));
         return 1;
     }
 
     private static int setLang(ServerCommandSource commandSource, String lang) {
-        commandSource.sendMessage(Text.of(tr("quickbackupmulti.lang.set", lang)));
+        Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.set", lang)));
         Translate.handleResourceReload(lang);
         Config.INSTANCE.setLang(lang);
         return 1;
@@ -101,14 +103,14 @@ public class QuickBackupMultiCommand {
     }
 
     private static int deleteSaveBackup(ServerCommandSource commandSource, int slot) {
-        if (delete(slot)) commandSource.sendMessage(Text.of(tr("quickbackupmulti.delete.success", slot)));
-        else commandSource.sendMessage(Text.of(tr("quickbackupmulti.delete.fail", slot)));
+        if (delete(slot)) Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.success", slot)));
+        else Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.fail", slot)));
         return 1;
     }
 
     private static int restoreSaveBackup(ServerCommandSource commandSource, int slot) {
         if (!backupDir.resolve("Slot" + slot + "_info.json").toFile().exists()) {
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.restore.fail")));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
             return 0;
         }
         ConcurrentHashMap<String, Object> restoreDataHashMap = new ConcurrentHashMap<>();
@@ -117,30 +119,34 @@ public class QuickBackupMultiCommand {
         restoreDataHashMap.put("Countdown", Executors.newSingleThreadScheduledExecutor());
         synchronized (QbDataHashMap) {
             QbDataHashMap.put("QBM", restoreDataHashMap);
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.restore.confirm_hint")));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.confirm_hint")));
             return 1;
         }
     }
 
-    private static int executeRestore(ServerCommandSource commandSource) {
+    //#if MC>11900
+    private static void executeRestore(ServerCommandSource commandSource) {
+    //#else
+    //$$ private static void executeRestore(ServerCommandSource commandSource) throws CommandSyntaxException {
+    //#endif
         synchronized (QbDataHashMap) {
             if (QbDataHashMap.containsKey("QBM")) {
                 if (!backupDir.resolve("Slot" + QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
-                    commandSource.sendMessage(Text.of(tr("quickbackupmulti.restore.fail")));
+                    Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
                     QbDataHashMap.clear();
-                    return 0;
+                    return;
                 }
                 EnvType env = FabricLoader.getInstance().getEnvironmentType();
                 String executePlayerName;
-                if (commandSource.isExecutedByPlayer()) {
+                if (commandSource.getPlayer() != null) {
                     executePlayerName = commandSource.getPlayer().getGameProfile().getName();
                 } else {
                     executePlayerName = "Console";
                 }
-                commandSource.sendMessage(Text.of(tr("quickbackupmulti.restore.abort_hint")));
+                Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.abort_hint")));
                 MinecraftServer server = commandSource.getServer();
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                    player.sendMessage(Text.of(tr("quickbackupmulti.restore.countdown.intro", executePlayerName)));
+                    player.sendMessage(Text.of(tr("quickbackupmulti.restore.countdown.intro", executePlayerName)), false);
                 }
                 int slot = (int) QbDataHashMap.get("QBM").get("Slot");
                 Config.TEMP_CONFIG.setBackupSlot(slot);
@@ -152,11 +158,15 @@ public class QuickBackupMultiCommand {
                     int remaining = countDown.decrementAndGet();
                     if (remaining >= 1) {
                         for (ServerPlayerEntity player : playerList) {
-                            MutableText content = Text.literal(tr("quickbackupmulti.restore.countdown.text", remaining, slot))
-                                    .append(Text.literal(tr("quickbackupmulti.restore.countdown.hover"))
+                            //#if MC>11900
+                            MutableText content = Messenger.literal(tr("quickbackupmulti.restore.countdown.text", remaining, slot))
+                            //#else
+                            //$$ BaseText content = (BaseText) Messenger.literal(tr("quickbackupmulti.restore.countdown.text", remaining, slot))
+                            //#endif
+                                    .append(Messenger.literal(tr("quickbackupmulti.restore.countdown.hover"))
                                             .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb cancel")))
                                             .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.restore.countdown.hover"))))));
-                            player.sendMessage(content);
+                            player.sendMessage(content, false);
                             logger.info(content.getString());
                         }
                     } else {
@@ -166,9 +176,8 @@ public class QuickBackupMultiCommand {
 
                 timer.schedule(new RestoreTask(env, playerList, slot), 10000);
             } else {
-                commandSource.sendMessage(Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));
+                Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));
             }
-            return 1;
         }
     }
 
@@ -181,17 +190,17 @@ public class QuickBackupMultiCommand {
                 countdown.shutdown();
                 QbDataHashMap.clear();
                 Config.TEMP_CONFIG.setIsBackupValue(false);
-                commandSource.sendMessage(Text.of(tr("quickbackupmulti.restore.abort")));
+                Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.abort")));
             }
         } else {
-            commandSource.sendMessage(Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));
         }
         return 1;
     }
 
     private static int listSaveBackups(ServerCommandSource commandSource) {
         MutableText resultText = list();
-        commandSource.sendMessage(resultText);
+        Messenger.sendMessage(commandSource, resultText);
         return 1;
     }
 }
