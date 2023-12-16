@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils;
+package dev.skydynamic.quickbackupmulti.i18n;
 
 import org.yaml.snakeyaml.Yaml;
 import org.apache.commons.io.IOUtils;
@@ -16,16 +16,13 @@ public class Translate {
 
     public static Map<String, String> getTranslationFromResourcePath(String lang) {
         InputStream langFile = Translate.class.getClassLoader().getResourceAsStream("assets/quickbackupmulti/lang/%s.yml".formatted(lang));
-        if (langFile == null)
-        {
+        if (langFile == null) {
             return Collections.emptyMap();
         }
         String yamlData;
-        try
-        {
+        try {
             yamlData = IOUtils.toString(langFile, StandardCharsets.UTF_8);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             return Collections.emptyMap();
         }
         Yaml yaml = new Yaml();
@@ -38,13 +35,13 @@ public class Translate {
     }
 
     public static String translate(String key, Object... args) {
-        String fmt = translateMap.getOrDefault(key,key);
+        String fmt = translateMap.getOrDefault(key, key);
         if (!translateMap.containsKey(key)) return key;
-        return MessageFormat.format(fmt, args);
+        return String.format(fmt, args);
     }
 
     public static String tr(String k, Object... o) {
-        return translate(k,o);
+        return translate(k, o);
     }
 
     private static Map<String, String> addMapToResult(String prefix, Map<String, Object> map) {

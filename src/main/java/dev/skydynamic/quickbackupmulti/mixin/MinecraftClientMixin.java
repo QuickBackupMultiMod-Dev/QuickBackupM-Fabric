@@ -12,16 +12,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static dev.skydynamic.quickbackupmulti.utils.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 
 @Mixin(MinecraftClient.class)
 public class MinecraftClientMixin {
 
-    @Shadow @Final private ToastManager toastManager;
+    @Shadow @Final
+    public ToastManager toastManager;
 
     @Inject(method = "setScreen", at = @At("RETURN"))
     void inj(CallbackInfo ci) {
-        if (Config.TEMPCONFIG.isBackup) {
+        if (Config.TEMP_CONFIG.isBackup) {
             Text title = Text.of(tr("quickbackupmulti.toast.start_title"));
             Text content = Text.of(tr("quickbackupmulti.toast.start_content"));
             SystemToast.show(this.toastManager, SystemToast.Type.PERIODIC_NOTIFICATION, title, content);
