@@ -48,9 +48,9 @@ jobs:
       - name: Upload JAR file
         uses: actions/upload-artifact@v3
         with:
-          name: QuickBackupMulti-Fabric
+          name: build-artifacts
           path: |
-            *.jar
+            path: versions/*/build/libs/
 
   summary:
     runs-on: ubuntu-22.04
