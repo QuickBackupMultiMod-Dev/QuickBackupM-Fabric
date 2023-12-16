@@ -43,6 +43,7 @@ public class Translate {
         return translate(k, o);
     }
 
+    @SuppressWarnings("unchecked")
     private static Map<String, String> addMapToResult(String prefix, Map<String, Object> map) {
         Map<String, String> resultMap = new HashMap<>();
         for (Map.Entry<String, Object> entry : map.entrySet()) {

@@ -43,7 +43,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew remapJar
+        run: ./gradlew remapJar --no-daemon
+        env:
+          BUILD_ID: ${{ github.run_number }}
+          BUILD_RELEASE: ${{ inputs.release }}
 
       - name: Upload JAR file
         uses: actions/upload-artifact@v3
