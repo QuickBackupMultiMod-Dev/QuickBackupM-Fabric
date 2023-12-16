@@ -44,7 +44,11 @@ public class ClientRestoreDelegate {
                     Config.TEMP_CONFIG.setIsBackupValue(false);
                     Text title = Text.of(tr("quickbackupmulti.toast.end_title"));
                     Text content = Text.of(tr("quickbackupmulti.toast.end_content"));
+                    //#if MC>=11800
                     SystemToast.show(minecraftClient.toastManager, SystemToast.Type.PERIODIC_NOTIFICATION, title, content);
+                    //#else
+                    //$$ SystemToast.show(minecraftClient.toastManager, SystemToast.Type.WORLD_BACKUP, title, content);
+                    //#endif
                 });
             });
         });

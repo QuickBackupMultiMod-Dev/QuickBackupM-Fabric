@@ -136,7 +136,11 @@ public class QbmManager {
         try {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.start")));
             MinecraftServer server = commandSource.getServer();
+            //#if MC>11800
             server.saveAll(true, true, true);
+            //#else
+            //$$ server.save(true, true, true);
+            //#endif
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = true;

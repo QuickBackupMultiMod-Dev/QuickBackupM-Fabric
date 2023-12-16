@@ -25,7 +25,11 @@ public class MinecraftClientMixin {
         if (Config.TEMP_CONFIG.isBackup) {
             Text title = Text.of(tr("quickbackupmulti.toast.start_title"));
             Text content = Text.of(tr("quickbackupmulti.toast.start_content"));
+            //#if MC>=11800
             SystemToast.show(this.toastManager, SystemToast.Type.PERIODIC_NOTIFICATION, title, content);
+            //#else
+            //$$ SystemToast.show(this.toastManager, SystemToast.Type.WORLD_BACKUP, title, content);
+            //#endif
         }
     }
 

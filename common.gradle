@@ -40,8 +40,10 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
     implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.1'
 }
 
 String versionSuffix = ''

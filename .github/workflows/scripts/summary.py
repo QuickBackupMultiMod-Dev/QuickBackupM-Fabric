@@ -2,7 +2,7 @@
 A script to scan through all valid mod jars in build-artifacts.zip/$version/build/libs,
 and generate an artifact summary table for that to GitHub action step summary
 """
-__author__ = 'Fallen_Breath'
+__author__ = ['Fallen_Breath', 'Sky_Dynamic']
 
 import glob
 import json
@@ -19,7 +19,7 @@ def read_prop(file_name: str, key: str) -> str:
 
 target_subproject = os.environ.get('TARGET_SUBPROJECT', '')
 with open('.github/workflows/matrix_includes.json') as f:
-	matrix: list[dict] = json.load(f)
+	matrix: list[str] = json.load(f)
 
 with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
 	f.write('## Build Artifacts Summary\n\n')
@@ -27,7 +27,7 @@ with open(os.environ['GITHUB_STEP_SUMMARY'], 'w') as f:
 	f.write('| --- | --- | --- |\n')
 
 	for m in matrix:
-		subproject = m['subproject_dir']
+		subproject = m
 		if target_subproject != '' and subproject != target_subproject:
 			continue
 		game_versions = read_prop('versions/{}/gradle.properties'.format(subproject), 'game_versions')
