@@ -35,7 +35,6 @@ quickbackupmulti:
       restore: Click to restore to slot §6%s§r
       delete: Click to delete slot §6%s§r
       total_space: "Total space consumed: §a%s§r"
-      info: " §rDate: %s; Desc: %s"
 
   restore:
     countdown:

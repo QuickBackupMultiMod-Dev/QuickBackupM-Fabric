@@ -183,14 +183,14 @@ public class QbmManager {
                 totalBackupSizeB += backupSizeB;
                 double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
                 double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
-                String sizeString = (backupSizeMB >= 1000) ? String.format("%.2f GB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
+                String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
                 resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", finalJ) + " ")
                     .append(backText)
                     .append(deleteText)
-                    .append("§2§l" + sizeString)
-                    .append(tr("quickbackupmulti.list_backup.slot.info", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
+                    .append("§a" + sizeString)
+                    .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                resultText.append(Messenger.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §rNone"));
+                resultText.append(Messenger.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §r") + tr("quickbackupmulti.empty_comment"));
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
