@@ -1,6 +1,9 @@
 package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+//#if MC<11900
+//$$ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+//#endif
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
