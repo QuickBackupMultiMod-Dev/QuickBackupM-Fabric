@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/github/license/SkyDynamic/QuickBackupM-Fabric.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Issues](https://img.shields.io/github/issues/SkyDynamic/QuickBackupM-Fabric.svg)](https://github.com/SkyDynamic/QuickBackupM-Fabric/issues)
 <div align="center">
 <a><img src="./indexImg.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
 </div>
@@ -5,13 +7,19 @@
 
 # QuickBackupMulti-Fabric
 
-_✨ MC备份 / 回档插件 ✨_  
+**简体中文** | [English](README_EN.MD)
+
+_✨ MC备份 / 回档模组 ✨_  
 重构自MCDR插件: [QuickBackupMulti](https://github.com/TISUnion/QuickBackupM)
 
 </div>
 
 > [!WARNING]  
 > 本 Mod 对于客户端单人游戏兼容性较差，使用时请谨慎，若造成存档损坏本 Mod 不负任何责任
+
+## 本Mod优势
+- 支持回档自动重启服务器, 不再是只备份不回档
+- 支持定时备份, 并支持自定义cron表达式
 
 ## 使用方式
 > 在使用mod前请确保你已安装Fabric Loader
@@ -20,6 +28,12 @@ _✨ MC备份 / 回档插件 ✨_
 
 ## 指令
 `/qb` 或 `/quickbackupmulti`均可触发mod
+
+## todo
+- [x] 定时备份
+- [ ] 无限槽位
+- [ ] Hash对比并仅备份差异文件
+- [ ] 个性化设置
 
 ## 许可
 本项目遵循 [Apache-2.0 license](https://www.apache.org/licenses/LICENSE-2.0) 许可
