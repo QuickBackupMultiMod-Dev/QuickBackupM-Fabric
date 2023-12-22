@@ -19,7 +19,7 @@ Idea come from: [QuickBackupMulti](https://github.com/TISUnion/QuickBackupM)
 
 ## Advantage
 - Support auto start server after restore backup
-- Support schedule backup
+- Support schedule backup and custom cron expression.
 
 ## How to use
 > Please install Fabric Loader before install this mod
