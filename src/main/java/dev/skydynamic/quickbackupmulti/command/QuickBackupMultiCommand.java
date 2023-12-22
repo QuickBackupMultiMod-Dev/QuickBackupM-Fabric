@@ -1,7 +1,6 @@
 package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -109,7 +108,7 @@ public class QuickBackupMultiCommand {
     }
 
     private static int restoreSaveBackup(ServerCommandSource commandSource, int slot) {
-        if (!backupDir.resolve("Slot" + slot + "_info.json").toFile().exists()) {
+        if (!getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists()) {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
             return 0;
         }
@@ -131,7 +130,7 @@ public class QuickBackupMultiCommand {
     //#endif
         synchronized (QbDataHashMap) {
             if (QbDataHashMap.containsKey("QBM")) {
-                if (!backupDir.resolve("Slot" + QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
+                if (!getBackupDir().resolve("Slot" + QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
                     Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
                     QbDataHashMap.clear();
                     return;

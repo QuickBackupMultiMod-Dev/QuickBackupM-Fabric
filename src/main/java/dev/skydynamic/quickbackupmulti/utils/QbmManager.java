@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -26,15 +28,23 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 
 public class QbmManager {
-
     public static Path backupDir = Path.of(System.getProperty("user.dir") + "/QuickBackupMulti/");
     public static Path savePath = Config.TEMP_CONFIG.server.getSavePath(WorldSavePath.ROOT);
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
 
     static Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
+
+    public static Path getBackupDir() {
+        if (Config.TEMP_CONFIG.env == EnvType.SERVER) {
+            return backupDir;
+        } else {
+            return backupDir.resolve(Config.TEMP_CONFIG.worldName);
+        }
+    }
 
     private static class SlotInfoStorage {
         String desc;
@@ -59,7 +69,7 @@ public class QbmManager {
             ConcurrentHashMap<String, Object> data = new ConcurrentHashMap<>();
             data.put("desc", desc);
             data.put("timestamp", System.currentTimeMillis());
-            var writer = new FileWriter(backupDir.resolve("Slot" + slot + "_info.json").toFile());
+            var writer = new FileWriter(getBackupDir().resolve("Slot" + slot + "_info.json").toFile());
             gson.toJson(data, writer);
             writer.close();
         } catch (Exception e) {
@@ -73,11 +83,11 @@ public class QbmManager {
     }
 
     private static boolean checkSlotExist(int slot) {
-        return backupDir.resolve("Slot" + slot + "_info.json").toFile().exists();
+        return getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists();
     }
 
     public static void restoreClient(int slot) {
-        File targetBackupSlot = backupDir.resolve("Slot" + slot).toFile();
+        File targetBackupSlot = getBackupDir().resolve("Slot" + slot).toFile();
         try {
             savePath.resolve("level.dat").toFile().delete();
             savePath.resolve("level.dat_old").toFile().delete();
@@ -103,7 +113,7 @@ public class QbmManager {
     }
 
     public static void restore(int slot) {
-        File targetBackupSlot = backupDir.resolve("Slot" + slot).toFile();
+        File targetBackupSlot = getBackupDir().resolve("Slot" + slot).toFile();
         try {
 //            var it = Files.walk(savePath,5).sorted(Comparator.reverseOrder()).iterator();
 //            while (it.hasNext()){
@@ -145,9 +155,9 @@ public class QbmManager {
                 if (serverWorld == null || serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = true;
             }
-            if (!backupDir.resolve("Slot" + slot).toFile().exists()) backupDir.resolve("Slot" + slot).toFile().mkdir();
-            if (Objects.requireNonNull(backupDir.resolve("Slot" + slot).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(backupDir.resolve("Slot" + slot).toFile());
-            FileUtils.copyDirectory(savePath.toFile(), backupDir.resolve("Slot" + slot).toFile(), fileFilter);
+            if (!getBackupDir().resolve("Slot" + slot).toFile().exists()) getBackupDir().resolve("Slot" + slot).toFile().mkdir();
+            if (Objects.requireNonNull(getBackupDir().resolve("Slot" + slot).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
+            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve("Slot" + slot).toFile(), fileFilter);
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
@@ -169,7 +179,7 @@ public class QbmManager {
             try {
                 MutableText backText = Messenger.literal("§2[▷] ");
                 MutableText deleteText = Messenger.literal("§c[×] ");
-                var reader = new FileReader(backupDir.resolve("Slot" + j + "_info.json").toFile());
+                var reader = new FileReader(getBackupDir().resolve("Slot" + j + "_info.json").toFile());
                 var result = gson.fromJson(reader, SlotInfoStorage.class);
                 reader.close();
                 int finalJ = j;
@@ -179,7 +189,7 @@ public class QbmManager {
                     .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", finalJ)))));
                 String desc = result.desc;
                 if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
-                long backupSizeB = getDirSize(backupDir.resolve("Slot" + j).toFile());
+                long backupSizeB = getDirSize(getBackupDir().resolve("Slot" + j).toFile());
                 totalBackupSizeB += backupSizeB;
                 double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
                 double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
@@ -190,7 +200,7 @@ public class QbmManager {
                     .append("§a" + sizeString)
                     .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                resultText.append(Messenger.literal("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §r") + tr("quickbackupmulti.empty_comment"));
+                resultText.append("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §r" + tr("quickbackupmulti.empty_comment"));
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
@@ -201,15 +211,26 @@ public class QbmManager {
     }
 
     public static boolean delete(int slot) {
-        if (backupDir.resolve("Slot" + slot + "_info.json").toFile().exists() || backupDir.resolve("Slot" + slot).toFile().exists()) {
+        if (getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists() || getBackupDir().resolve("Slot" + slot).toFile().exists()) {
             try {
-                backupDir.resolve("Slot" + slot + "_info.json").toFile().delete();
-                FileUtils.deleteDirectory(backupDir.resolve("Slot" + slot).toFile());
+                getBackupDir().resolve("Slot" + slot + "_info.json").toFile().delete();
+                FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
                 return true;
             } catch (SecurityException | IOException e) {
                 return false;
             }
         } else return false;
+    }
+
+    public static void createBackupDir(Path path) {
+        if (!path.toFile().exists()) {
+            LOGGER.info(tr("quickbackupmulti.init.start"));
+            path.toFile().mkdirs();
+            LOGGER.info(tr("quickbackupmulti.init.finish"));
+        }
+        for(int j = 1; j<= Config.INSTANCE.getNumOfSlot(); j++) {
+            if (!path.resolve("Slot" + j).toFile().exists()) path.resolve("Slot" + j).toFile().mkdir();
+        }
     }
 
 }

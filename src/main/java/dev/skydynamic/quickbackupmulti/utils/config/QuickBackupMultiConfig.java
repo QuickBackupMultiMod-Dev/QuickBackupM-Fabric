@@ -96,6 +96,12 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public boolean getShouldCheckUpdate() {
+        synchronized (lock) {
+            return configStorage.shouldCheckUpdate;
+        }
+    }
+
     public void setLang(String lang) {
         synchronized (lock) {
             configStorage.lang = lang;
