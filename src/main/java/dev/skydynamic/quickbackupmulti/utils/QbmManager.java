@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -128,8 +127,7 @@ public class QbmManager {
         }
     }
 
-    public static int make(ServerCommandSource commandSource, int slot, String desc) {
-        long startTime = System.currentTimeMillis();
+    private static int getSlot(int slot) {
         if (slot == -1) {
             for (int j=1;j<=Config.INSTANCE.getNumOfSlot();j++) {
                 if (!checkSlotExist(j)) {
@@ -139,6 +137,39 @@ public class QbmManager {
             }
             if (slot == -1) slot = 1;
         }
+        return slot;
+    }
+
+    public static boolean scheduleMake(ServerCommandSource commandSource, int slot) {
+        slot = getSlot(slot);
+        try {
+            MinecraftServer server = commandSource.getServer();
+            //#if MC>11800
+            server.saveAll(true, true, true);
+            //#else
+            //$$ server.save(true, true, true);
+            //#endif
+            for (ServerWorld serverWorld : server.getWorlds()) {
+                if (serverWorld == null || serverWorld.savingDisabled) continue;
+                serverWorld.savingDisabled = true;
+            }
+            if (!getBackupDir().resolve("Slot" + slot).toFile().exists()) getBackupDir().resolve("Slot" + slot).toFile().mkdir();
+            if (Objects.requireNonNull(getBackupDir().resolve("Slot" + slot).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
+            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve("Slot" + slot).toFile(), fileFilter);
+            writeBackupInfo(slot, "Scheduled Backup");
+            for (ServerWorld serverWorld : server.getWorlds()) {
+                if (serverWorld == null || !serverWorld.savingDisabled) continue;
+                serverWorld.savingDisabled = false;
+            }
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static int make(ServerCommandSource commandSource, int slot, String desc) {
+        long startTime = System.currentTimeMillis();
+        slot = getSlot(slot);
         if (slot > Config.INSTANCE.getNumOfSlot() || slot < 1) {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.no_slot")));
             return 0;

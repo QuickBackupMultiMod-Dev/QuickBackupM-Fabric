@@ -96,9 +96,27 @@ public class QuickBackupMultiConfig {
         }
     }
 
-    public boolean getShouldCheckUpdate() {
+    public boolean getScheduleBackup() {
         synchronized (lock) {
-            return configStorage.shouldCheckUpdate;
+            return configStorage.scheduleBackup;
+        }
+    }
+
+    public String getScheduleCron() {
+        synchronized (lock) {
+            return configStorage.scheduleCron;
+        }
+    }
+
+    public int getScheduleInrerval() {
+        synchronized (lock) {
+            return configStorage.scheduleInterval;
+        }
+    }
+
+    public String getScheduleMode() {
+        synchronized (lock) {
+            return configStorage.scheduleMode;
         }
     }
 
@@ -108,4 +126,33 @@ public class QuickBackupMultiConfig {
             saveModifiedConfig(configStorage);
         }
     }
+
+    public void setScheduleCron(String value) {
+        synchronized (lock) {
+            configStorage.scheduleCron = value;
+            saveModifiedConfig(configStorage);
+        }
+    }
+
+    public void setScheduleInterval(int value) {
+        synchronized (lock) {
+            configStorage.scheduleInterval = value;
+            saveModifiedConfig(configStorage);
+        }
+    }
+
+    public void setScheduleBackup(boolean value) {
+        synchronized (lock) {
+            configStorage.scheduleBackup = value;
+            saveModifiedConfig(configStorage);
+        }
+    }
+
+    public void setScheduleMode(String mode) {
+        synchronized (lock) {
+            configStorage.scheduleMode = mode;
+            saveModifiedConfig(configStorage);
+        }
+    }
+
 }

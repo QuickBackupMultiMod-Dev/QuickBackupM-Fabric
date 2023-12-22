@@ -1,6 +1,28 @@
 quickbackupmulti:
   empty_comment: §7空§r
 
+  schedule:
+    get: "下一次备份时间为: §b%s"
+    get_fail: "定时备份未启用"
+    mode:
+      get: "当前设置的§a定时备份模式§r为: §4§l%s§r"
+    switch:
+      set: "定时备份模式切换到: §a%s"
+      fail: "定时备份切换失败: §c%s"
+    enable:
+      success: "定时备份已开启, 下一次触发备份时间: §b%s"
+      fail: "定时备份启用失败: §c%s"
+    disable:
+      success: "定时备份已关闭"
+      fail: "定时备份关闭失败: §c%s"
+    execute:
+      finish: "定时备份完成, 下一次触发备份时间: §b%s"
+    cron:
+      set_custom_success: "自定义定时备份设置成功, 下一次触发备份时间: §b%s"
+      set_success: "定时备份设置成功, 下一次触发备份时间: §b%s"
+      set_fail: "定时备份设置失败: §c%s"
+      expression_error: 你输入的Cron表达式有误
+
   toast:
     start_title: 正在进行回档...请稍等!
     start_content: 在此期间请勿进入存档!

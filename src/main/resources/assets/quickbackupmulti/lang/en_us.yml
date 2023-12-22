@@ -1,6 +1,28 @@
 quickbackupmulti:
   empty_comment: §7Empty§r
 
+  schedule:
+    get: "Next backup time is: §b%s"
+    get_fail: "Schedule Backup do not enable"
+    mode:
+      get: "The current §aschedule mode§r is: §4§l%s§r"
+    switch:
+      set: "Schedule mode switch to: §a%s"
+      fail: "Schedule mode switch fail: §c%s"
+    enable:
+      success: "Schedule backup started, the next execute time: §b%s"
+      fail: "Schedule backup start fail: §c%s"
+    disable:
+      success: "Schedule backup shutdown!"
+      fail: "Schedule backup shutdown fail: §c%s"
+    execute:
+      finish: "Finish to backup, the next execute time: §b%s"
+    cron:
+      set_custom_success: "Custom cron set success, the next execute time: §b%s"
+      set_success: "set success, the next execute time: §b%s"
+      set_fail: "set fail: §c%s"
+      expression_error: The Cron expression you entered is non-standard!
+
   toast:
     start_title: Restoring now...Please wait a moment
     start_content: Don't join world in this time!
@@ -8,7 +30,7 @@ quickbackupmulti:
     end_content: Now you can join your save!
 
   lang:
-    get: "The current §alanguage§r set is: §4§l%s§r"
+    get: "The current §alanguage§r is: §4§l%s§r"
     set: "§aLanguage§r has been set to: §4§l%s§r"
 
   confirm_restore:
