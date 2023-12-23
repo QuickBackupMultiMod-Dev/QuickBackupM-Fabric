@@ -1,6 +1,9 @@
+import net.fabricmc.loom.task.RemapJarTask
+
 apply plugin: 'maven-publish'
 apply plugin: 'fabric-loom'
 apply plugin: 'com.replaymod.preprocess'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 int mcVersion = 1
 
@@ -10,6 +13,8 @@ preprocess {
 }
 
 configurations {
+    api.extendsFrom includeApi
+    shadowInclude
     modRuntimeOnly.exclude group: 'net.fabricmc', module: 'fabric-loader'
 }
 
@@ -41,10 +46,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
-    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.1'
-    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.3.2'
+    shadowInclude implementation('commons-io:commons-io:2.15.1')
+    shadowInclude implementation('org.yaml:snakeyaml:2.0')
+    shadowInclude implementation('org.slf4j:slf4j-api:2.0.1')
+    shadowInclude implementation('org.quartz-scheduler:quartz:2.3.2')
 }
 
 String versionSuffix = ''
@@ -82,6 +87,24 @@ java {
 
 jar {
     from "LICENSE"
+}
+
+shadowJar {
+    archiveClassifier = "all-dev"
+    configurations = [project.configurations.shadowInclude]
+    minimize()
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
+    relocate "org.quartz", "dev.skydynamic.quickbackupmulti.deps.quartz"
+}
+
+task("remapShadowJar", type: RemapJarTask, dependsOn: shadowJar) {
+    input = shadowJar.archiveFile
+    archiveFileName = shadowJar.archiveFileName.get().replaceAll("-all-dev\\.jar\$", ".jar")
+    addNestedDependencies = true
+    File sourceJarFile = projectDir.toPath().resolve("build").resolve("libs").resolve(shadowJar.archiveFileName.get()).toFile()
+    sourceJarFile.delete()
 }
 
 publishing {
