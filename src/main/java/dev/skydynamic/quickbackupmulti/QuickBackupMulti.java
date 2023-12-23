@@ -16,7 +16,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restore;
 import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
 

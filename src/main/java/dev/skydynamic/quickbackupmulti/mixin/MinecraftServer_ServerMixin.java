@@ -14,11 +14,11 @@ import java.nio.file.Path;
 
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.createBackupDir;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildTrigger;
+import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildScheduler;
 
 @Environment(EnvType.SERVER)
 @Mixin(MinecraftServer.class)
-public abstract class MinecraftServer_ServerMixin {
+public class MinecraftServer_ServerMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void setServer(CallbackInfo ci) {
@@ -31,7 +31,7 @@ public abstract class MinecraftServer_ServerMixin {
         createBackupDir(backupDir);
         if (Config.INSTANCE.getScheduleBackup()) {
             try {
-                buildTrigger();
+                buildScheduler();
                 Config.TEMP_CONFIG.scheduler.start();
                 Config.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
                 LOGGER.info("QBM Schedule backup started.");
