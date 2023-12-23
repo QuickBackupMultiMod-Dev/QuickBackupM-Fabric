@@ -52,7 +52,7 @@ String versionSuffix = ''
 // https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables
 if (System.getenv("BUILD_RELEASE") != "true") {
     String buildNumber = System.getenv("BUILD_ID")
-    versionSuffix += buildNumber != null ? ('+build.' + buildNumber) : '-SNAPSHOT'
+    versionSuffix += buildNumber != null ? ('+build.' + buildNumber) : '+SNAPSHOT'
 }
 String fullModVersion = project.mod_version + versionSuffix
 
@@ -67,7 +67,7 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         def valueMap = [
-                "version": project.version,
+                "version": fullModVersion,
                 "id": project.mod_id,
                 "name": project.archives_base_name,
                 "minecraft_dependency": project.minecraft_version,

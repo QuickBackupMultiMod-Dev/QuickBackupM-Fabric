@@ -19,8 +19,9 @@ quickbackupmulti:
       finish: "Finish to backup, the next execute time: §b%s"
     cron:
       set_custom_success: "Custom cron set success, the next execute time: §b%s"
-      set_success: "set success, the next execute time: §b%s"
-      set_fail: "set fail: §c%s"
+      set_success: "Set success, the next execute time: §b%s"
+      set_success_only: "Set success, but you do not enable schedule backup"
+      set_fail: "Set fail: §c%s"
       expression_error: The Cron expression you entered is non-standard!
 
   toast:

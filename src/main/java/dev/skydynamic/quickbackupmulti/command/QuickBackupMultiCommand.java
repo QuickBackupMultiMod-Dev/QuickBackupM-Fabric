@@ -134,9 +134,9 @@ public class QuickBackupMultiCommand {
     private static int switchMode(ServerCommandSource commandSource, String mode) {
             Config.INSTANCE.setScheduleMode(mode);
         try {
-            Config.TEMP_CONFIG.scheduler.shutdown();
-            buildScheduler();
             if (Config.INSTANCE.getScheduleBackup()) {
+                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+                buildScheduler();
                 Config.TEMP_CONFIG.scheduler.start();
             }
         } catch (SchedulerException e) {
@@ -150,14 +150,18 @@ public class QuickBackupMultiCommand {
     private static int setScheduleCron(ServerCommandSource commandSource, String value) {
         try {
             if (cronIsValid(value)) {
-                Config.TEMP_CONFIG.scheduler.shutdown();
-                buildScheduler();
-                Config.INSTANCE.setScheduleCron(value);
+                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
                 if (Config.INSTANCE.getScheduleBackup()) {
+                    Config.INSTANCE.setScheduleCron(value);
+                    buildScheduler();
                     Config.TEMP_CONFIG.scheduler.start();
+                    Messenger.sendMessage(commandSource,
+                        Messenger.literal(tr("quickbackupmulti.schedule.cron.set_custom_success", getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false))));
+                } else {
+                    Config.INSTANCE.setScheduleCron(value);
+                    Messenger.sendMessage(commandSource,
+                        Messenger.literal(tr("quickbackupmulti.schedule.cron.set_custom_success_only")));
                 }
-                Messenger.sendMessage(commandSource,
-                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_custom_success", getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false))));
             } else {
                 Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.cron.expression_error")));
                 return 0;
@@ -177,12 +181,15 @@ public class QuickBackupMultiCommand {
                 case "h" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, value, 0));
                 case "d" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, 0, value));
             }
-            buildScheduler();
             if (Config.INSTANCE.getScheduleBackup()) {
+                buildScheduler();
                 Config.TEMP_CONFIG.scheduler.start();
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L))));
+            } else {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success_only")));
             }
-            Messenger.sendMessage(commandSource,
-                Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L))));
             return 1;
         } catch (SchedulerException e) {
             Messenger.sendMessage(commandSource,
@@ -211,7 +218,7 @@ public class QuickBackupMultiCommand {
                 case "interval" -> nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
             }
             Config.INSTANCE.setScheduleBackup(true);
-            Config.TEMP_CONFIG.scheduler.shutdown();
+            if (Config.TEMP_CONFIG.scheduler != null) Config.TEMP_CONFIG.scheduler.shutdown();
             buildScheduler();
             Config.TEMP_CONFIG.scheduler.start();
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.success", nextBackupTimeString)));

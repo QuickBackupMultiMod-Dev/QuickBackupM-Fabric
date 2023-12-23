@@ -3,7 +3,6 @@ package dev.skydynamic.quickbackupmulti;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
-import dev.skydynamic.quickbackupmulti.utils.schedule.ScheduleBackup;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -14,18 +13,12 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //#endif
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
 
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restore;
 import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildScheduler;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildTrigger;
 
 public final class QuickBackupMulti implements ModInitializer {
 
@@ -37,8 +30,6 @@ public final class QuickBackupMulti implements ModInitializer {
 	public void onInitialize() {
 		Config.INSTANCE.load();
 		Translate.handleResourceReload(Config.INSTANCE.getLang());
-
-		buildScheduler();
 
 		//#if MC>=11900
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> RegisterCommand(dispatcher));
