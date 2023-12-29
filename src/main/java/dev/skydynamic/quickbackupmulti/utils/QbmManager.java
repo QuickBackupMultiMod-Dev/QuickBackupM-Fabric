@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.NotFileFilter;
+import org.quartz.SchedulerException;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -29,6 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildScheduler;
+import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getNextExecutionTime;
 
 public class QbmManager {
     public static Path backupDir = Path.of(System.getProperty("user.dir") + "/QuickBackupMulti/");
@@ -193,6 +196,7 @@ public class QbmManager {
             double intervalTime = (endTime - startTime) / 1000.0;
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
             writeBackupInfo(slot, desc);
+            startSchedule(commandSource);
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = false;
@@ -264,4 +268,18 @@ public class QbmManager {
         }
     }
 
+    public static void startSchedule(ServerCommandSource commandSource) {
+        String nextBackupTimeString = "";
+        try {
+            switch (Config.INSTANCE.getScheduleMode()) {
+                case "cron" -> nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
+                case "interval" -> nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
+            }
+            buildScheduler();
+            Config.TEMP_CONFIG.scheduler.start();
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.success", nextBackupTimeString)));
+        } catch (SchedulerException e) {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
+        }
+    }
 }

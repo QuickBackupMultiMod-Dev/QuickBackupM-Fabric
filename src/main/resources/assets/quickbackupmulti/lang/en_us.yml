@@ -17,6 +17,7 @@ quickbackupmulti:
       fail: "Schedule backup shutdown fail: §c%s"
     execute:
       finish: "Finish to backup, the next execute time: §b%s"
+      schedule_reset: "Execute Backup, Scheduler reset and the next execute time: §b%s"
     cron:
       set_custom_success: "Custom cron set success, the next execute time: §b%s"
       set_success: "Set success, the next execute time: §b%s"

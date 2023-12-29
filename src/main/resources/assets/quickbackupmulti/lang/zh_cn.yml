@@ -17,6 +17,7 @@ quickbackupmulti:
       fail: "定时备份关闭失败: §c%s"
     execute:
       finish: "定时备份完成, 下一次触发备份时间: §b%s"
+      schedule_reset: "备份触发, 定时备份下一次触发时间: §b%s"
     cron:
       set_custom_success: "自定义定时备份设置成功, 下一次触发备份时间: §b%s"
       set_success: "设置成功, 下一次触发备份时间: §b%s"
