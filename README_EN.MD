@@ -1,5 +1,7 @@
 [![License](https://img.shields.io/github/license/SkyDynamic/QuickBackupM-Fabric.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Issues](https://img.shields.io/github/issues/SkyDynamic/QuickBackupM-Fabric.svg)](https://github.com/SkyDynamic/QuickBackupM-Fabric/issues)
+[![Modrinth](https://img.shields.io/modrinth/dt/DgWBIBY5?label=Modrinth%20Downloads)](https://modrinth.com/mod/quickbackupmulti)
+
 <div align="center">
 <a><img src="./indexImg.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
 </div>
