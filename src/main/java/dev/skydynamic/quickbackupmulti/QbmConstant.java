@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 public final class QbmConstant {
 
-    public static Path configDir = FabricLoader.getInstance().getConfigDir();
-    public static Path gameDir = FabricLoader.getInstance().getGameDir();
+    public static final Path configDir = FabricLoader.getInstance().getConfigDir();
+    public static final Path gameDir = FabricLoader.getInstance().getGameDir();
 
 }
