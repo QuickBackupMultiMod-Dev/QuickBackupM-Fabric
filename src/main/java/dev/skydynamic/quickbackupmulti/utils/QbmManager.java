@@ -3,6 +3,7 @@ package dev.skydynamic.quickbackupmulti.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import dev.skydynamic.quickbackupmulti.QbmConstant;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import net.fabricmc.api.EnvType;
@@ -34,7 +35,7 @@ import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildSched
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getNextExecutionTime;
 
 public class QbmManager {
-    public static Path backupDir = Path.of(System.getProperty("user.dir") + "/QuickBackupMulti/");
+    public static Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/");
     public static Path savePath = Config.TEMP_CONFIG.server.getSavePath(WorldSavePath.ROOT);
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
 

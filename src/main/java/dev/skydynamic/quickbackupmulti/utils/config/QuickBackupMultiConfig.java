@@ -2,6 +2,7 @@ package dev.skydynamic.quickbackupmulti.utils.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dev.skydynamic.quickbackupmulti.QbmConstant;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,7 +15,7 @@ import java.util.List;
 public class QuickBackupMultiConfig {
     private final Object lock = new Object();
     private final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
-    private final Path configPath = Path.of(System.getProperty("user.dir") + "/config/");
+    private final Path configPath = QbmConstant.configDir;
     private ConfigStorage configStorage;
     File path = configPath.toFile();
     File config = configPath.resolve("QuickBackupMulti.json").toFile();
