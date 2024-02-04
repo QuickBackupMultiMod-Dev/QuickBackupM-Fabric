@@ -21,7 +21,7 @@ quickbackupmulti:
     cron:
       set_custom_success: "自定义定时备份设置成功, 下一次触发备份时间: §b%s"
       set_success: "设置成功, 下一次触发备份时间: §b%s"
-      set_success_only: "设置成功, 但你尚未开启定制备份"
+      set_success_only: "设置成功, 但你尚未开启定时备份"
       set_fail: "设置失败: §c%s"
       expression_error: 你输入的Cron表达式有误
 
