@@ -69,7 +69,7 @@ processResources {
                 "version": fullModVersion,
                 "id": project.mod_id,
                 "name": project.archives_base_name,
-                "minecraft_dependency": project.minecraft_version,
+                "minecraft_support": project.minecraft_support_version
         ]
         expand valueMap
     }

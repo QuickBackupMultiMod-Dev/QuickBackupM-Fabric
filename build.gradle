@@ -10,19 +10,11 @@ preprocess {
 	def mc118 = createNode("1.18.2", 1_18_02, "yarn")
 	def mc119 = createNode("1.19.4", 1_19_04, "yarn")
 	def mc1200 = createNode("1.20", 1_20_00, "yarn")
-	def mc1201 = createNode("1.20.1", 1_20_01, "yarn")
-	def mc1202 = createNode("1.20.2", 1_20_02, "yarn")
-	def mc1203 = createNode("1.20.3", 1_20_03, "yarn")
-	def mc1204 = createNode("1.20.4", 1_20_04, "yarn")
 
 	mc116.link(mc117, file("versions/mapping-1.16-1.17.txt"))
 	mc117.link(mc118, file("versions/mapping-1.17-1.18.txt"))
 	mc118.link(mc119, file("versions/mapping-1.18-1.19.txt"))
 	mc119.link(mc1200, file("versions/mapping-1.19-1.20.txt"))
-	mc1200.link(mc1201, file("versions/mapping-1.19-1.20.txt"))
-	mc1201.link(mc1202, file("versions/mapping-1.19-1.20.txt"))
-	mc1202.link(mc1203, file("versions/mapping-1.19-1.20.txt"))
-	mc1203.link(mc1204, file("versions/mapping-1.19-1.20.txt"))
 }
 
 tasks.register("buildAndGather") {
