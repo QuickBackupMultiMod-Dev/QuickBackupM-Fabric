@@ -26,7 +26,6 @@ public class MinecraftServer_ClientMixin {
         Config.TEMP_CONFIG.setServerValue(server);
         Path saveDirectoryPath = server.getSavePath(WorldSavePath.ROOT);
         String worldName = saveDirectoryPath.getParent().getFileName().toString();
-        System.out.println(worldName);
         Config.TEMP_CONFIG.setWorldName(worldName);
         Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/").resolve(worldName);
         createBackupDir(backupDir);

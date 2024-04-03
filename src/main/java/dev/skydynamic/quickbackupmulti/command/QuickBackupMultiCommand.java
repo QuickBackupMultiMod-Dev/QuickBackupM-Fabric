@@ -2,6 +2,7 @@ package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 //#if MC<=11820
 //$$ import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -44,14 +45,15 @@ public class QuickBackupMultiCommand {
 
     public static void RegisterCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> QuickBackupMultiShortCommand = dispatcher.register(literal("qb")
-            .then(literal("list").executes(it -> listSaveBackups(it.getSource())))
+            .then(literal("list").executes(it -> listSaveBackups(it.getSource(), 1))
+                .then(CommandManager.argument("page", IntegerArgumentType.integer())
+                    .executes(it -> listSaveBackups(it.getSource(), IntegerArgumentType.getInteger(it, "page")))))
 
             .then(makeCommand)
 
             .then(literal("back").requires(me -> me.hasPermissionLevel(2))
-                    .executes(it -> restoreSaveBackup(it.getSource(), 1))
-                    .then(CommandManager.argument("slot", IntegerArgumentType.integer(1))
-                            .executes(it -> restoreSaveBackup(it.getSource(), IntegerArgumentType.getInteger(it, "slot")))))
+                    .then(CommandManager.argument("name", StringArgumentType.string())
+                            .executes(it -> restoreSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(literal("confirm").requires(me -> me.hasPermissionLevel(2))
                     .executes(it -> {
@@ -67,8 +69,8 @@ public class QuickBackupMultiCommand {
                     .executes(it -> cancelRestore(it.getSource())))
 
             .then(literal("delete").requires(me -> me.hasPermissionLevel(2))
-                    .then(CommandManager.argument("slot", IntegerArgumentType.integer(1))
-                            .executes(it -> deleteSaveBackup(it.getSource(), IntegerArgumentType.getInteger(it, "slot")))))
+                    .then(CommandManager.argument("name", StringArgumentType.string())
+                            .executes(it -> deleteSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(settingCommand)
         );
@@ -78,19 +80,19 @@ public class QuickBackupMultiCommand {
 
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> QbDataHashMap = new ConcurrentHashMap<>();
 
-    private static int deleteSaveBackup(ServerCommandSource commandSource, int slot) {
-        if (delete(slot)) Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.success", slot)));
-        else Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.fail", slot)));
+    private static int deleteSaveBackup(ServerCommandSource commandSource, String name) {
+        if (delete(name)) Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.success", name)));
+        else Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.fail", name)));
         return 1;
     }
 
-    private static int restoreSaveBackup(ServerCommandSource commandSource, int slot) {
-        if (!getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists()) {
+    private static int restoreSaveBackup(ServerCommandSource commandSource, String name) {
+        if (!getBackupDir().resolve(name + "_info.json").toFile().exists()) {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
             return 0;
         }
         ConcurrentHashMap<String, Object> restoreDataHashMap = new ConcurrentHashMap<>();
-        restoreDataHashMap.put("Slot", slot);
+        restoreDataHashMap.put("Slot", name);
         restoreDataHashMap.put("Timer", new Timer());
         restoreDataHashMap.put("Countdown", Executors.newSingleThreadScheduledExecutor());
         synchronized (QbDataHashMap) {
@@ -107,7 +109,7 @@ public class QuickBackupMultiCommand {
     //#endif
         synchronized (QbDataHashMap) {
             if (QbDataHashMap.containsKey("QBM")) {
-                if (!getBackupDir().resolve("Slot" + QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
+                if (!getBackupDir().resolve(QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
                     Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
                     QbDataHashMap.clear();
                     return;
@@ -124,7 +126,7 @@ public class QuickBackupMultiCommand {
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     player.sendMessage(Text.of(tr("quickbackupmulti.restore.countdown.intro", executePlayerName)), false);
                 }
-                int slot = (int) QbDataHashMap.get("QBM").get("Slot");
+                String slot = (String) QbDataHashMap.get("QBM").get("Slot");
                 Config.TEMP_CONFIG.setBackupSlot(slot);
                 Timer timer = (Timer) QbDataHashMap.get("QBM").get("Timer");
                 ScheduledExecutorService countdown = (ScheduledExecutorService) QbDataHashMap.get("QBM").get("Countdown");
@@ -178,8 +180,8 @@ public class QuickBackupMultiCommand {
         return 1;
     }
 
-    private static int listSaveBackups(ServerCommandSource commandSource) {
-        MutableText resultText = list();
+    private static int listSaveBackups(ServerCommandSource commandSource, int page) {
+        MutableText resultText = list(page);
         Messenger.sendMessage(commandSource, resultText);
         return 1;
     }

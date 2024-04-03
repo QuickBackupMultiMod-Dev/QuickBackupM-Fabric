@@ -4,8 +4,7 @@ import java.util.*;
 
 public class ConfigStorage {
     @Ignore
-    public static final ConfigStorage DEFAULT = new ConfigStorage(5, new ArrayList<>(List.of("session.lock")), "zh_cn", false, "* * 0/4 * * ?", 14400, "interval");
-    int numOfSlots;
+    public static final ConfigStorage DEFAULT = new ConfigStorage(new ArrayList<>(List.of("session.lock")), "zh_cn", false, "* * 0/4 * * ?", 14400, "interval");
     ArrayList<String> ignoredFiles;
     String lang;
     boolean scheduleBackup;
@@ -13,18 +12,13 @@ public class ConfigStorage {
     int scheduleInterval;
     String scheduleMode;
 
-    public ConfigStorage(int NumOfSlots, ArrayList<String> IgnoredFiles, String lang, boolean scheduleBackup, String scheduleCron, int scheduleInterval, String scheduleMode) {
-        this.numOfSlots = NumOfSlots;
+    public ConfigStorage(ArrayList<String> IgnoredFiles, String lang, boolean scheduleBackup, String scheduleCron, int scheduleInterval, String scheduleMode) {
         this.ignoredFiles = IgnoredFiles;
         this.lang = lang;
         this.scheduleBackup = scheduleBackup;
         this.scheduleCron = scheduleCron;
         this.scheduleInterval = scheduleInterval;
         this.scheduleMode = scheduleMode;
-    }
-
-    public int getNumOfSlots() {
-        return this.numOfSlots;
     }
 
     public List<String> getIgnoredFiles() {
@@ -53,6 +47,6 @@ public class ConfigStorage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getNumOfSlots(), getIgnoredFiles(), getLang(), getScheduleBackup(), getScheduleCron(), getScheduleInterval(), getScheduleMode());
+        return Objects.hash(getIgnoredFiles(), getLang(), getScheduleBackup(), getScheduleCron(), getScheduleInterval(), getScheduleMode());
     }
 }

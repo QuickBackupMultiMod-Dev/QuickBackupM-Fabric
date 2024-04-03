@@ -25,7 +25,9 @@ import org.quartz.SchedulerException;
 import java.io.*;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,12 +69,12 @@ public class QbmManager {
         }
     }
 
-    private static void writeBackupInfo(int slot, String desc) {
+    private static void writeBackupInfo(String name, String desc) {
         try {
             ConcurrentHashMap<String, Object> data = new ConcurrentHashMap<>();
             data.put("desc", desc);
             data.put("timestamp", System.currentTimeMillis());
-            var writer = new FileWriter(getBackupDir().resolve("Slot" + slot + "_info.json").toFile());
+            var writer = new FileWriter(getBackupDir().resolve(name + "_info.json").toFile());
             gson.toJson(data, writer);
             writer.close();
         } catch (Exception e) {
@@ -85,12 +87,12 @@ public class QbmManager {
         return FileUtils.sizeOf(dir);
     }
 
-    private static boolean checkSlotExist(int slot) {
-        return getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists();
+    private static boolean checkSlotExist(String name) {
+        return getBackupDir().resolve(name + "_info.json").toFile().exists() && getBackupDir().resolve(name).toFile().exists();
     }
 
-    public static void restoreClient(int slot) {
-        File targetBackupSlot = getBackupDir().resolve("Slot" + slot).toFile();
+    public static void restoreClient(String slot) {
+        File targetBackupSlot = getBackupDir().resolve(slot).toFile();
         try {
             savePath.resolve("level.dat").toFile().delete();
             savePath.resolve("level.dat_old").toFile().delete();
@@ -115,8 +117,8 @@ public class QbmManager {
         }
     }
 
-    public static void restore(int slot) {
-        File targetBackupSlot = getBackupDir().resolve("Slot" + slot).toFile();
+    public static void restore(String slot) {
+        File targetBackupSlot = getBackupDir().resolve(slot).toFile();
         try {
 //            var it = Files.walk(savePath,5).sorted(Comparator.reverseOrder()).iterator();
 //            while (it.hasNext()){
@@ -131,21 +133,12 @@ public class QbmManager {
         }
     }
 
-    private static int getSlot(int slot) {
-        if (slot == -1) {
-            for (int j=1;j<=Config.INSTANCE.getNumOfSlot();j++) {
-                if (!checkSlotExist(j)) {
-                    slot = j;
-                    break;
-                }
-            }
-            if (slot == -1) slot = 1;
-        }
-        return slot;
+    private static boolean getSlotExist(String name) {
+        return checkSlotExist(name);
     }
 
-    public static boolean scheduleMake(ServerCommandSource commandSource, int slot) {
-        slot = getSlot(slot);
+    public static boolean scheduleMake(ServerCommandSource commandSource, String name) {
+        if (!checkSlotExist(name)) return false;
         try {
             MinecraftServer server = commandSource.getServer();
             //#if MC>11800
@@ -157,10 +150,10 @@ public class QbmManager {
                 if (serverWorld == null || serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = true;
             }
-            if (!getBackupDir().resolve("Slot" + slot).toFile().exists()) getBackupDir().resolve("Slot" + slot).toFile().mkdir();
-            if (Objects.requireNonNull(getBackupDir().resolve("Slot" + slot).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
-            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve("Slot" + slot).toFile(), fileFilter);
-            writeBackupInfo(slot, "Scheduled Backup");
+            if (!getBackupDir().resolve(name).toFile().exists()) getBackupDir().resolve(name).toFile().mkdir();
+            if (Objects.requireNonNull(getBackupDir().resolve(name).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve(name).toFile());
+            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve(name).toFile(), fileFilter);
+            writeBackupInfo(name, "Scheduled Backup");
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = false;
@@ -171,18 +164,18 @@ public class QbmManager {
         }
     }
 
-    public static int make(ServerCommandSource commandSource, int slot, String desc) {
+    public static int make(ServerCommandSource commandSource, String name, String desc) {
         long startTime = System.currentTimeMillis();
-        slot = getSlot(slot);
-        if (slot > Config.INSTANCE.getNumOfSlot() || slot < 1) {
-            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.no_slot")));
-            return 0;
+        if (getSlotExist(name)) {
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail_exists")));
         }
         try {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.start")));
             MinecraftServer server = commandSource.getServer();
             //#if MC>11800
             server.saveAll(true, true, true);
+            // I dont know how create after this
+            server.session.close();
             //#else
             //$$ server.save(true, true, true);
             //#endif
@@ -190,13 +183,13 @@ public class QbmManager {
                 if (serverWorld == null || serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = true;
             }
-            if (!getBackupDir().resolve("Slot" + slot).toFile().exists()) getBackupDir().resolve("Slot" + slot).toFile().mkdir();
-            if (Objects.requireNonNull(getBackupDir().resolve("Slot" + slot).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
-            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve("Slot" + slot).toFile(), fileFilter);
+            if (!getBackupDir().resolve(name).toFile().exists()) getBackupDir().resolve(name).toFile().mkdir();
+            if (Objects.requireNonNull(getBackupDir().resolve(name).toFile().listFiles()).length > 0) FileUtils.deleteDirectory(getBackupDir().resolve(name).toFile());
+            FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve(name).toFile(), fileFilter);
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
-            writeBackupInfo(slot, desc);
+            writeBackupInfo(name, desc);
             startSchedule(commandSource);
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
@@ -204,39 +197,106 @@ public class QbmManager {
             }
         } catch (IOException e) {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getMessage())));
+            backupDir.resolve(name).toFile().deleteOnExit();
         }
         return 1;
     }
 
-    public static MutableText list() {
-        MutableText resultText = Messenger.literal(tr("quickbackupmulti.list_backup.title"));
+    private static int getPageCount(List<String>backupsDirList, int page) {
+        int size = backupsDirList.size();
+        if (!(size < 5*page)) {
+            return 5;
+        } else if (size < 5*page && (size < 5 && size > 0)){
+            return size;
+        } else {
+            return Math.max(size - 5 * (page - 1), 0);
+        }
+    }
+
+    public static List<String> getBackupsList(Path backupDir) {
+        List<String> backupsDirList = new ArrayList<>();
+        for (File file : getBackupDir().toFile().listFiles()) {
+            if (file.isDirectory() && backupDir.resolve(file.getName()).toFile().exists() && backupDir.resolve(file.getName() + "_info.json").toFile().exists()) {
+                backupsDirList.add(file.getName());
+            }
+        }
+        return backupsDirList;
+    }
+
+    public static int getTotalPage(List<String> backupsList) {
+        return (int) Math.ceil(backupsList.size() / 5.0);
+    }
+
+    public static MutableText list(int page) {
         long totalBackupSizeB = 0;
-        for (int j=1;j<=Config.INSTANCE.getNumOfSlot();j++) {
+        Path backupDir = getBackupDir();
+        List<String> backupsList = getBackupsList(backupDir);
+        if (backupsList.isEmpty() || getPageCount(backupsList, page) == 0) {
+            return Messenger.literal(tr("quickbackupmulti.list_empty"));
+        }
+        int totalPage = getTotalPage(backupsList);
+
+        MutableText resultText = Messenger.literal(tr("quickbackupmulti.list_backup.title", page));
+        MutableText backPageText;
+        MutableText nextPageText;
+        if (page != totalPage) {
+            if (page == 1) {
+                backPageText = Messenger.literal("§8[<-]");
+                backPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_back_page")))));
+            } else {
+                backPageText = Messenger.literal("§b[<-]");
+                backPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))))
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.back_page")))));
+            }
+            nextPageText = Messenger.literal("§b[->]");
+            nextPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page + 1))))
+                .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.next_page")))));
+        } else {
+            nextPageText = Messenger.literal("§8[->]");
+            nextPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_next_page")))));
+            if (totalPage != 1) {
+                backPageText = Messenger.literal("§b[<-]");
+                backPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))))
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.back_page")))));
+            } else {
+                backPageText = Messenger.literal("§8[<-]");
+                backPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_back_page")))));
+            }
+        }
+        resultText.append("\n")
+            .append(backPageText)
+            .append("  ")
+            .append(tr("quickbackupmulti.list_backup.page_msg", page, totalPage))
+            .append("  ")
+            .append(nextPageText);
+
+        for (int j=1;j<=getPageCount(backupsList, page);j++) {
             try {
+                String name = backupsList.get(((j-1)+5*(page-1)));
                 MutableText backText = Messenger.literal("§2[▷] ");
                 MutableText deleteText = Messenger.literal("§c[×] ");
-                var reader = new FileReader(getBackupDir().resolve("Slot" + j + "_info.json").toFile());
+                var reader = new FileReader(backupDir.resolve(name + "_info.json").toFile());
                 var result = gson.fromJson(reader, SlotInfoStorage.class);
                 reader.close();
-                int finalJ = j;
-                backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", finalJ)))));
-                deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + finalJ)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", finalJ)))));
+                backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)))
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))));
+                deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name)))
+                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", name)))));
                 String desc = result.desc;
                 if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
-                long backupSizeB = getDirSize(getBackupDir().resolve("Slot" + j).toFile());
+                long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
                 totalBackupSizeB += backupSizeB;
                 double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
                 double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
                 String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
-                resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", finalJ) + " ")
+                resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", j + (5 * (page - 1))) + " ")
+                    .append("§6" + name + "§r ")
                     .append(backText)
                     .append(deleteText)
                     .append("§a" + sizeString)
                     .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
             } catch (IOException e) {
-                resultText.append("\n"+ tr("quickbackupmulti.list_backup.slot.header", j) + " §2[▷] §c[×] §r" + tr("quickbackupmulti.empty_comment"));
+                LOGGER.error("FileNotFoundException: " + e.getMessage());
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
@@ -246,11 +306,11 @@ public class QbmManager {
         return resultText;
     }
 
-    public static boolean delete(int slot) {
-        if (getBackupDir().resolve("Slot" + slot + "_info.json").toFile().exists() || getBackupDir().resolve("Slot" + slot).toFile().exists()) {
+    public static boolean delete(String name) {
+        if (getBackupDir().resolve(name + "_info.json").toFile().exists() || getBackupDir().resolve(name).toFile().exists()) {
             try {
-                getBackupDir().resolve("Slot" + slot + "_info.json").toFile().delete();
-                FileUtils.deleteDirectory(getBackupDir().resolve("Slot" + slot).toFile());
+                getBackupDir().resolve(name + "_info.json").toFile().delete();
+                FileUtils.deleteDirectory(getBackupDir().resolve(name).toFile());
                 return true;
             } catch (SecurityException | IOException e) {
                 return false;
@@ -259,14 +319,7 @@ public class QbmManager {
     }
 
     public static void createBackupDir(Path path) {
-        if (!path.toFile().exists()) {
-            LOGGER.info(tr("quickbackupmulti.init.start"));
-            path.toFile().mkdirs();
-            LOGGER.info(tr("quickbackupmulti.init.finish"));
-        }
-        for(int j = 1; j<= Config.INSTANCE.getNumOfSlot(); j++) {
-            if (!path.resolve("Slot" + j).toFile().exists()) path.resolve("Slot" + j).toFile().mkdir();
-        }
+        if (!path.toFile().exists()) path.toFile().mkdirs();
     }
 
     public static void startSchedule(ServerCommandSource commandSource) {

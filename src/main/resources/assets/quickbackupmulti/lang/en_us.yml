@@ -1,5 +1,6 @@
 quickbackupmulti:
   empty_comment: §7Empty§r
+  list_empty: "§7Do not have any backups now"
 
   schedule:
     get: "Next backup time is: §b%s"
@@ -45,20 +46,26 @@ quickbackupmulti:
   make:
     start: §aBackup§r now...Please wait a moment
     no_slot: No available slots found, §abackup§r abort!
-    success: §aBackup §rcompleted, It takes§6%s§rs
+    success: §aBackup §rcompleted, It takes §6%s§rs
     fail: §a备份§r失败，错误原因%s
+    fail_exist: "§aMake backup §rFailed，error msg: Slot already exists"
 
   delete:
     success: §aSuccess delete slot §6%s
     fail: §4Fail§r to delete slot §6%s
 
   list_backup:
-    title: §d[Slot Information]§r
+    title: §d[Page §b%s§d Slot Information]§r
+    back_page: Last page
+    next_page: Next page
+    cant_back_page: Unable to go last page
+    cant_next_page: Unable to go next page
+    page_msg: "[§b%s§r / §b%s§r]"
     slot:
-      header: "[Slot§6%s§r]"
+      header: "[§6%s§r]"
       restore: Click to restore to slot §6%s§r
       delete: Click to delete slot §6%s§r
-      total_space: "Total space consumed: §a%s§r"
+      total_space: "These backups total space consumed: §a%s§r"
 
   restore:
     countdown:
