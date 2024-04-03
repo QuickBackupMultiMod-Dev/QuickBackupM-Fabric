@@ -19,9 +19,9 @@ import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restoreClient;
 public class ClientRestoreDelegate {
 
     private final List<ServerPlayerEntity> playerList;
-    private final int slot;
+    private final String slot;
 
-    public ClientRestoreDelegate(List<ServerPlayerEntity> playerList, int slot) {
+    public ClientRestoreDelegate(List<ServerPlayerEntity> playerList, String slot) {
         this.playerList = playerList;
         this.slot = slot;
     }

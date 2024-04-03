@@ -85,12 +85,6 @@ public class QuickBackupMultiConfig {
         }
     }
 
-    public int getNumOfSlot() {
-        synchronized (lock) {
-            return configStorage.numOfSlots;
-        }
-    }
-
     public String getLang() {
         synchronized (lock) {
             return configStorage.lang;

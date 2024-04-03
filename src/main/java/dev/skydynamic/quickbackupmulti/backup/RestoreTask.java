@@ -14,9 +14,9 @@ public class RestoreTask extends TimerTask {
 
     private final EnvType env;
     private final List<ServerPlayerEntity> playerList;
-    private final int slot;
+    private final String slot;
 
-    public RestoreTask(EnvType env, List<ServerPlayerEntity> playerList, int slot) {
+    public RestoreTask(EnvType env, List<ServerPlayerEntity> playerList, String slot) {
         this.env = env;
         this.playerList = playerList;
         this.slot = slot;

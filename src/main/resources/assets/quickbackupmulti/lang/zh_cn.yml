@@ -1,5 +1,6 @@
 quickbackupmulti:
   empty_comment: §7空§r
+  list_empty: "§7当前没有任何备份"
 
   schedule:
     get: "下一次备份时间为: §b%s"
@@ -25,6 +26,10 @@ quickbackupmulti:
       set_fail: "设置失败: §c%s"
       expression_error: 你输入的Cron表达式有误
 
+  search:
+    success: "§a搜索成功§r, 结果如下: "
+    fail: "§4没有搜索到任何结果"
+
   toast:
     start_title: 正在进行回档...请稍等!
     start_content: 在此期间请勿进入存档!
@@ -47,18 +52,22 @@ quickbackupmulti:
     no_slot: 未找到可用槽位，§a备份§r中断!
     success: §a备份§r完成，耗时§6%s§r秒
     fail: §a备份§r失败，错误原因%s
+    fail_exist: "§a备份§r失败，错误原因: 槽位已存在"
 
   delete:
     success: 删除槽位§6%s§r§a完成§r
     fail: 删除槽位§6%s§r§4失败§r
 
   list_backup:
-    title: §d[槽位信息]§r
+    title: "§d[第§b%s§d页槽位信息]§r"
+    back_page: 上一页
+    next_page: 下一页
+    page_msg: "[第§b%s§r页 / 共§b%s§r页]"
     slot:
-      header: "[槽位§6%s§r]"
+      header: "[§6%s§r]"
       restore: 点击回档至槽位§6%s§r
       delete: 点击删除槽位§6%s§r
-      total_space: "备份总占用空间: §a%s§r"
+      total_space: "当前页面备份总占用空间: §a%s§r"
 
   restore:
     countdown:

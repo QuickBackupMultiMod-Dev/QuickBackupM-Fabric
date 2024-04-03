@@ -4,7 +4,6 @@ import dev.skydynamic.quickbackupmulti.utils.Messenger;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 
@@ -16,11 +15,15 @@ import static dev.skydynamic.quickbackupmulti.utils.QbmManager.scheduleMake;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getNextExecutionTime;
 
 public class ScheduleBackup implements Job {
+    public static String generateName() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        return "ScheduleBackup-" + dateFormat.format(System.currentTimeMillis());
+    }
     @Override
     public void execute(JobExecutionContext context) {
         if (Config.TEMP_CONFIG.server != null) {
             MinecraftServer server = Config.TEMP_CONFIG.server;
-            if (scheduleMake(server.getCommandSource(), -1)) {
+            if (scheduleMake(server.getCommandSource(), generateName())) {
                 final Collection<ServerPlayerEntity> playerList = server.getPlayerManager().getPlayerList();
                 String nextExecuteTime = "";
                 switch (Config.INSTANCE.getScheduleMode()) {

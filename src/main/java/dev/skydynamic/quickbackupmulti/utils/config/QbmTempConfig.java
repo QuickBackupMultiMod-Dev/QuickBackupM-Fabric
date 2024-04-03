@@ -7,7 +7,7 @@ import org.quartz.Scheduler;
 public class QbmTempConfig {
     public Boolean isBackup = false;
     public MinecraftServer server;
-    public int backupSlot;
+    public String backupSlot;
     public EnvType env;
     public String worldName;
     public Scheduler scheduler;
@@ -21,7 +21,7 @@ public class QbmTempConfig {
         this.server = server;
     }
 
-    public void setBackupSlot(int slot) {
+    public void setBackupSlot(String slot) {
         this.backupSlot = slot;
     }
 
