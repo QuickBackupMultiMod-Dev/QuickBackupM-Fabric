@@ -26,6 +26,10 @@ quickbackupmulti:
       set_fail: "设置失败: §c%s"
       expression_error: 你输入的Cron表达式有误
 
+  search:
+    success: "§a搜索成功§r, 结果如下: "
+    fail: "§4没有搜索到任何结果"
+
   toast:
     start_title: 正在进行回档...请稍等!
     start_content: 在此期间请勿进入存档!
@@ -58,8 +62,6 @@ quickbackupmulti:
     title: "§d[第§b%s§d页槽位信息]§r"
     back_page: 上一页
     next_page: 下一页
-    cant_back_page: 已无法继续向前一页了
-    cant_next_page: 已无法继续向后一页了
     page_msg: "[第§b%s§r页 / 共§b%s§r页]"
     slot:
       header: "[§6%s§r]"

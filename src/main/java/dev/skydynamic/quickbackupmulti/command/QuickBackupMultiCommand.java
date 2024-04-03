@@ -20,6 +20,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +47,12 @@ public class QuickBackupMultiCommand {
     public static void RegisterCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> QuickBackupMultiShortCommand = dispatcher.register(literal("qb")
             .then(literal("list").executes(it -> listSaveBackups(it.getSource(), 1))
-                .then(CommandManager.argument("page", IntegerArgumentType.integer())
+                .then(CommandManager.argument("page", IntegerArgumentType.integer(1))
                     .executes(it -> listSaveBackups(it.getSource(), IntegerArgumentType.getInteger(it, "page")))))
+
+            .then(literal("search")
+                .then(CommandManager.argument("name", StringArgumentType.string())
+                    .executes(it -> searchSaveBackups(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(makeCommand)
 
@@ -79,6 +84,19 @@ public class QuickBackupMultiCommand {
     }
 
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> QbDataHashMap = new ConcurrentHashMap<>();
+
+    private static int searchSaveBackups(ServerCommandSource commandSource, String string) {
+        List<String> backupsList = getBackupsList(getBackupDir());
+        List<String> result = backupsList.stream()
+            .filter(it -> StringUtils.containsIgnoreCase(it, string))
+            .toList();
+        if (result.isEmpty()) {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.search.fail")));
+        } else {
+            Messenger.sendMessage(commandSource, search(result));
+        }
+        return 1;
+    }
 
     private static int deleteSaveBackup(ServerCommandSource commandSource, String name) {
         if (delete(name)) Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.delete.success", name)));

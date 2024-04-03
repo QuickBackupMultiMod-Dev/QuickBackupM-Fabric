@@ -26,6 +26,10 @@ quickbackupmulti:
       set_fail: "Set fail: §c%s"
       expression_error: The Cron expression you entered is non-standard!
 
+  search:
+    success: "§aSearch success§r, the result: "
+    fail: "§4Do not have any result"
+
   toast:
     start_title: Restoring now...Please wait a moment
     start_content: Don't join world in this time!
@@ -58,8 +62,6 @@ quickbackupmulti:
     title: §d[Page §b%s§d Slot Information]§r
     back_page: Last page
     next_page: Next page
-    cant_back_page: Unable to go last page
-    cant_next_page: Unable to go next page
     page_msg: "[§b%s§r / §b%s§r]"
     slot:
       header: "[§6%s§r]"

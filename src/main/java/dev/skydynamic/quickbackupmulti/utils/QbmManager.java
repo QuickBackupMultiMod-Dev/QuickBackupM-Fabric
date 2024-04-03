@@ -14,6 +14,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.WorldSavePath;
 
 import org.apache.commons.io.FileUtils;
@@ -227,6 +228,57 @@ public class QbmManager {
         return (int) Math.ceil(backupsList.size() / 5.0);
     }
 
+    private static MutableText getBackPageText(int page, int totalPage) {
+        MutableText backPageText;
+        backPageText = Messenger.literal("[<-]");
+        backPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.back_page")))));
+        if (page != 1 && totalPage > 1) {
+            backPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))))
+                .styled(style -> style.withColor(Formatting.AQUA));
+        } else if (page == 1) {
+            backPageText.styled(style -> style.withColor(Formatting.DARK_GRAY));
+        }
+        return backPageText;
+    }
+
+    private static MutableText getNextPageText(int page, int totalPage) {
+        MutableText nextPageText;
+        nextPageText = Messenger.literal("[->]");
+        nextPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.next_page")))));
+        if (page != totalPage && totalPage > 1) {
+            nextPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page + 1))))
+                .styled(style -> style.withColor(Formatting.AQUA));
+        } else if (page == totalPage) {
+            nextPageText.styled(style -> style.withColor(Formatting.DARK_GRAY));
+        }
+        return nextPageText;
+    }
+
+    private static MutableText getSlotText(Path backupDir,String name, int page, int num, long backupSizeB) throws IOException {
+        MutableText backText = Messenger.literal("§2[▷] ");
+        MutableText deleteText = Messenger.literal("§c[×] ");
+        MutableText resultText = Messenger.literal("");
+        var reader = new FileReader(backupDir.resolve(name + "_info.json").toFile());
+        var result = gson.fromJson(reader, SlotInfoStorage.class);
+        reader.close();
+        backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)))
+            .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))));
+        deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name)))
+            .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", name)))));
+        String desc = result.desc;
+        if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
+        double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
+        double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
+        String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
+        resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", num + (5 * (page - 1))) + " ")
+            .append("§6" + name + "§r ")
+            .append(backText)
+            .append(deleteText)
+            .append("§a" + sizeString)
+            .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
+        return resultText;
+    }
+
     public static MutableText list(int page) {
         long totalBackupSizeB = 0;
         Path backupDir = getBackupDir();
@@ -237,32 +289,8 @@ public class QbmManager {
         int totalPage = getTotalPage(backupsList);
 
         MutableText resultText = Messenger.literal(tr("quickbackupmulti.list_backup.title", page));
-        MutableText backPageText;
-        MutableText nextPageText;
-        if (page != totalPage) {
-            if (page == 1) {
-                backPageText = Messenger.literal("§8[<-]");
-                backPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_back_page")))));
-            } else {
-                backPageText = Messenger.literal("§b[<-]");
-                backPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.back_page")))));
-            }
-            nextPageText = Messenger.literal("§b[->]");
-            nextPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page + 1))))
-                .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.next_page")))));
-        } else {
-            nextPageText = Messenger.literal("§8[->]");
-            nextPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_next_page")))));
-            if (totalPage != 1) {
-                backPageText = Messenger.literal("§b[<-]");
-                backPageText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.back_page")))));
-            } else {
-                backPageText = Messenger.literal("§8[<-]");
-                backPageText.styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.cant_back_page")))));
-            }
-        }
+        MutableText backPageText = getBackPageText(page, totalPage);
+        MutableText nextPageText = getNextPageText(page, totalPage);
         resultText.append("\n")
             .append(backPageText)
             .append("  ")
@@ -273,28 +301,9 @@ public class QbmManager {
         for (int j=1;j<=getPageCount(backupsList, page);j++) {
             try {
                 String name = backupsList.get(((j-1)+5*(page-1)));
-                MutableText backText = Messenger.literal("§2[▷] ");
-                MutableText deleteText = Messenger.literal("§c[×] ");
-                var reader = new FileReader(backupDir.resolve(name + "_info.json").toFile());
-                var result = gson.fromJson(reader, SlotInfoStorage.class);
-                reader.close();
-                backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))));
-                deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name)))
-                    .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", name)))));
-                String desc = result.desc;
-                if (Objects.equals(result.desc, "")) desc = tr("quickbackupmulti.empty_comment");
                 long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
                 totalBackupSizeB += backupSizeB;
-                double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
-                double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
-                String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
-                resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", j + (5 * (page - 1))) + " ")
-                    .append("§6" + name + "§r ")
-                    .append(backText)
-                    .append(deleteText)
-                    .append("§a" + sizeString)
-                    .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.timestamp), desc));
+                resultText.append(getSlotText(backupDir, name, page, j, backupSizeB));
             } catch (IOException e) {
                 LOGGER.error("FileNotFoundException: " + e.getMessage());
             }
@@ -303,6 +312,21 @@ public class QbmManager {
         double totalBackupSizeGB = (double) totalBackupSizeB / FileUtils.ONE_GB;
         String sizeString = (totalBackupSizeMB >= 1000) ? String.format("%.2fGB", totalBackupSizeGB) : String.format("%.2fMB", totalBackupSizeMB);
         resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.total_space", sizeString));
+        return resultText;
+    }
+
+    public static MutableText search(List<String> searchResultList) {
+        MutableText resultText = Messenger.literal(tr("quickbackupmulti.search.success"));
+        Path backupDir = getBackupDir();
+        for (int i=1;i<=searchResultList.size();i++) {
+            try {
+                String name = searchResultList.get(i-1);
+                long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
+                resultText.append(getSlotText(backupDir, name, 1, i, backupSizeB));
+            } catch (IOException e) {
+                LOGGER.error("FileNotFoundException: " + e.getMessage());
+            }
+        }
         return resultText;
     }
 
