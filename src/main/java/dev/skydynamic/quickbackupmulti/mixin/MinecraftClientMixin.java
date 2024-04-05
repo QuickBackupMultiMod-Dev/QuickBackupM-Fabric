@@ -21,7 +21,7 @@ public class MinecraftClientMixin {
     public ToastManager toastManager;
 
     @Inject(method = "setScreen", at = @At("RETURN"))
-    void inj(CallbackInfo ci) {
+    private void inj(CallbackInfo ci) {
         if (Config.TEMP_CONFIG.isBackup) {
             Text title = Text.of(tr("quickbackupmulti.toast.start_title"));
             Text content = Text.of(tr("quickbackupmulti.toast.start_content"));
