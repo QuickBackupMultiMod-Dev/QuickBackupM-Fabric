@@ -17,6 +17,9 @@
 	"entrypoints": {
 		"main": [
 			"dev.skydynamic.quickbackupmulti.QuickBackupMulti"
+		],
+		"client": [
+			"dev.skydynamic.quickbackupmulti.QuickBackupMultiClient"
 		]
 	},
 	"mixins": [

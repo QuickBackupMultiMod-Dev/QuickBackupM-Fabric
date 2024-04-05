@@ -2,6 +2,20 @@ quickbackupmulti:
   empty_comment: §7空§r
   list_empty: "§7当前没有任何备份"
 
+  config_page:
+    save_button: "保存"
+    close_button: "关闭"
+    back: "返回"
+    title: "QuickBackupMulti 配置页面"
+    open_schedule_config_button: "打开定时备份配置界面"
+    lang: "语言"
+    schedule:
+      switch: "定时备份: %s"
+      cron: "Cron表达式"
+      interval: "备份间隔"
+      mode:
+        switch: "定时备份模式: %s"
+
   schedule:
     get: "下一次备份时间为: §b%s"
     get_fail: "定时备份未启用"
@@ -37,6 +51,7 @@ quickbackupmulti:
     end_content: 你现在可以进入存档了!
 
   lang:
+    failed: "§4语言不存在"
     get: "当前设置的§a语言§r为: §4§l%s§r"
     set: "已将§a语言§r设置为: §4§l%s§r"
 

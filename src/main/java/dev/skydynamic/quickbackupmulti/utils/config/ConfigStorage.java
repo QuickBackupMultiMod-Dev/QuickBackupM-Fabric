@@ -5,12 +5,12 @@ import java.util.*;
 public class ConfigStorage {
     @Ignore
     public static final ConfigStorage DEFAULT = new ConfigStorage(new ArrayList<>(List.of("session.lock")), "zh_cn", false, "* * 0/4 * * ?", 14400, "interval");
-    ArrayList<String> ignoredFiles;
-    String lang;
-    boolean scheduleBackup;
-    String scheduleCron;
-    int scheduleInterval;
-    String scheduleMode;
+    public ArrayList<String> ignoredFiles;
+    public String lang;
+    public boolean scheduleBackup;
+    public String scheduleCron;
+    public int scheduleInterval;
+    public String scheduleMode;
 
     public ConfigStorage(ArrayList<String> IgnoredFiles, String lang, boolean scheduleBackup, String scheduleCron, int scheduleInterval, String scheduleMode) {
         this.ignoredFiles = IgnoredFiles;

@@ -1,7 +1,5 @@
 package dev.skydynamic.quickbackupmulti.utils.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dev.skydynamic.quickbackupmulti.QbmConstant;
 
 import java.io.File;
@@ -12,9 +10,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
+
 public class QuickBackupMultiConfig {
     private final Object lock = new Object();
-    private final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
     private final Path configPath = QbmConstant.configDir;
     private ConfigStorage configStorage;
     File path = configPath.toFile();
@@ -76,6 +75,19 @@ public class QuickBackupMultiConfig {
             return t;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public String getConfigStorage() {
+        synchronized (lock) {
+            return gson.toJson(fixFields(configStorage, ConfigStorage.DEFAULT));
+        }
+    }
+
+    public void setConfigStorage(ConfigStorage configStorage) {
+        synchronized (lock) {
+            this.configStorage = configStorage;
+            saveModifiedConfig(configStorage);
         }
     }
 

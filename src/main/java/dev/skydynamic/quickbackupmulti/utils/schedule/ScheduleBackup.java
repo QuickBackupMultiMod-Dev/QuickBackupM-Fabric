@@ -25,6 +25,7 @@ public class ScheduleBackup implements Job {
             MinecraftServer server = Config.TEMP_CONFIG.server;
             if (scheduleMake(server.getCommandSource(), generateName())) {
                 final Collection<ServerPlayerEntity> playerList = server.getPlayerManager().getPlayerList();
+                Config.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
                 String nextExecuteTime = "";
                 switch (Config.INSTANCE.getScheduleMode()) {
                     case "interval" -> nextExecuteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);

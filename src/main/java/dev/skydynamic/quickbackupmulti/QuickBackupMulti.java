@@ -3,8 +3,11 @@ package dev.skydynamic.quickbackupmulti;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
+import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 //#if MC>=11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -13,11 +16,15 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //#endif
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
+import net.minecraft.network.PacketByteBuf;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restore;
+import static dev.skydynamic.quickbackupmulti.QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID;
+import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
 import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
+import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 
 public final class QuickBackupMulti implements ModInitializer {
 
@@ -35,6 +42,7 @@ public final class QuickBackupMulti implements ModInitializer {
 		//#else
 		//$$ CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> RegisterCommand(dispatcher));
 		//#endif
+		registerPacketHandler();
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			Config.TEMP_CONFIG.setServerValue(server);
 			Config.TEMP_CONFIG.setEnv(env);
@@ -51,6 +59,26 @@ public final class QuickBackupMulti implements ModInitializer {
 				}
 			}
 			Config.TEMP_CONFIG.server = null;
+		});
+	}
+
+	public static void registerPacketHandler() {
+		ServerPlayNetworking.registerGlobalReceiver(REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			if (player.hasPermissionLevel(2)) {
+				PacketByteBuf sendBuf = PacketByteBufs.create();
+				sendBuf.writeString(Config.INSTANCE.getConfigStorage());
+				ServerPlayNetworking.send(player, QbmConstant.OPEN_CONFIG_GUI_PACKET_ID, sendBuf);
+			}
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			if (player.hasPermissionLevel(2)) {
+				String configStorage = buf.readString();
+				ConfigStorage c = gson.fromJson(configStorage, ConfigStorage.class);
+				// Verify config
+				ConfigStorage result = verifyConfig(c, player);
+				Config.INSTANCE.setConfigStorage(result);
+			}
 		});
 	}
 }

@@ -2,6 +2,20 @@ quickbackupmulti:
   empty_comment: §7Empty§r
   list_empty: "§7Do not have any backups now"
 
+  config_page:
+    save_button: "Save Config"
+    close_button: "Close Screen"
+    back: "Back"
+    title: "QuickBackupMulti Config Screen"
+    open_schedule_config_button: "Open Schedule Config Screen"
+    lang: "Language"
+    schedule:
+      switch: "Schedule Backup: %s"
+      cron: "Cron expression"
+      interval: "Backup Interval"
+      mode:
+        switch: "Schedule backup mode: %s"
+
   schedule:
     get: "Next backup time is: §b%s"
     get_fail: "Schedule Backup do not enable"
@@ -37,6 +51,7 @@ quickbackupmulti:
     end_content: Now you can join your save!
 
   lang:
+    failed: "§4Language do not exists"
     get: "The current §alanguage§r is: §4§l%s§r"
     set: "§aLanguage§r has been set to: §4§l%s§r"
 

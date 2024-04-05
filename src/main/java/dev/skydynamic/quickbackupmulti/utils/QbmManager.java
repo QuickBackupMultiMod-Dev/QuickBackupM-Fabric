@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import dev.skydynamic.quickbackupmulti.QbmConstant;
+import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
+import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
 import net.fabricmc.api.EnvType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -33,9 +36,9 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
+import static dev.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.buildScheduler;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getNextExecutionTime;
+import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.*;
 
 public class QbmManager {
     public static Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/");
@@ -139,7 +142,7 @@ public class QbmManager {
     }
 
     public static boolean scheduleMake(ServerCommandSource commandSource, String name) {
-        if (!checkSlotExist(name)) return false;
+        if (checkSlotExist(name)) return false;
         try {
             MinecraftServer server = commandSource.getServer();
             //#if MC>11800
@@ -359,5 +362,129 @@ public class QbmManager {
         } catch (SchedulerException e) {
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
         }
+    }
+
+    public static int switchScheduleMode(ServerCommandSource commandSource, String mode) {
+        try {
+            if (Config.INSTANCE.getScheduleBackup()) {
+                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+                startSchedule(commandSource);
+            }
+        } catch (SchedulerException e) {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.fail", e)));
+            return 0;
+        }
+        Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.set", mode)));
+        return 1;
+    }
+
+    public static int disableSchedule(ServerCommandSource commandSource) {
+        try {
+            Config.TEMP_CONFIG.scheduler.shutdown();
+            Config.INSTANCE.setScheduleBackup(false);
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.success")));
+            return 1;
+        } catch (SchedulerException e) {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.fail", e)));
+            return 0;
+        }
+    }
+
+    public static int setScheduleCron(ServerCommandSource commandSource, String value) throws SchedulerException {
+        if (cronIsValid(value)) {
+            if (Config.TEMP_CONFIG.scheduler != null) {
+                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+            }
+            Config.INSTANCE.setScheduleCron(value);
+            if (Config.INSTANCE.getScheduleBackup()) {
+                startSchedule(commandSource);
+                if (Config.INSTANCE.getScheduleMode().equals("cron")) {
+                    Messenger.sendMessage(commandSource,
+                        Messenger.literal(tr("quickbackupmulti.schedule.cron.set_custom_success", getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false))));
+                }
+            } else {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success_only")));
+            }
+        } else {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.cron.expression_error")));
+            return 0;
+        }
+        return 1;
+    }
+
+    public static int setScheduleInterval(ServerCommandSource commandSource, int value, String type) throws SchedulerException {
+        if (Config.TEMP_CONFIG.scheduler != null) {
+            if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+        }
+        switch (type) {
+            case "s" -> Config.INSTANCE.setScheduleInterval(value);
+            case "m" -> Config.INSTANCE.setScheduleInterval(getSeconds(value, 0, 0));
+            case "h" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, value, 0));
+            case "d" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, 0, value));
+        }
+        if (Config.INSTANCE.getScheduleBackup()) {
+            startSchedule(commandSource);
+            if (Config.INSTANCE.getScheduleMode().equals("interval")) {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L))));
+            }
+        } else {
+            Messenger.sendMessage(commandSource,
+                Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success_only")));
+        }
+        return 1;
+    }
+
+    public static int setScheduleInterval(ServerCommandSource commandSource, int value) throws SchedulerException {
+        return setScheduleInterval(commandSource, value, "s");
+    }
+
+    public static ConfigStorage verifyConfig(ConfigStorage c, PlayerEntity player) {
+        ServerCommandSource commandSource = player.getCommandSource();
+
+        // schedule enable
+        if (c.scheduleBackup && !Config.INSTANCE.getScheduleBackup()) {
+            startSchedule(commandSource);
+        } else if (!c.scheduleBackup && Config.INSTANCE.getScheduleBackup()){
+            disableSchedule(commandSource);
+        }
+
+        // schedule backup mode switch
+        if (!c.scheduleMode.equals(Config.INSTANCE.getScheduleMode()))
+            switchScheduleMode(commandSource, c.scheduleMode);
+
+        // schedule set cron
+        if (!c.scheduleCron.equals(Config.INSTANCE.getScheduleCron())) {
+            try {
+                setScheduleCron(commandSource, c.scheduleCron);
+            } catch (SchedulerException e) {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
+            }
+        }
+
+        // schedule set interval
+        if (!((Integer) c.scheduleInterval).equals(Config.INSTANCE.getScheduleInrerval())) {
+            try {
+                setScheduleInterval(commandSource, c.scheduleInterval);
+            } catch (SchedulerException e) {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
+            }
+        }
+
+        // lang
+        if (!c.lang.equals(Config.INSTANCE.getLang())) {
+            if (!supportLanguage.contains(c.lang)) {
+                Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.failed")));
+                c.lang = Config.INSTANCE.getLang();
+            } else {
+                Translate.handleResourceReload(c.lang);
+                Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.set", c.lang)));
+            }
+        }
+
+        return c;
     }
 }
