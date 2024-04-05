@@ -17,9 +17,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import net.minecraft.network.PacketByteBuf;
-import org.quartz.SchedulerException;
+
+//#if MC>=11900
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+//#else
+//$$ import org.apache.logging.log4j.LogManager;
+//$$ import org.apache.logging.log4j.Logger;
+//#endif
 
 import static dev.skydynamic.quickbackupmulti.QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID;
 import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
@@ -28,7 +33,11 @@ import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 
 public final class QuickBackupMulti implements ModInitializer {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger("QuickBackupMulti");
+	//#if MC>=11900
+	public static final Logger LOGGER = LoggerFactory.getLogger("QuickBackupMulti");
+	//#else
+	//$$ public static final Logger LOGGER = LogManager.getLogger("QuickBackupMulti");
+	//#endif
 
 	EnvType env = FabricLoader.getInstance().getEnvironmentType();
 

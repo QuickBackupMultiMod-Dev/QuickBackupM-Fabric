@@ -42,7 +42,6 @@ dependencies {
 
     implementation('commons-io:commons-io:2.15.1')
     include(implementation('org.yaml:snakeyaml:2.0'))
-    include(implementation('org.slf4j:slf4j-api:2.0.1'))
     include(implementation('org.quartz-scheduler:quartz:2.3.2'))
 }
 
