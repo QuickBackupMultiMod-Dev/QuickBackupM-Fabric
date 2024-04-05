@@ -1,15 +1,16 @@
 package dev.skydynamic.quickbackupmulti;
 
-//#if MC>=11900
 import dev.skydynamic.quickbackupmulti.screen.ConfigScreen;
 import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
 
 import net.fabricmc.api.ClientModInitializer;
+//#if MC>=11900
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 //#else
 //$$ import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 //$$ import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
+//$$ import com.mojang.brigadier.CommandDispatcher;
 //#endif
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -22,7 +23,7 @@ public class QuickBackupMultiClient implements ClientModInitializer {
      */
     @Override
     public void onInitializeClient() {
-        //#if MC>=11900;
+        //#if MC>=11900
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("open-qb-config-screen").executes(
                 context -> {

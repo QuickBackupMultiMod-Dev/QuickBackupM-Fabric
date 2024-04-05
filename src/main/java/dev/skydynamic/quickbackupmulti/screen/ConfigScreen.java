@@ -8,7 +8,11 @@ import net.fabricmc.api.Environment;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+//#if MC>=12000
 import net.minecraft.client.gui.DrawContext;
+//#else
+//$$ import net.minecraft.client.util.math.MatrixStack;
+//#endif
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -36,17 +40,19 @@ public class ConfigScreen extends Screen {
     @Override
     protected void init() {
         // save & close
-        ButtonWidget saveConfigButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.save_button")), (button) -> {
+        ButtonWidget saveConfigButton = buildButton(tr("quickbackupmulti.config_page.save_button"),
+            width / 2 - totalWidth / 2, height - 70, 105, 20,
+            (button) -> {
             tempConfig.config.lang = langTextField.getText();
             PacketByteBuf sendBuf = PacketByteBufs.create();
             sendBuf.writeString(gson.toJson(tempConfig.config));
             ClientPlayNetworking.send(SAVE_CONFIG_PACKET_ID, sendBuf);
-        }).dimensions(width / 2 - totalWidth / 2, height - 70, 105, 20).build();
-        ButtonWidget closeScreenButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.close_button")), (button) -> this.close())
-            .dimensions(width / 2 - totalWidth / 2 + 135, height - 70, 105, 20).build();
+        });
+        ButtonWidget closeScreenButton = buildButton(tr("quickbackupmulti.config_page.close_button"),
+            width / 2 - totalWidth / 2 + 135, height - 70, 105, 20, (button) -> this.close());
 
-        ButtonWidget openScheduleConfigScreenButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.open_schedule_config_button")), (button) -> client.setScreen(new ScheduleConfigScreen(this)))
-            .dimensions(width / 2 - 100, 55, 200, 20).build();
+        ButtonWidget openScheduleConfigScreenButton = buildButton(tr("quickbackupmulti.config_page.open_schedule_config_button"),
+            width / 2 - 100, 55, 200, 20, (button) -> client.setScreen(new ScheduleConfigScreen(this)));
 
         langTextField = new TextFieldWidget(textRenderer, width / 2 - 38, 90, 105, 15, Text.of(""));
         langTextField.setText(tempConfig.config.lang);
@@ -82,9 +88,17 @@ public class ConfigScreen extends Screen {
     private void drawCenteredTextWithShadow(DrawContext context, String text, int x, int y, int color) {
         context.drawCenteredTextWithShadow(textRenderer, text, x, y, color);
     //#else
-    //$$ private void drawTitle(MatrixStack context) {
+    //$$ private void drawCenteredTextWithShadow(MatrixStack context, String text, int x, int y, int color) {
     //$$    drawCenteredTextWithShadow(context, textRenderer, text, x, y, color);
     //#endif
+    }
+
+    private ButtonWidget buildButton(String text, int x, int y, int width, int height, ButtonWidget.PressAction action) {
+        //#if MC>=11903
+        return ButtonWidget.builder(Messenger.literal(text), action).dimensions(x, y, width, height).build();
+        //#else
+        //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
+        //#endif
     }
 
 }

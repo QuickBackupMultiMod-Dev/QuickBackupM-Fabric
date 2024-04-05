@@ -3,7 +3,11 @@ package dev.skydynamic.quickbackupmulti.screen;
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+//#if MC>=12000
 import net.minecraft.client.gui.DrawContext;
+//#else
+//$$ import net.minecraft.client.util.math.MatrixStack;
+//#endif
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
@@ -27,13 +31,16 @@ public class ScheduleConfigScreen  extends Screen {
     protected void init() {
         int totalWidth = 2 * 120 + 20;
 
-        ButtonWidget backButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.back")), (button) -> {
+        ButtonWidget backButton = buildButton(tr("quickbackupmulti.config_page.back"), width / 2 - 100, height - 70, 200, 20,
+            (button) -> {
             tempConfig.config.scheduleCron = cronTextField.getText();
             tempConfig.config.scheduleInterval = Integer.parseInt(intervalTextField.getText());
             this.client.setScreen(parent);
-        }).dimensions(width / 2 - 100, height - 70, 200, 20).build();
+        });
 
-        ButtonWidget enableScheduleBackupButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.schedule.switch", tempConfig.config.getScheduleBackup() ? "On" : "Off")), (button) -> {
+        ButtonWidget enableScheduleBackupButton = buildButton(tr("quickbackupmulti.config_page.schedule.switch", tempConfig.config.getScheduleBackup() ? "On" : "Off"),
+            width / 2 - totalWidth / 2, 50, 120, 20,
+            (button) -> {
             if (button.getMessage().toString().contains("On")) {
                 button.setMessage(Messenger.literal(tr("quickbackupmulti.config_page.schedule.switch", "Off")));
                 tempConfig.config.scheduleBackup = false;
@@ -41,8 +48,10 @@ public class ScheduleConfigScreen  extends Screen {
                 button.setMessage(Messenger.literal(tr("quickbackupmulti.config_page.schedule.switch", "On")));
                 tempConfig.config.scheduleBackup = true;
             }
-        }).dimensions(width / 2 - totalWidth / 2, 50, 120, 20).build();
-        ButtonWidget switchScheduleModeButton = ButtonWidget.builder(Messenger.literal(tr("quickbackupmulti.config_page.schedule.mode.switch", tempConfig.config.getScheduleMode())), (button) -> {
+        });
+        ButtonWidget switchScheduleModeButton = buildButton(tr("quickbackupmulti.config_page.schedule.mode.switch", tempConfig.config.getScheduleMode()),
+            width / 2 - totalWidth / 2 + 105 + 20, 50, 120, 20,
+            (button) -> {
             if (button.getMessage().toString().contains("interval")) {
                 button.setMessage(Messenger.literal(tr("quickbackupmulti.config_page.schedule.mode.switch", "cron")));
                 tempConfig.config.scheduleMode = "cron";
@@ -50,7 +59,7 @@ public class ScheduleConfigScreen  extends Screen {
                 button.setMessage(Messenger.literal(tr("quickbackupmulti.config_page.schedule.mode.switch", "interval")));
                 tempConfig.config.scheduleMode = "interval";
             }
-        }).dimensions(width / 2 - totalWidth / 2 + 105 + 20, 50, 120, 20).build();
+        });
 
         cronTextField = new TextFieldWidget(textRenderer, width / 2, 80, 105, 15, Text.of(""));
         cronTextField.setText(tempConfig.config.scheduleCron);
@@ -98,8 +107,16 @@ public class ScheduleConfigScreen  extends Screen {
     private void drawCenteredTextWithShadow(DrawContext context, String text, int x, int y, int color) {
         context.drawCenteredTextWithShadow(textRenderer, text, x, y, color);
         //#else
-        //$$ private void drawTitle(MatrixStack context) {
+        //$$ private void drawCenteredTextWithShadow(MatrixStack context, String text, int x, int y, int color) {
         //$$    drawCenteredTextWithShadow(context, textRenderer, text, x, y, color);
+        //#endif
+    }
+
+    private ButtonWidget buildButton(String text, int x, int y, int width, int height, ButtonWidget.PressAction action) {
+        //#if MC>=11903
+        return ButtonWidget.builder(Messenger.literal(text), action).dimensions(x, y, width, height).build();
+        //#else
+        //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
         //#endif
     }
 }
