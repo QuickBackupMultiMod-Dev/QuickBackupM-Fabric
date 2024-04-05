@@ -1,6 +1,7 @@
 package dev.skydynamic.quickbackupmulti.screen;
 
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 //#if MC>=12000
@@ -76,11 +77,11 @@ public class ScheduleConfigScreen  extends Screen {
         intervalTextField.setText(String.valueOf(tempConfig.config.scheduleInterval));
         intervalTextField.setEditable(true);
 
-        this.addDrawableChild(cronTextField);
-        this.addDrawableChild(intervalTextField);
-        this.addDrawableChild(enableScheduleBackupButton);
-        this.addDrawableChild(switchScheduleModeButton);
-        this.addDrawableChild(backButton);
+        addChild(cronTextField);
+        addChild(intervalTextField);
+        addChild(enableScheduleBackupButton);
+        addChild(switchScheduleModeButton);
+        addChild(backButton);
     }
 
     @Override
@@ -119,4 +120,14 @@ public class ScheduleConfigScreen  extends Screen {
         //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
         //#endif
     }
+
+    //#if MC>=11701
+    private void addChild(ButtonWidget value) {
+        addDrawableChild(value);
+    }
+
+    private void addChild(TextFieldWidget value) {
+        addDrawableChild(value);
+    }
+    //#endif
 }

@@ -59,10 +59,10 @@ public class ConfigScreen extends Screen {
         langTextField.setMaxLength(5);
         langTextField.setEditable(true);
 
-        this.addDrawableChild(langTextField);
-        this.addDrawableChild(saveConfigButton);
-        this.addDrawableChild(closeScreenButton);
-        this.addDrawableChild(openScheduleConfigScreenButton);
+        addChild(langTextField);
+        addChild(saveConfigButton);
+        addChild(closeScreenButton);
+        addChild(openScheduleConfigScreenButton);
     }
 
     @Override
@@ -100,5 +100,15 @@ public class ConfigScreen extends Screen {
         //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
         //#endif
     }
+
+    //#if MC>=11701
+    private void addChild(ButtonWidget value) {
+        addDrawableChild(value);
+    }
+
+    private void addChild(TextFieldWidget value) {
+        addDrawableChild(value);
+    }
+    //#endif
 
 }
