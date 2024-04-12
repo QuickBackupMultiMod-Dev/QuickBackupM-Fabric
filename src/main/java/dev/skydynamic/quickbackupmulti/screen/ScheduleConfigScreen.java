@@ -15,6 +15,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.screen.ScreenUtils.buildButton;
 import static dev.skydynamic.quickbackupmulti.screen.TempConfig.tempConfig;
 
 @Environment(EnvType.CLIENT)
@@ -110,14 +111,6 @@ public class ScheduleConfigScreen  extends Screen {
         //#else
         //$$ private void drawCenteredTextWithShadow(MatrixStack context, String text, int x, int y, int color) {
         //$$    drawCenteredTextWithShadow(context, textRenderer, text, x, y, color);
-        //#endif
-    }
-
-    private ButtonWidget buildButton(String text, int x, int y, int width, int height, ButtonWidget.PressAction action) {
-        //#if MC>=11903
-        return ButtonWidget.builder(Messenger.literal(text), action).dimensions(x, y, width, height).build();
-        //#else
-        //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
         //#endif
     }
 

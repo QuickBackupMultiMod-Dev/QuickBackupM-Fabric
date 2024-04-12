@@ -55,7 +55,7 @@ public class QbmManager {
         }
     }
 
-    private static class SlotInfoStorage {
+    public static class SlotInfoStorage {
         String desc;
         long timestamp;
 

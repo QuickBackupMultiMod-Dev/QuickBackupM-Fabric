@@ -22,6 +22,7 @@ import net.minecraft.text.Text;
 import static dev.skydynamic.quickbackupmulti.QbmConstant.SAVE_CONFIG_PACKET_ID;
 import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.screen.ScreenUtils.buildButton;
 import static dev.skydynamic.quickbackupmulti.screen.TempConfig.tempConfig;
 
 @Environment(EnvType.CLIENT)
@@ -80,24 +81,16 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void close() {
-        client.setScreen(parent);
+        client.execute(() -> client.setScreen(parent));
         tempConfig.config = null;
     }
 
     //#if MC>=12000
     private void drawCenteredTextWithShadow(DrawContext context, String text, int x, int y, int color) {
         context.drawCenteredTextWithShadow(textRenderer, text, x, y, color);
-    //#else
-    //$$ private void drawCenteredTextWithShadow(MatrixStack context, String text, int x, int y, int color) {
-    //$$    drawCenteredTextWithShadow(context, textRenderer, text, x, y, color);
-    //#endif
-    }
-
-    private ButtonWidget buildButton(String text, int x, int y, int width, int height, ButtonWidget.PressAction action) {
-        //#if MC>=11903
-        return ButtonWidget.builder(Messenger.literal(text), action).dimensions(x, y, width, height).build();
         //#else
-        //$$ return new ButtonWidget(x, y, width, height, Messenger.literal(text), action);
+        //$$ private void drawCenteredTextWithShadow(MatrixStack context, String text, int x, int y, int color) {
+        //$$    drawCenteredTextWithShadow(context, textRenderer, text, x, y, color);
         //#endif
     }
 
@@ -110,5 +103,4 @@ public class ConfigScreen extends Screen {
         addDrawableChild(value);
     }
     //#endif
-
 }
