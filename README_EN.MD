@@ -16,8 +16,9 @@ Idea come from: [QuickBackupMulti](https://github.com/TISUnion/QuickBackupM)
 
 </div>
 
-> [!WARNING]
-> This mod has poor support in SinglePlay. So use it with great caution. If your save break, This mod will not be responsible for you.
+[//]: # (> [!WARNING])
+
+[//]: # (> This mod has poor support in SinglePlay. So use it with great caution. If your save break, This mod will not be responsible for you.)
 
 ## Advantage
 - Support auto start server after restore backup
