@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -149,11 +150,11 @@ public class QuickBackupMultiCommand {
                 Timer timer = (Timer) QbDataHashMap.get("QBM").get("Timer");
                 ScheduledExecutorService countdown = (ScheduledExecutorService) QbDataHashMap.get("QBM").get("Countdown");
                 AtomicInteger countDown = new AtomicInteger(11);
-                final List<ServerPlayerEntity> playerList = server.getPlayerManager().getPlayerList();
+                List<ServerPlayerEntity> finalPlayerList = new ArrayList<>(server.getPlayerManager().getPlayerList());
                 countdown.scheduleAtFixedRate(() -> {
                     int remaining = countDown.decrementAndGet();
                     if (remaining >= 1) {
-                        for (ServerPlayerEntity player : playerList) {
+                        for (ServerPlayerEntity player : finalPlayerList) {
                             //#if MC>11900
                             MutableText content = Messenger.literal(tr("quickbackupmulti.restore.countdown.text", remaining, slot))
                             //#else
@@ -174,7 +175,7 @@ public class QuickBackupMultiCommand {
                 } catch (IOException var4) {
                     LOGGER.error("Failed to unlock level {}", server.session.getDirectoryName(), var4);
                 }
-                timer.schedule(new RestoreTask(env, playerList, slot), 10000);
+                timer.schedule(new RestoreTask(env, finalPlayerList, slot), 10000);
             } else {
                 Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));
             }
