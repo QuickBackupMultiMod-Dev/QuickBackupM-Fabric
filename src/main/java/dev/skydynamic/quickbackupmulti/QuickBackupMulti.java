@@ -26,12 +26,6 @@ import org.slf4j.LoggerFactory;
 //$$ import org.apache.logging.log4j.Logger;
 //#endif
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-
 import static dev.skydynamic.quickbackupmulti.QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID;
 import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
 import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
@@ -94,24 +88,6 @@ public final class QuickBackupMulti implements ModInitializer {
 				ConfigStorage result = verifyConfig(c, player);
 				Config.INSTANCE.setConfigStorage(result);
 			}
-		});
-
-		ServerPlayNetworking.registerGlobalReceiver(QbmConstant.GET_BACKUP_LIST_PACKET_ID, (server, player, handler, buf, responseSender) -> {
-			HashMap<String, SlotInfoStorage> backupsData = new HashMap<>();
-			List<String> backupsList = getBackupsList(getBackupDir());
-			for (String backupName : backupsList) {
-                FileReader reader;
-                try {
-                    reader = new FileReader(backupDir.resolve(backupName + "_info.json").toFile());
-					var result = gson.fromJson(reader, SlotInfoStorage.class);
-					backupsData.put(backupName, result);
-                } catch (FileNotFoundException e) {
-                    LOGGER.error("Can't not get " + backupName + " info.");
-                }
-			}
-			PacketByteBuf sendBuf = PacketByteBufs.create();
-			sendBuf.writeString(gson.toJson(backupsData));
-			ServerPlayNetworking.send(player, QbmConstant.GET_BACKUP_LIST_PACKET_ID, sendBuf);
 		});
 	}
 }

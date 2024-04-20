@@ -1,8 +1,6 @@
 package dev.skydynamic.quickbackupmulti;
 
 import dev.skydynamic.quickbackupmulti.screen.ConfigScreen;
-import dev.skydynamic.quickbackupmulti.screen.TempConfig;
-import dev.skydynamic.quickbackupmulti.utils.QbmManager;
 import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -16,8 +14,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 //#endif
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-
-import java.util.HashMap;
 
 import static dev.skydynamic.quickbackupmulti.QbmConstant.*;
 
@@ -53,12 +49,6 @@ public class QuickBackupMultiClient implements ClientModInitializer {
             String config = buf.readString();
             ConfigStorage c = gson.fromJson(config, ConfigStorage.class);
             client.execute(() -> client.setScreen(new ConfigScreen(client.currentScreen, c)));
-        });
-
-        ClientPlayNetworking.registerGlobalReceiver(GET_BACKUP_LIST_PACKET_ID, (client, handler, buf, responseSender) -> {
-            String Backups = buf.readString();
-            HashMap<String, QbmManager.SlotInfoStorage> BackupsData = gson.fromJson(Backups, HashMap.class);
-            TempConfig.tempConfig.setBackupsData(BackupsData);
         });
     }
 }

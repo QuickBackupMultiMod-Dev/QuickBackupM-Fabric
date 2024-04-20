@@ -91,7 +91,11 @@ public class ScheduleConfigScreen  extends Screen {
         //#else
         //$$ public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
         //#endif
+        //#if MC>=12003
+        //$$ this.renderBackground(context, mouseX, mouseY, delta);
+        //#else
         this.renderBackground(context);
+        //#endif
         drawCenteredTextWithShadow(context, tr("quickbackupmulti.config_page.title"), width / 2, 20, 0xFFFFFF);
         drawCenteredTextWithShadow(context, tr("quickbackupmulti.config_page.schedule.cron"), width / 2 - 46, 83, 0xFFFFFF);
         drawCenteredTextWithShadow(context, tr("quickbackupmulti.config_page.schedule.interval"), width / 2 - 45, 123, 0xFFFFFF);

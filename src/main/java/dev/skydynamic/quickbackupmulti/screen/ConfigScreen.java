@@ -72,7 +72,11 @@ public class ConfigScreen extends Screen {
     //#else
     //$$ public void render(MatrixStack context, int mouseX, int mouseY, float delta) {
     //#endif
+        //#if MC>=12003
+        //$$ this.renderBackground(context, mouseX, mouseY, delta);
+        //#else
         this.renderBackground(context);
+        //#endif
         drawCenteredTextWithShadow(context, tr("quickbackupmulti.config_page.title"), width / 2, 20, 0xFFFFFF);
         drawCenteredTextWithShadow(context, tr("quickbackupmulti.config_page.lang"), width / 2 - 70, 93, 0xFFFFFF);
         langTextField.render(context, mouseX, mouseY, delta);
