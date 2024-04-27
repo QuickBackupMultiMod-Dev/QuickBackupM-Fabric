@@ -68,7 +68,6 @@ public class QbmManager {
                     for (String fileName : indexFiles.keySet()) {
                         File indexFilePath = getBackupDir().resolve(indexFiles.get(fileName)).resolve(dir).resolve(dimDir).resolve(fileName).toFile();
                         File targetFilePath = targetPath.resolve(dir).resolve(dimDir).toFile();
-                        System.out.println(targetFilePath);
                         if (!targetFilePath.exists()) targetFilePath.mkdirs();
                         FileUtils.copyFileToDirectory(indexFilePath, targetFilePath);
                     }
