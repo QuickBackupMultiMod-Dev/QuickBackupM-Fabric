@@ -35,7 +35,7 @@ Go to [release](https://github.com/SkyDynamic/QuickBackupM-Fabric/releases) to d
 ## todo
 - [x] Schedule Backup
 - [x] Infinite Slot
-- [ ] Compare files hash and save what files had change
+- [x] Compare files hash and save what files had change
 - [ ] Personal Setting
 
 ## LICENSE
