@@ -14,7 +14,7 @@ public class MakeCommand {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
 
-    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(me -> me.hasPermissionLevel(2))
+    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(MakeCommand::cheakPermission)
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
         .then(CommandManager.argument("name", StringArgumentType.string())
             .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))
@@ -26,5 +26,14 @@ public class MakeCommand {
 
     private static int makeSaveBackup(ServerCommandSource commandSource, String name, String desc) {
         return make(commandSource, name, desc);
+    }
+
+    private static boolean cheakPermission(CommandSourceStack stack){
+        // 
+        boolean flag = stack.hasPermission(2);
+        if (!flag && stack.getServer().isSingleplayer() && stack.isPlayer() && stack.getPlayer() != null) {
+            flag = stack.getServer().isSingleplayerOwner(stack.getPlayer().getGameProfile());
+        }
+        return flag;
     }
 }
