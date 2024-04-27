@@ -79,7 +79,7 @@ quickbackupmulti:
     next_page: Next page
     page_msg: "[§b%s§r / §b%s§r]"
     slot:
-      header: "[§6%s§r]"
+      header: "[§6#%s§r]"
       restore: Click to restore to slot §6%s§r
       delete: Click to delete slot §6%s§r
       total_space: "These backups total space consumed: §a%s§r"

@@ -7,7 +7,7 @@ import net.minecraft.server.command.ServerCommandSource;
 
 import java.text.SimpleDateFormat;
 
-import static dev.skydynamic.quickbackupmulti.utils.QbmManager.make;
+import static dev.skydynamic.quickbackupmulti.utils.MakeUtils.make;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class MakeCommand {

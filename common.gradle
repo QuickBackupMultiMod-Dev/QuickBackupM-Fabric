@@ -41,8 +41,16 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     implementation('commons-io:commons-io:2.15.1')
+
     include(implementation('org.yaml:snakeyaml:2.0'))
+
     include(implementation('org.quartz-scheduler:quartz:2.3.2'))
+
+    include(implementation('dev.morphia.morphia:morphia-core:2.3.9'))
+    include(implementation('de.bwaldvogel:mongo-java-server:1.45.0'))
+    include(implementation('de.bwaldvogel:mongo-java-server-h2-backend:1.45.0'))
+    include(implementation('org.mongodb:mongodb-driver-sync:4.11.1'))
+
 }
 
 String versionSuffix = ''

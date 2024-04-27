@@ -79,7 +79,7 @@ quickbackupmulti:
     next_page: 下一页
     page_msg: "[第§b%s§r页 / 共§b%s§r页]"
     slot:
-      header: "[§6%s§r]"
+      header: "[§6#%s§r]"
       restore: 点击回档至槽位§6%s§r
       delete: 点击删除槽位§6%s§r
       total_space: "当前页面备份总占用空间: §a%s§r"

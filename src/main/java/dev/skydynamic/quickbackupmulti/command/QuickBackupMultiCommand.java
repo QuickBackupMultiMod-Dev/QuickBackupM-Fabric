@@ -21,8 +21,6 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,14 +35,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static dev.skydynamic.quickbackupmulti.command.MakeCommand.makeCommand;
 import static dev.skydynamic.quickbackupmulti.command.SettingCommand.settingCommand;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
+import static dev.skydynamic.quickbackupmulti.utils.ListUtils.list;
+import static dev.skydynamic.quickbackupmulti.utils.ListUtils.search;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class QuickBackupMultiCommand {
-
-    private static final Logger logger = LoggerFactory.getLogger("Command");
-
     public static void RegisterCommand(CommandDispatcher<ServerCommandSource> dispatcher) {
         LiteralCommandNode<ServerCommandSource> QuickBackupMultiShortCommand = dispatcher.register(literal("qb")
             .then(literal("list").executes(it -> listSaveBackups(it.getSource(), 1))
@@ -66,7 +63,7 @@ public class QuickBackupMultiCommand {
                         try {
                             executeRestore(it.getSource());
                         } catch (Exception e) {
-                            logger.info(e.toString());
+                            LOGGER.info(e.toString());
                         }
                         return 0;
                     }))
@@ -87,7 +84,7 @@ public class QuickBackupMultiCommand {
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> QbDataHashMap = new ConcurrentHashMap<>();
 
     private static int searchSaveBackups(ServerCommandSource commandSource, String string) {
-        List<String> backupsList = getBackupsList(getBackupDir());
+        List<String> backupsList = getBackupsList();
         List<String> result = backupsList.stream()
             .filter(it -> StringUtils.containsIgnoreCase(it, string))
             .toList();
@@ -106,7 +103,7 @@ public class QuickBackupMultiCommand {
     }
 
     private static int restoreSaveBackup(ServerCommandSource commandSource, String name) {
-        if (!getBackupDir().resolve(name + "_info.json").toFile().exists()) {
+        if (!checkSlotExist(name)) {
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
             return 0;
         }
@@ -128,7 +125,7 @@ public class QuickBackupMultiCommand {
     //#endif
         synchronized (QbDataHashMap) {
             if (QbDataHashMap.containsKey("QBM")) {
-                if (!getBackupDir().resolve(QbDataHashMap.get("QBM").get("Slot") + "_info.json").toFile().exists()) {
+                if (!checkSlotExist((String) QbDataHashMap.get("QBM").get("Slot"))) {
                     Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.fail")));
                     QbDataHashMap.clear();
                     return;
@@ -164,7 +161,7 @@ public class QuickBackupMultiCommand {
                                             .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb cancel")))
                                             .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.restore.countdown.hover"))))));
                             player.sendMessage(content, false);
-                            logger.info(content.getString());
+                            LOGGER.info(content.getString());
                         }
                     } else {
                         countdown.shutdown();

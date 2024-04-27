@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.QbmManager.scheduleMake;
+import static dev.skydynamic.quickbackupmulti.utils.MakeUtils.scheduleMake;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getNextExecutionTime;
 
 public class ScheduleBackup implements Job {
