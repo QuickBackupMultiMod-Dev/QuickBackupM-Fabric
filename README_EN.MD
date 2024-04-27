@@ -16,7 +16,10 @@ Idea come from: [QuickBackupMulti](https://github.com/TISUnion/QuickBackupM)
 
 </div>
 
-[//]: # (> [!WARNING])
+> [!WARNING]  
+> Now the Mod version is `v2`, and there are great differences backup implementation method compared to the `v1` version
+>
+> If you use `v1` now, please don't to upgrade to `v2`. Also, if you use `v2` now, please don't downgrade to `v1`
 
 [//]: # (> This mod has poor support in SinglePlay. So use it with great caution. If your save break, This mod will not be responsible for you.)
 
