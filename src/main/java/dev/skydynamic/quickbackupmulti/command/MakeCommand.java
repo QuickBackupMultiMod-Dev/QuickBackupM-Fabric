@@ -2,8 +2,11 @@ package dev.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 
@@ -14,7 +17,7 @@ public class MakeCommand {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
 
-    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(MakeCommand::cheakPermission)
+    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(MakeCommand::checkPermission)
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
         .then(CommandManager.argument("name", StringArgumentType.string())
             .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))
@@ -28,11 +31,13 @@ public class MakeCommand {
         return make(commandSource, name, desc);
     }
 
-    private static boolean cheakPermission(CommandSourceStack stack){
-        // 
-        boolean flag = stack.hasPermission(2);
-        if (!flag && stack.getServer().isSingleplayer() && stack.isPlayer() && stack.getPlayer() != null) {
-            flag = stack.getServer().isSingleplayerOwner(stack.getPlayer().getGameProfile());
+    private static boolean checkPermission(@NotNull ServerCommandSource source) {
+        //
+        boolean flag = source.hasPermissionLevel(2);
+        ServerPlayerEntity player;
+        MinecraftServer server;
+        if (!flag && (server = source.getServer()).isSingleplayer() && source.isExecutedByPlayer() && (player = source.getPlayer()) != null) {
+            flag = server.isHost(player.getGameProfile());
         }
         return flag;
     }
