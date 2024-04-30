@@ -21,6 +21,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,11 +55,11 @@ public class QuickBackupMultiCommand {
 
             .then(makeCommand)
 
-            .then(literal("back").requires(me -> me.hasPermissionLevel(2))
+            .then(literal("back").requires(QuickBackupMultiCommand::checkPermission)
                     .then(CommandManager.argument("name", StringArgumentType.string())
                             .executes(it -> restoreSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
-            .then(literal("confirm").requires(me -> me.hasPermissionLevel(2))
+            .then(literal("confirm").requires(QuickBackupMultiCommand::checkPermission)
                     .executes(it -> {
                         try {
                             executeRestore(it.getSource());
@@ -68,10 +69,10 @@ public class QuickBackupMultiCommand {
                         return 0;
                     }))
 
-            .then(literal("cancel").requires(me -> me.hasPermissionLevel(2))
+            .then(literal("cancel").requires(QuickBackupMultiCommand::checkPermission)
                     .executes(it -> cancelRestore(it.getSource())))
 
-            .then(literal("delete").requires(me -> me.hasPermissionLevel(2))
+            .then(literal("delete").requires(QuickBackupMultiCommand::checkPermission)
                     .then(CommandManager.argument("name", StringArgumentType.string())
                             .executes(it -> deleteSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
@@ -200,5 +201,16 @@ public class QuickBackupMultiCommand {
         MutableText resultText = list(page);
         Messenger.sendMessage(commandSource, resultText);
         return 1;
+    }
+
+    public static boolean checkPermission(@NotNull ServerCommandSource source) {
+        //
+        boolean flag = source.hasPermissionLevel(2);
+        ServerPlayerEntity player;
+        MinecraftServer server;
+        if (!flag && (server = source.getServer()).isSingleplayer() && source.isExecutedByPlayer() && (player = source.getPlayer()) != null) {
+            flag = server.isHost(player.getGameProfile());
+        }
+        return flag;
     }
 }

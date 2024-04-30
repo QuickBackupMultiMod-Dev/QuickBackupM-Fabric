@@ -17,7 +17,7 @@ public class MakeCommand {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
 
-    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(MakeCommand::checkPermission)
+    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(QuickBackupMultiCommand::checkPermission)
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
         .then(CommandManager.argument("name", StringArgumentType.string())
             .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))
@@ -29,16 +29,5 @@ public class MakeCommand {
 
     private static int makeSaveBackup(ServerCommandSource commandSource, String name, String desc) {
         return make(commandSource, name, desc);
-    }
-
-    private static boolean checkPermission(@NotNull ServerCommandSource source) {
-        //
-        boolean flag = source.hasPermissionLevel(2);
-        ServerPlayerEntity player;
-        MinecraftServer server;
-        if (!flag && (server = source.getServer()).isSingleplayer() && source.isExecutedByPlayer() && (player = source.getPlayer()) != null) {
-            flag = server.isHost(player.getGameProfile());
-        }
-        return flag;
     }
 }
