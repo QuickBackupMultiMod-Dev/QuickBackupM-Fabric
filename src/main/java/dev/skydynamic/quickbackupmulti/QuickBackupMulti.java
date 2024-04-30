@@ -19,8 +19,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import net.minecraft.network.PacketByteBuf;
 
-//#if MC>=11900
 import org.apache.logging.log4j.LogManager;
+//#if MC>=11900
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //#else

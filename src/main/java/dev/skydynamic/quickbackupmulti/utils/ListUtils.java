@@ -158,9 +158,10 @@ public class ListUtils {
     }
 
     public static MutableText show(String name) {
+        MutableText resultText;
         if (checkSlotExist(name)) {
             BackupInfo backupInfo = getDataBase().getSlotInfo(name);
-            MutableText resultText = Messenger.literal(tr("quickbackupmulti.show.header"));
+            resultText = Messenger.literal(tr("quickbackupmulti.show.header"));
             String desc = backupInfo.getDesc();
             if (desc.isEmpty()) desc = tr("quickbackupmulti.empty_comment");
 
@@ -182,7 +183,9 @@ public class ListUtils {
 
             return resultText;
         } else {
-            return Messenger.literal(tr("quickbackupmulti.show.fail")).styled(style -> style.withColor(Formatting.RED));
+            resultText = Messenger.literal(tr("quickbackupmulti.show.fail"));
+            resultText.styled(style -> style.withColor(Formatting.RED));
+            return resultText;
         }
     }
 }
