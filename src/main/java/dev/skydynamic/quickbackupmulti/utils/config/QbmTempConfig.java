@@ -1,5 +1,6 @@
 package dev.skydynamic.quickbackupmulti.utils.config;
 
+import dev.skydynamic.quickbackupmulti.utils.DataBase;
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.MinecraftServer;
 import org.quartz.Scheduler;
@@ -12,6 +13,7 @@ public class QbmTempConfig {
     public String worldName;
     public Scheduler scheduler;
     public long latestScheduleExecuteTime;
+    public DataBase dataBase;
 
     public void setIsBackupValue(Boolean value) {
         this.isBackup = value;
@@ -39,6 +41,10 @@ public class QbmTempConfig {
 
     public void setLatestScheduleExecuteTime(long time) {
         this.latestScheduleExecuteTime = time;
+    }
+
+    public void setDataBase(DataBase dataBase) {
+        this.dataBase = dataBase;
     }
 
 }

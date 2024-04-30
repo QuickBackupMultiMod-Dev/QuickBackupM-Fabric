@@ -21,14 +21,13 @@ import java.util.List;
 import java.util.Objects;
 
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.DataBase.getDatabase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
+import static dev.skydynamic.quickbackupmulti.utils.ScheduleUtils.startSchedule;
 import static dev.skydynamic.quickbackupmulti.utils.hash.HashUtils.compareFileHash;
 import static dev.skydynamic.quickbackupmulti.utils.hash.HashUtils.getFileHash;
 
 public class MakeUtils {
-    private static final DataBase dataBase = getDatabase();
-
     public static void copyFileAndMakeDirs(File destDir, File file) throws IOException {
         if (file.isDirectory()) {
             if (!file.getParentFile().getName().equals(Config.TEMP_CONFIG.worldName)) new File(destDir, file.getName()).mkdirs();
@@ -68,7 +67,7 @@ public class MakeUtils {
             long time = 0;
             String latestBackupName = null;
             for (String name : backupList) {
-                BackupInfo info = dataBase.getSlotInfo(name);
+                BackupInfo info = getDataBase().getSlotInfo(name);
                 long timestamp = info.getTimestamp();
                 if (Math.max(time, timestamp) == timestamp) {
                     latestBackupName = name;
@@ -125,8 +124,6 @@ public class MakeUtils {
             MinecraftServer server = commandSource.getServer();
             //#if MC>11800
             server.saveAll(true, true, true);
-            // I dont know how create after this
-            server.session.close();
             //#else
             //$$ server.save(true, true, true);
             //#endif
@@ -142,8 +139,8 @@ public class MakeUtils {
 
             String latestBackupName = getLatestBackup();
 
-            FileHashes fileHashedDocument = dataBase.getDatastore().find(FileHashes.class).filter(Filters.eq("name", latestBackupName)).first();
-            IndexFile indexFileDocument = dataBase.getDatastore().find(IndexFile.class).filter(Filters.eq("name", latestBackupName)).first();
+            FileHashes fileHashedDocument = getDataBase().getDatastore().find(FileHashes.class).filter(Filters.eq("name", latestBackupName)).first();
+            IndexFile indexFileDocument = getDataBase().getDatastore().find(IndexFile.class).filter(Filters.eq("name", latestBackupName)).first();
 
             boolean firstBackup = latestBackupName.equals("null");
             if (firstBackup) FileUtils.copyDirectory(savePath.toFile(), getBackupDir().resolve(name).toFile(), fileFilter);

@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 
 import java.io.File;
 
-import static dev.skydynamic.quickbackupmulti.utils.DataBase.getDatabase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 
 @Entity(value = "FileHashes", useDiscriminator = false)
 public class FileHashes extends JavaEditLevelFormat {
@@ -43,6 +43,6 @@ public class FileHashes extends JavaEditLevelFormat {
     }
 
     public void save() {
-        getDatabase().save(this);
+        getDataBase().save(this);
     }
 }

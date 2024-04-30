@@ -3,6 +3,7 @@ package dev.skydynamic.quickbackupmulti.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 //#if MC<=11820
 //$$ import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -36,8 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static dev.skydynamic.quickbackupmulti.command.MakeCommand.makeCommand;
 import static dev.skydynamic.quickbackupmulti.command.SettingCommand.settingCommand;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.ListUtils.list;
-import static dev.skydynamic.quickbackupmulti.utils.ListUtils.search;
+import static dev.skydynamic.quickbackupmulti.utils.ListUtils.*;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -76,13 +76,23 @@ public class QuickBackupMultiCommand {
                     .then(CommandManager.argument("name", StringArgumentType.string())
                             .executes(it -> deleteSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
+
             .then(settingCommand)
+
+            .then(literal("show")
+                .then(CommandManager.argument("name", StringArgumentType.string())
+                    .executes(it -> showBackupDetail(it.getSource(), StringArgumentType.getString(it, "name")))))
         );
 
         dispatcher.register(literal("quickbackupm").redirect(QuickBackupMultiShortCommand));
     }
 
     public static final ConcurrentHashMap<String, ConcurrentHashMap<String, Object>> QbDataHashMap = new ConcurrentHashMap<>();
+
+    private static int showBackupDetail(ServerCommandSource commandSource, String name) {
+        Messenger.sendMessage(commandSource, show(name));
+        return 1;
+    }
 
     private static int searchSaveBackups(ServerCommandSource commandSource, String string) {
         List<String> backupsList = getBackupsList();
@@ -204,11 +214,18 @@ public class QuickBackupMultiCommand {
     }
 
     public static boolean checkPermission(@NotNull ServerCommandSource source) {
-        //
+         try {
+            return getPermission(source);
+         } catch (CommandSyntaxException e) {
+            return false;
+         }
+    }
+
+    private static boolean getPermission(ServerCommandSource source) throws CommandSyntaxException{
         boolean flag = source.hasPermissionLevel(2);
         ServerPlayerEntity player;
         MinecraftServer server;
-        if (!flag && (server = source.getServer()).isSingleplayer() && source.isExecutedByPlayer() && (player = source.getPlayer()) != null) {
+        if (!flag && (server = source.getServer()).isSingleplayer() && (player = source.getPlayer()) != null) {
             flag = server.isHost(player.getGameProfile());
         }
         return flag;

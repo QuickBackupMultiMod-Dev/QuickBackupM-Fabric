@@ -15,6 +15,7 @@ import dev.morphia.mapping.MapperOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
 import dev.skydynamic.quickbackupmulti.QbmConstant;
+import dev.skydynamic.quickbackupmulti.utils.config.Config;
 import dev.skydynamic.quickbackupmulti.utils.storage.BackupInfo;
 import dev.skydynamic.quickbackupmulti.utils.storage.IndexFile;
 import dev.skydynamic.quickbackupmulti.utils.storage.codec.DimensionFormatCodec;
@@ -35,16 +36,19 @@ import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 public final class DataBase {
     private MongoServer server;
     private Datastore datastore;
-    private static final DataBase dataBase = new DataBase();
 
     private static final InsertOneOptions INSERT_OPTIONS = new InsertOneOptions();
     private static final DeleteOptions DELETE_OPTIONS = new DeleteOptions();
 
-    public DataBase() {
+    public DataBase(String worldName) {
         File qbmDir = new File(QbmConstant.gameDir + "/QuickBackupMulti/");
         if (!qbmDir.exists()) qbmDir.mkdirs();
-        String connectionString = startInternalMongoServer();
-        LOGGER.info("Started local MongoDB server at " + server.getConnectionString());
+
+        String connectionString = Config.INSTANCE.getMongoDBUri();
+        if (Config.INSTANCE.getUseInternalDataBase()) {
+            connectionString = startInternalMongoServer();
+            LOGGER.info("Started local MongoDB server at " + server.getConnectionString());
+        }
 
         MongoClient mongoClient = MongoClients.create(connectionString);
 
@@ -58,7 +62,7 @@ public final class DataBase {
             .codecProvider(codecProvider)
             .build();
 
-        datastore = Morphia.createDatastore(mongoClient, "QuickBackupMulti", mapperOptions);
+        datastore = Morphia.createDatastore(mongoClient, "QuickBackupMulti-" + worldName.replace(" ", ""), mapperOptions);
         // database = mongoClient.getDatabase("QuickBackupMulti");
     }
 
@@ -135,11 +139,11 @@ public final class DataBase {
         return server.getConnectionString();
     }
 
-    public Datastore getDatastore() {
-        return datastore;
+    public void stopInternalMongoServer() {
+        server.shutdownNow();
     }
 
-    public static DataBase getDatabase() {
-        return dataBase;
+    public Datastore getDatastore() {
+        return datastore;
     }
 }

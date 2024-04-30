@@ -1,6 +1,7 @@
 package dev.skydynamic.quickbackupmulti;
 
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
+import dev.skydynamic.quickbackupmulti.utils.DataBase;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 
 import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
@@ -19,10 +20,10 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.PacketByteBuf;
 
 //#if MC>=11900
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //#else
-//$$ import org.apache.logging.log4j.LogManager;
 //$$ import org.apache.logging.log4j.Logger;
 //#endif
 
@@ -31,18 +32,22 @@ import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
 import static dev.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand.RegisterCommand;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 
-public final class QuickBackupMulti implements ModInitializer {
+public class QuickBackupMulti implements ModInitializer {
 
 	//#if MC>=11900
-	public static final Logger LOGGER = LoggerFactory.getLogger("QuickBackupMulti");
+	public static final Logger LOGGER = LoggerFactory.getLogger(QuickBackupMulti.class);
 	//#else
-	//$$ public static final Logger LOGGER = LogManager.getLogger("QuickBackupMulti");
+	//$$ public static final Logger LOGGER = LogManager.getLogger(QuickBackupMulti.class);
 	//#endif
 
 	EnvType env = FabricLoader.getInstance().getEnvironmentType();
 
 	@Override
 	public void onInitialize() {
+		final var filter = new JavaUtilLog4jFilter();
+		java.util.logging.Logger.getLogger("").setFilter(filter);
+		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(filter);
+
 		Config.INSTANCE.load();
 		Translate.handleResourceReload(Config.INSTANCE.getLang());
 
@@ -89,5 +94,17 @@ public final class QuickBackupMulti implements ModInitializer {
 				Config.INSTANCE.setConfigStorage(result);
 			}
 		});
+	}
+
+	public static boolean shouldFilterMessage(String message) {
+		return message.contains("Mongo") || message.contains("H2Backend") || message.contains("cluster");
+	}
+
+	public static DataBase getDataBase() {
+		return Config.TEMP_CONFIG.dataBase;
+	}
+
+	public static void setDataBase(String worldName) {
+		Config.TEMP_CONFIG.setDataBase(new DataBase(worldName));
 	}
 }

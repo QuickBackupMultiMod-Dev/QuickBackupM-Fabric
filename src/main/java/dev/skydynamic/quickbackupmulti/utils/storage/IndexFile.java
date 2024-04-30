@@ -8,7 +8,7 @@ import org.bson.types.ObjectId;
 import javax.annotation.Nullable;
 import java.io.File;
 
-import static dev.skydynamic.quickbackupmulti.utils.DataBase.getDatabase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 
 @Entity(value = "IndexFile", useDiscriminator = false)
 public class IndexFile extends JavaEditLevelFormat{
@@ -46,10 +46,10 @@ public class IndexFile extends JavaEditLevelFormat{
     }
 
     public void save() {
-        getDatabase().save(this);
+        getDataBase().save(this);
     }
 
     public void delete() {
-        getDatabase().delete(this);
+        getDataBase().delete(this);
     }
 }

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.setDataBase;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.createBackupDir;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.startSchedule;
 
@@ -28,6 +29,7 @@ public class MinecraftServer_ServerMixin {
     private void initQuickBackupMulti(CallbackInfo ci) {
         Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/");
         createBackupDir(backupDir);
+        setDataBase("server");
         startSchedule();
     }
 

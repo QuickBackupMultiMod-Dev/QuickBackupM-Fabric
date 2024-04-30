@@ -82,6 +82,7 @@ quickbackupmulti:
       header: "[§6#%s§r]"
       restore: 点击回档至槽位§6%s§r
       delete: 点击删除槽位§6%s§r
+      show: 点击查看槽位§6%s§r详情
       total_space: "当前页面备份总占用空间: §a%s§r"
 
   restore:
@@ -93,3 +94,12 @@ quickbackupmulti:
     fail: "回档§4失败§r: 槽位§4不存在§r!"
     confirm_hint: 使用§7/qb confirm§r 确认§c回档§r
     abort_hint: 已确认回档, 如需取消请输入§7/qb cancel§r
+
+  show:
+    header: "§d[槽位信息]§r"
+    name: "§b名称"
+    desc: "§b描述"
+    time: "§b备份时间"
+    back_button: "§2[点击回档]"
+    delete_button: "§c[点击删除]"
+    fail: 槽位不存在

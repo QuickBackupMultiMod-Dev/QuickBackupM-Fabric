@@ -13,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.setDataBase;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.createBackupDir;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.*;
 
@@ -29,11 +31,13 @@ public class MinecraftServer_ClientMixin {
         Config.TEMP_CONFIG.setWorldName(worldName);
         Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/").resolve(worldName);
         createBackupDir(backupDir);
+        setDataBase(worldName);
         startSchedule();
     }
 
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void stopSchedule(CallbackInfo ci) {
         shutdownSchedule();
+        getDataBase().stopInternalMongoServer();
     }
 }

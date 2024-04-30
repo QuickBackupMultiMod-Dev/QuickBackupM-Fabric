@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 
 import java.util.List;
 
-import static dev.skydynamic.quickbackupmulti.utils.DataBase.getDatabase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 
 @Entity(value = "BackupInfo", useDiscriminator = false)
 public class BackupInfo {
@@ -43,6 +43,6 @@ public class BackupInfo {
     }
 
     public void save() {
-        getDatabase().save(this);
+        getDataBase().save(this);
     }
 }

@@ -13,19 +13,25 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Objects;
 
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.DataBase.getDatabase;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.getBackupDir;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.getBackupsList;
+import static dev.skydynamic.quickbackupmulti.utils.QbmManager.checkSlotExist;
 
 public class ListUtils {
-    private static final DataBase dataBase = getDatabase();
-
     private static long getDirSize(File dir) {
         return FileUtils.sizeOf(dir);
+    }
+
+    public static String truncateString(String str, int maxLength) {
+        if (str.length() > maxLength) {
+            return str.substring(0, maxLength - 3) + "...";
+        } else {
+            return str;
+        }
     }
 
     private static int getPageCount(List<String>backupsDirList, int page) {
@@ -72,26 +78,31 @@ public class ListUtils {
     private static MutableText getSlotText(String name, int page, int num, long backupSizeB) throws IOException {
         MutableText backText = Messenger.literal("§2[▷] ");
         MutableText deleteText = Messenger.literal("§c[×] ");
+        MutableText nameText = Messenger.literal("§6" + truncateString(name, 8) + "§r ");
         MutableText resultText = Messenger.literal("");
         // var reader = new FileReader(backupDir.resolve(name + "_info.json").toFile());
         // var result = gson.fromJson(reader, BackupInfo.class);
         // reader.close();
-        BackupInfo result = dataBase.getSlotInfo(name);
+        BackupInfo result = getDataBase().getSlotInfo(name);
         backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)))
             .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))));
         deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name)))
             .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", name)))));
+        nameText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb show " + name)))
+            .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.show", name)))));
+
         String desc = result.getDesc();
-        if (Objects.equals(result.getDesc(), "")) desc = tr("quickbackupmulti.empty_comment");
+        if (desc.isEmpty()) desc = tr("quickbackupmulti.empty_comment");
         double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
         double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
         String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
         resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header",  num + (5 * (page - 1))) + " ")
-            .append("§6" + name + "§r ")
+            .append(nameText)
             .append(backText)
             .append(deleteText)
             .append("§a" + sizeString)
-            .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.getTimestamp()), desc));
+            .append(String.format(" §b%s§7: §r%s", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(result.getTimestamp()),
+                truncateString(desc, 10)));
         return resultText;
     }
 
@@ -144,5 +155,34 @@ public class ListUtils {
             }
         }
         return resultText;
+    }
+
+    public static MutableText show(String name) {
+        if (checkSlotExist(name)) {
+            BackupInfo backupInfo = getDataBase().getSlotInfo(name);
+            MutableText resultText = Messenger.literal(tr("quickbackupmulti.show.header"));
+            String desc = backupInfo.getDesc();
+            if (desc.isEmpty()) desc = tr("quickbackupmulti.empty_comment");
+
+            MutableText backText = Messenger.literal(tr("quickbackupmulti.show.back_button"));
+            MutableText deleteText = Messenger.literal(tr("quickbackupmulti.show.delete_button"));
+            backText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)))
+                .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))));
+            deleteText.styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name)))
+                .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(tr("quickbackupmulti.list_backup.slot.delete", name)))));
+
+            resultText.append("\n")
+                .append(tr("quickbackupmulti.show.name") + ": §r" + backupInfo.getName() + "\n")
+                .append(tr("quickbackupmulti.show.desc") + ": §r" + desc + "\n")
+                .append(tr("quickbackupmulti.show.time") + ": §r" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(backupInfo.getTimestamp()))
+                .append("\n")
+                .append(backText)
+                .append(" ")
+                .append(deleteText);
+
+            return resultText;
+        } else {
+            return Messenger.literal(tr("quickbackupmulti.show.fail")).styled(style -> style.withColor(Formatting.RED));
+        }
     }
 }

@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import dev.skydynamic.quickbackupmulti.i18n.LangSuggestionProvider;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
-import dev.skydynamic.quickbackupmulti.utils.QbmManager;
+import dev.skydynamic.quickbackupmulti.utils.ScheduleUtils;
 import dev.skydynamic.quickbackupmulti.utils.config.Config;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
+import static dev.skydynamic.quickbackupmulti.utils.ScheduleUtils.*;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.*;
 import static net.minecraft.server.command.CommandManager.literal;
 
@@ -90,7 +90,7 @@ public class SettingCommand {
 
     private static int setScheduleCron(ServerCommandSource commandSource, String value) {
         try {
-            return QbmManager.setScheduleCron(commandSource, value);
+            return ScheduleUtils.setScheduleCron(commandSource, value);
         } catch (SchedulerException e) {
             return 0;
         }
@@ -98,7 +98,7 @@ public class SettingCommand {
 
     private static int setScheduleInterval(ServerCommandSource commandSource, int value, String type) {
         try {
-            return QbmManager.setScheduleInterval(commandSource, value, type);
+            return ScheduleUtils.setScheduleInterval(commandSource, value, type);
         } catch (SchedulerException e) {
             Messenger.sendMessage(commandSource,
                 Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));

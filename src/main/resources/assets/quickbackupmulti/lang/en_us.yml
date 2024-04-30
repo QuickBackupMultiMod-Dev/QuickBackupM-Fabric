@@ -82,6 +82,7 @@ quickbackupmulti:
       header: "[§6#%s§r]"
       restore: Click to restore to slot §6%s§r
       delete: Click to delete slot §6%s§r
+      show: Click to show §6%s§r detail
       total_space: "These backups total space consumed: §a%s§r"
 
   restore:
@@ -93,3 +94,12 @@ quickbackupmulti:
     fail: "§4Fail§r ro restore: slot §4NotFount§r!"
     confirm_hint: Use §7/qb confirm§r to confirm §crestore§r
     abort_hint: Confirmed restore, If you want to abort, please enter §7/qb cancel§r
+
+  show:
+    header: "§d[Slot Information]§r"
+    name: "§bName"
+    desc: "§bBackup Desc"
+    time: "§bBackup Time"
+    back_button: "§2[Click to back]"
+    delete_button: "§c[Click to delete]"
+    fail: Backup Not Found
