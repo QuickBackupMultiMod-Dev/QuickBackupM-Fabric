@@ -48,8 +48,12 @@ dependencies {
 
     include(implementation('dev.morphia.morphia:morphia-core:2.3.9'))
     include(implementation('de.bwaldvogel:mongo-java-server:1.45.0'))
+    include(implementation('de.bwaldvogel:mongo-java-server-core:1.45.0'))
     include(implementation('de.bwaldvogel:mongo-java-server-h2-backend:1.45.0'))
     include(implementation('org.mongodb:mongodb-driver-sync:4.11.1'))
+    include(implementation('org.mongodb:mongodb-driver-core:4.11.1'))
+    include(implementation('org.mongodb:bson:4.11.1'))
+    include(implementation('com.h2database:h2:2.2.224'))
 
 }
 

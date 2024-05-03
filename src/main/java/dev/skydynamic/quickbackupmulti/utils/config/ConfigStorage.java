@@ -51,4 +51,16 @@ public class ConfigStorage {
     public String getScheduleMode() {
         return this.scheduleMode;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConfigStorage that)) return false;
+        return getScheduleBackup() == that.getScheduleBackup() && scheduleInterval == that.scheduleInterval && useInternalDataBase == that.useInternalDataBase && Objects.equals(ignoredFiles, that.ignoredFiles) && Objects.equals(lang, that.lang) && Objects.equals(scheduleCron, that.scheduleCron) && Objects.equals(getScheduleMode(), that.getScheduleMode()) && Objects.equals(mongoDBUri, that.mongoDBUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ignoredFiles, lang, getScheduleBackup(), scheduleCron, scheduleInterval, getScheduleMode(), useInternalDataBase, mongoDBUri);
+    }
 }

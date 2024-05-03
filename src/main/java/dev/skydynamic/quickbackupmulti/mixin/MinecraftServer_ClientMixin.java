@@ -38,6 +38,6 @@ public class MinecraftServer_ClientMixin {
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void stopSchedule(CallbackInfo ci) {
         shutdownSchedule();
-        getDataBase().stopInternalMongoServer();
+        if (!Config.TEMP_CONFIG.isBackup) getDataBase().stopInternalMongoServer();
     }
 }

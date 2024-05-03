@@ -12,8 +12,10 @@ import net.minecraft.text.Text;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restoreClient;
+import static dev.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.shutdownSchedule;
 
 @Environment(EnvType.CLIENT)
 public class ClientRestoreDelegate {
@@ -29,7 +31,6 @@ public class ClientRestoreDelegate {
     public void run() {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         minecraftClient.execute(() -> {
-            Config.TEMP_CONFIG.setIsBackupValue(true);
             minecraftClient.world.disconnect();
             minecraftClient.disconnect(new MessageScreen(Text.of("Restore backup")));
             CompletableFuture.runAsync(() -> {
@@ -42,6 +43,7 @@ public class ClientRestoreDelegate {
                     minecraftClient.setScreen(null);
                     restoreClient(slot);
                     Config.TEMP_CONFIG.setIsBackupValue(false);
+                    getDataBase().stopInternalMongoServer();
                     Text title = Text.of(tr("quickbackupmulti.toast.end_title"));
                     Text content = Text.of(tr("quickbackupmulti.toast.end_content"));
                     //#if MC>=11800

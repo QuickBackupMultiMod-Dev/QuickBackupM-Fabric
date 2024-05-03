@@ -25,6 +25,7 @@ public class RestoreTask extends TimerTask {
     @Override
     public void run() {
         QbDataHashMap.clear();
+        Config.TEMP_CONFIG.setIsBackupValue(true);
         if (env == EnvType.SERVER) {
             for (ServerPlayerEntity player : playerList) {
                 player.networkHandler.disconnect(Text.of("Server restore backup"));
