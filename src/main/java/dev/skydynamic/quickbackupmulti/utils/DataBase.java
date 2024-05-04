@@ -50,7 +50,13 @@ public final class DataBase {
             LOGGER.info("Started local MongoDB server at " + server.getConnectionString());
         }
 
-        MongoClient mongoClient = MongoClients.create(connectionString);
+        MongoClient mongoClient;
+        try {
+            mongoClient = MongoClients.create(connectionString);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
 
         var codecProvider = CodecRegistries.fromCodecs(
             new DimensionFormatCodec()
