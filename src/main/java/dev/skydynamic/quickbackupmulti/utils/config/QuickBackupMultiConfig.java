@@ -54,11 +54,11 @@ public class QuickBackupMultiConfig {
         }
     }
 
-    private <T> T fixFields(T t, T defaultVal) {
+    private ConfigStorage fixFields(ConfigStorage t, ConfigStorage defaultVal) {
         if (t == null) {
             throw new NullPointerException();
         }
-        if (t == defaultVal) {
+        if (t.equals(defaultVal)) {
             return t;
         }
         try {
