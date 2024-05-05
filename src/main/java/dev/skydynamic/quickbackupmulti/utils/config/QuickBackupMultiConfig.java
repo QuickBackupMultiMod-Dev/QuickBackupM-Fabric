@@ -177,4 +177,11 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public void setUseInternalDataBase(boolean value) {
+        synchronized (lock) {
+            configStorage.useInternalDataBase = value;
+            saveModifiedConfig(configStorage);
+        }
+    }
+
 }

@@ -40,6 +40,12 @@ quickbackupmulti:
       set_fail: "Set fail: §c%s"
       expression_error: The Cron expression you entered is non-standard!
 
+  database:
+    set_success: "Set Success"
+    set_fail: "Set fail, because: %s"
+    set_success_but: "Set Success, but an error has occurred: %s"
+    value_equal_config: "Use Internal DataBase is §b%s now!"
+
   search:
     success: "§aSearch success§r, the result: "
     fail: "§4Do not have any result"

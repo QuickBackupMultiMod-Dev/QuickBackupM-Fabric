@@ -40,6 +40,12 @@ quickbackupmulti:
       set_fail: "设置失败: §c%s"
       expression_error: 你输入的Cron表达式有误
 
+  database:
+    set_success: "设置成功"
+    set_fail: "设置失败, 原因: %s"
+    set_success_but: "设置成功, 但发生了错误: %s"
+    value_equal_config: "当前的值已经为§b%s"
+
   search:
     success: "§a搜索成功§r, 结果如下: "
     fail: "§4没有搜索到任何结果"

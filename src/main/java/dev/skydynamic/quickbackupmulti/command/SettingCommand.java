@@ -1,5 +1,6 @@
 package dev.skydynamic.quickbackupmulti.command;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -15,6 +16,8 @@ import org.quartz.SchedulerException;
 
 import java.text.SimpleDateFormat;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.setDataBase;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.ScheduleUtils.*;
@@ -65,7 +68,38 @@ public class SettingCommand {
                     .then(literal("get").executes(it -> getScheduleMode(it.getSource()))))
             )
             .then(literal("get")
-                .executes(it -> getNextBackupTime(it.getSource()))));
+                .executes(it -> getNextBackupTime(it.getSource()))))
+        .then(literal("dataBase")
+            .requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("useInternalDataBase")
+                .then(literal("set")
+                    .then(CommandManager.argument("value", BoolArgumentType.bool())
+                        .executes(it -> setUseInternalDataBase(it.getSource(), BoolArgumentType.getBool(it, "value")))))));
+
+    private static int setUseInternalDataBase(ServerCommandSource commandSource, Boolean value) {
+        if (value != Config.INSTANCE.getUseInternalDataBase()) {
+            Config.INSTANCE.setUseInternalDataBase(value);
+            try {
+                if (value) {
+                    setDataBase(Config.TEMP_CONFIG.worldName);
+                } else {
+                    getDataBase().stopInternalMongoServer();
+                    setDataBase(Config.TEMP_CONFIG.worldName);
+                }
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.database.set_success")));
+                return 1;
+            } catch (Exception e) {
+                Messenger.sendMessage(commandSource,
+                    Messenger.literal(tr("quickbackupmulti.database.set_success_but", e.getMessage())));
+                return 0;
+            }
+        } else {
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.database.set_fail", tr("quickbackupmulti.database.value_equal_config", value))));
+            return 0;
+        }
+
+    }
 
     private static int getLang(ServerCommandSource commandSource) {
         Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.get", Config.INSTANCE.getLang())));

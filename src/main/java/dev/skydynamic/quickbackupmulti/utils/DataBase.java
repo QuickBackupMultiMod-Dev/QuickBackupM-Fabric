@@ -51,12 +51,7 @@ public final class DataBase {
         }
 
         MongoClient mongoClient;
-        try {
-            mongoClient = MongoClients.create(connectionString);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return;
-        }
+        mongoClient = MongoClients.create(connectionString);
 
         var codecProvider = CodecRegistries.fromCodecs(
             new DimensionFormatCodec()
@@ -146,7 +141,8 @@ public final class DataBase {
     }
 
     public void stopInternalMongoServer() {
-        server.shutdownNow();
+        if (server != null) server.shutdownNow();
+        server = null;
     }
 
     public Datastore getDatastore() {
