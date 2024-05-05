@@ -5,7 +5,7 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Bug description / Bug秒速
+      label: Bug description / Bug描述
       description: |
         A clear and concise description of what the bug is.
         Is it a game crash, an unexpected behavior, or has something gone wrong?
@@ -21,7 +21,7 @@ body:
   - type: textarea
     id: to-reproduce
     attributes:
-      label: Steps to reproduce / 复现不走
+      label: Steps to reproduce / 复现步骤
       description: | 
         Steps to reproduce the bug.
         ---------------------------
