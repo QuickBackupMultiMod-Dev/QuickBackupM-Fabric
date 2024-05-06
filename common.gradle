@@ -70,6 +70,21 @@ version = 'v' + fullModVersion
 group = project.maven_group
 archivesBaseName = project.archives_base_name + '-mc' + project.minecraft_version
 
+def mcVersionString = project.minecraft_version
+def versionStringList = mcVersionString.split("\\.").toList()
+if (versionStringList.size() == 2) {
+    versionStringList.add(2, "00")
+} else {
+    if (!(versionStringList.get(2).toInteger() >= 10)) {
+        versionStringList.set(2, "0" + versionStringList.get(2))
+    }
+}
+def versionInt = versionStringList.join("").toInteger()
+String fabric_id = "fabric_"
+if (versionInt < 11800) {
+    fabric_id = "fabric"
+}
+
 processResources {
     from "qbm.accesswidener"
 
@@ -80,7 +95,8 @@ processResources {
                 "version": fullModVersion,
                 "id": project.mod_id,
                 "name": project.archives_base_name,
-                "minecraft_support": project.minecraft_support_version
+                "minecraft_support": project.minecraft_support_version,
+                "fabric_api_id": fabric_id
         ]
         expand valueMap
     }
