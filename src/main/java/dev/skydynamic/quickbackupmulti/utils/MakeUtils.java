@@ -79,27 +79,30 @@ public class MakeUtils {
     }
 
     private static <T extends HashMap<String, String>> HashMap<String, Object> compareAndIndex(
-        boolean isFirstBackup,
-        String latestBackupName,
-        FileHashes fileHashes,
-        IndexFile indexFile,
-        File file,
-        File destCopyDir,
-        T hashMap,
-        T indexMap,
-        List<String> indexBackupList
+        boolean isFirstBackup,       // 是否是第一次备份
+        String latestBackupName,     // 最新备份的名字
+        FileHashes fileHashes,       // 最新备份的哈希存储类
+        IndexFile indexFile,         // 最新备份的索引存储类
+        File file,                   // 目标文件
+        File destCopyDir,            // 复制的目标文件夹
+        T hashMap,                   // 需要改动的HashMap
+        T indexMap,                  // 需要改动的IndexMap
+        List<String> indexBackupList // 索引列表
     ) throws Exception {
+        // 获取文件Hash
         String fileHash = getFileHash(file.toPath());
+        // 如果不是第一次备份
         if (!isFirstBackup) {
+            // 对比文件Hash
             if (compareFileHash(fileHashes, file.getParentFile(), file, fileHash)) {
+                // 获取索引
                 String index = indexFile.isIndexAndGetIndex(file.getParentFile(), file);
-                if (index != null) {
-                    indexMap.put(file.getName(), index);
-                    if (!indexBackupList.contains(index)) {
-                        indexBackupList.add(index);
-                    }
-                } else {
-                    indexMap.put(file.getName(), latestBackupName);
+                // 如果最新备份中该文件没有索引到别的备份中, 则索引到最新存档中的文件
+                if (index != null) index = latestBackupName;
+                indexMap.put(file.getName(), index);
+                // 如果索引的备份列表中没有索引文件的出处，则添加到索引列表
+                if (!indexBackupList.contains(index)) {
+                    indexBackupList.add(index);
                 }
             } else {
                 copyFileAndMakeDirs(destCopyDir, file);
@@ -150,30 +153,39 @@ public class MakeUtils {
             HashMap<String, String> rootHashMap = new HashMap<>();
             HashMap<String, String> rootIndexMap = new HashMap<>();
             List<String> indexBackupList = new ArrayList<>();
-            if (!firstBackup) indexBackupList.add(latestBackupName);
+            // if (!firstBackup) indexBackupList.add(latestBackupName);
+            // 开始循环存档文件夹
             for (File file : saveFiles) {
+                // 判断是否是文件夹
                 if (file.isDirectory()) {
-                    HashMap<String, String> hashMap = new HashMap<>();
-                    HashMap<String, String> indexMap = new HashMap<>();
-                    DimensionFormat dimHashData = new DimensionFormat();
-                    DimensionFormat dimIndexData = new DimensionFormat();
+                    // 新建一些表来临时用
+                    HashMap<String, String> hashMap = new HashMap<>(); // hashMap     文件哈希临时存储Map
+                    HashMap<String, String> indexMap = new HashMap<>(); // indexMap   文件索引临时存储Map
+                    DimensionFormat dimHashData = new DimensionFormat(); // DIM Hash  哈希类
+                    DimensionFormat dimIndexData = new DimensionFormat();// DIM Index 索引类
                     for (File dirFile : file.listFiles()) {
+                        // DIM1和DIM-1文件格式有点特殊，单独区别
                         if (file.getName().equals("DIM1") || file.getName().equals("DIM-1")) {
+                            // 如果是文件夹（原版情况下一般只有文件夹了xwx, 但还是要判断）
                             if (dirFile.isDirectory()) {
+                                // 初始化
                                 hashMap = new HashMap<>();
                                 indexMap = new HashMap<>();
                                 for (File dirFile1 : dirFile.listFiles()) {
+                                    // 该处同root与别的文件夹
                                     HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, dirFile1, destDir, hashMap, indexMap, indexBackupList);
                                     hashMap = (HashMap<String, String>) resultMap.get("hash");
                                     indexMap = (HashMap<String, String>) resultMap.get("index");
                                     indexBackupList = (List<String>) resultMap.get("indexBackupList");
                                 }
+                                // 设置
                                 dimHashData.set(dirFile.getName(), hashMap);
                                 dimIndexData.set(dirFile.getName(), indexMap);
                             }
                             fileHashes.setDim(file.getName(), dimHashData);
                             indexFile.setDim(file.getName(), dimIndexData);
                         } else {
+                            // 正常来说除了datapacks文件夹外，别的原版文件夹下没有文件夹了, 现在临时过滤掉datapacks下的文件夹
                             if (file.getName().equals("datapacks")) {
                                 if(dirFile.isDirectory()) {
                                     continue;
@@ -188,6 +200,7 @@ public class MakeUtils {
                     fileHashes.set(file.getName(), hashMap);
                     indexFile.set(file.getName(), indexMap);
                 } else {
+                    // 不是文件夹则为root下的，不进行继续迭代
                     HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, file, destDir, rootHashMap, rootIndexMap, indexBackupList);
                     rootHashMap = (HashMap<String, String>) resultMap.get("hash");
                     rootIndexMap = (HashMap<String, String>) resultMap.get("index");
