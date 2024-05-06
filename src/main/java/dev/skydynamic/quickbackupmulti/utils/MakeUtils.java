@@ -174,6 +174,11 @@ public class MakeUtils {
                             fileHashes.setDim(file.getName(), dimHashData);
                             indexFile.setDim(file.getName(), dimIndexData);
                         } else {
+                            if (file.getName().equals("datapacks")) {
+                                if(dirFile.isDirectory()) {
+                                    continue;
+                                }
+                            }
                             HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, dirFile, destDir, hashMap, indexMap, indexBackupList);
                             hashMap = (HashMap<String, String>) resultMap.get("hash");
                             indexMap = (HashMap<String, String>) resultMap.get("index");
