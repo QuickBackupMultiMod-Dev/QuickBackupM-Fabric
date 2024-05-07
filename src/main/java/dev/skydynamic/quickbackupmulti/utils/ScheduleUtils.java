@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.utils;
 
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.minecraft.server.command.ServerCommandSource;
 import org.quartz.SchedulerException;
 
@@ -15,9 +15,16 @@ public class ScheduleUtils {
     public static void startSchedule(ServerCommandSource commandSource) {
         String nextBackupTimeString = "";
         try {
+            // 照顾Java8
             switch (Config.INSTANCE.getScheduleMode()) {
-                case "cron" -> nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
-                case "interval" -> nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
+                case "cron": {
+                    nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
+                    break;
+                }
+                case "interval": {
+                    nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
+                    break;
+                }
             }
             buildScheduler();
             Config.TEMP_CONFIG.scheduler.start();
@@ -81,10 +88,22 @@ public class ScheduleUtils {
             if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
         }
         switch (type) {
-            case "s" -> Config.INSTANCE.setScheduleInterval(value);
-            case "m" -> Config.INSTANCE.setScheduleInterval(getSeconds(value, 0, 0));
-            case "h" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, value, 0));
-            case "d" -> Config.INSTANCE.setScheduleInterval(getSeconds(0, 0, value));
+            case "s" : {
+                Config.INSTANCE.setScheduleInterval(value);
+                break;
+            }
+            case "m" : {
+                Config.INSTANCE.setScheduleInterval(getSeconds(value, 0, 0));
+                break;
+            }
+            case "h" : {
+                Config.INSTANCE.setScheduleInterval(getSeconds(0, value, 0));
+                break;
+            }
+            case "d" : {
+                Config.INSTANCE.setScheduleInterval(getSeconds(0, 0, value));
+                break;
+            }
         }
         if (Config.INSTANCE.getScheduleBackup()) {
             startSchedule(commandSource);

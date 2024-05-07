@@ -29,10 +29,22 @@ remapJar {
     remapperIsolation = true
 }
 
-if (mcVersion >= 11800) {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+JavaVersion SOURCE_JAVA_VERSION
+JavaVersion TARGET_JAVA_VERSION
+if (mcVersion >= 12005) {
+    SOURCE_JAVA_VERSION = JavaVersion.VERSION_21
+    TARGET_JAVA_VERSION = JavaVersion.VERSION_21
+} else if (mcVersion >= 11800){
+    SOURCE_JAVA_VERSION = JavaVersion.VERSION_17
+    TARGET_JAVA_VERSION = JavaVersion.VERSION_17
+}  else if (mcVersion >= 11700) {
+    SOURCE_JAVA_VERSION = JavaVersion.VERSION_16
+    TARGET_JAVA_VERSION = JavaVersion.VERSION_16
+} else {
+    SOURCE_JAVA_VERSION = JavaVersion.VERSION_1_8
+    TARGET_JAVA_VERSION = JavaVersion.VERSION_17
 }
+JavaVersion MIXIN_COMPATIBILITY_LEVEL = TARGET_JAVA_VERSION
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -70,18 +82,8 @@ version = 'v' + fullModVersion
 group = project.maven_group
 archivesBaseName = project.archives_base_name + '-mc' + project.minecraft_version
 
-def mcVersionString = project.minecraft_version
-def versionStringList = mcVersionString.split("\\.").toList()
-if (versionStringList.size() == 2) {
-    versionStringList.add(2, "00")
-} else {
-    if (!(versionStringList.get(2).toInteger() >= 10)) {
-        versionStringList.set(2, "0" + versionStringList.get(2))
-    }
-}
-def versionInt = versionStringList.join("").toInteger()
-String fabric_id = "fabric_"
-if (versionInt < 11800) {
+String fabric_id = "fabric-api"
+if (mcVersion < 11800) {
     fabric_id = "fabric"
 }
 
@@ -92,24 +94,32 @@ processResources {
 
     filesMatching("fabric.mod.json") {
         def valueMap = [
-                "version": fullModVersion,
-                "id": project.mod_id,
-                "name": project.archives_base_name,
+                "version"          : fullModVersion,
+                "id"               : project.mod_id,
+                "name"             : project.archives_base_name,
                 "minecraft_support": project.minecraft_support_version,
-                "fabric_api_id": fabric_id
+                "fabric_api_id"    : fabric_id
         ]
         expand valueMap
+    }
+
+    filesMatching("quickbackupmulti.mixins.json") {
+        filter {
+            text -> text.replace("/*JAVA_VERSION*/", "JAVA_${MIXIN_COMPATIBILITY_LEVEL.ordinal() + 1}")
+        }
     }
 }
 
 java {
     withSourcesJar()
+    sourceCompatibility = SOURCE_JAVA_VERSION
+    targetCompatibility = TARGET_JAVA_VERSION
 }
 
 jar {
     from "LICENSE"
 }
 
-tasks.withType(JavaCompile){
-    options.encoding="UTF-8"
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }

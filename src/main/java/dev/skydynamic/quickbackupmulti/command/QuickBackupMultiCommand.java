@@ -10,7 +10,7 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 //#endif
 import dev.skydynamic.quickbackupmulti.backup.RestoreTask;
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
@@ -178,11 +178,6 @@ public class QuickBackupMultiCommand {
                         countdown.shutdown();
                     }
                 }, 0, 1, TimeUnit.SECONDS);
-                try {
-                    server.session.close();
-                } catch (IOException var4) {
-                    LOGGER.error("Failed to unlock level {}", server.session.getDirectoryName(), var4);
-                }
                 timer.schedule(new RestoreTask(env, finalPlayerList, slot), 10000);
             } else {
                 Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.confirm_restore.nothing_to_confirm")));

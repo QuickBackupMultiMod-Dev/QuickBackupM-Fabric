@@ -1,13 +1,16 @@
 package dev.skydynamic.quickbackupmulti.screen;
 
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
-import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
+import dev.skydynamic.quickbackupmulti.config.ConfigStorage;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+//#if MC>=12005
+//$$ import dev.skydynamic.quickbackupmulti.Packets;
+//#endif
 //#if MC>=12000
 import net.minecraft.client.gui.DrawContext;
 //#else
@@ -45,9 +48,13 @@ public class ConfigScreen extends Screen {
             width / 2 - totalWidth / 2, height - 70, 105, 20,
             (button) -> {
             tempConfig.config.lang = langTextField.getText();
+            //#if MC>=12005
+            //$$ ClientPlayNetworking.send(new Packets.SaveConfigPacket(gson.toJson(tempConfig.config)));
+            //#else
             PacketByteBuf sendBuf = PacketByteBufs.create();
             sendBuf.writeString(gson.toJson(tempConfig.config));
             ClientPlayNetworking.send(SAVE_CONFIG_PACKET_ID, sendBuf);
+            //#endif
         });
         ButtonWidget closeScreenButton = buildButton(tr("quickbackupmulti.config_page.close_button"),
             width / 2 - totalWidth / 2 + 135, height - 70, 105, 20, (button) -> this.close());

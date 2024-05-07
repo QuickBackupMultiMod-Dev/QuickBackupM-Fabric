@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils.storage;
+package dev.skydynamic.quickbackupmulti.storage;
 
 import java.util.HashMap;
 
@@ -42,31 +42,45 @@ public class DimensionFormat {
     }
 
     public HashMap<String, String> get(String s) {
+        // 照顾Java8
         switch (s) {
-            case "data" -> {
+            case "data" : {
                 return getData();
             }
-            case "poi" -> {
+            case "poi" : {
                 return getPoi();
             }
-            case "entities" -> {
+            case "entities" : {
                 return getEntities();
             }
-            case "region" -> {
+            case "region" : {
                 return getRegion();
             }
-            default -> {
-                return null;
+            default : {
+                return new HashMap<>();
             }
         }
     }
 
     public void set(String s, HashMap<String, String> value) {
+        // 照顾Java8
         switch (s) {
-            case "data" -> setData(value);
-            case "poi" -> setPoi(value);
-            case "entities" -> setEntities(value);
-            case "region" -> setRegion(value);
+            case "data" : {
+                setData(value);
+                break;
+            }
+            case "poi" : {
+                setPoi(value);
+                break;
+            }
+            case "entities" : {
+                setEntities(value);
+                break;
+            }
+            case "region" : {
+                setRegion(value);
+                break;
+            }
         }
     }
 }

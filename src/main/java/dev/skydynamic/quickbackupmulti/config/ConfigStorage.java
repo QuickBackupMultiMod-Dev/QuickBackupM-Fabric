@@ -1,11 +1,11 @@
-package dev.skydynamic.quickbackupmulti.utils.config;
+package dev.skydynamic.quickbackupmulti.config;
 
 import java.util.*;
 
 public class ConfigStorage {
     @Ignore
     public static final ConfigStorage DEFAULT = new ConfigStorage(
-        new ArrayList<>(List.of()),
+        new ArrayList<>(),
         "zh_cn",
         false,
         "* * 0/4 * * ?",
@@ -55,7 +55,9 @@ public class ConfigStorage {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ConfigStorage that)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConfigStorage that = (ConfigStorage) o;
+
         return getScheduleBackup() == that.getScheduleBackup() && scheduleInterval == that.scheduleInterval && useInternalDataBase == that.useInternalDataBase && Objects.equals(ignoredFiles, that.ignoredFiles) && Objects.equals(lang, that.lang) && Objects.equals(scheduleCron, that.scheduleCron) && Objects.equals(getScheduleMode(), that.getScheduleMode()) && Objects.equals(mongoDBUri, that.mongoDBUri);
     }
 

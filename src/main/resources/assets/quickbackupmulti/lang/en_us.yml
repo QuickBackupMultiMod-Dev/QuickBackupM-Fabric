@@ -73,7 +73,7 @@ quickbackupmulti:
     no_slot: No available slots found, §abackup§r abort!
     success: §aBackup §rcompleted, It takes §6%s§rs
     fail: §a备份§r失败，错误原因%s
-    fail_exist: "§aMake backup §rFailed，error msg: Slot already exists"
+    fail_exists: "§aMake backup §rFailed，error msg: Slot already exists"
 
   delete:
     success: §aSuccess delete slot §6%s

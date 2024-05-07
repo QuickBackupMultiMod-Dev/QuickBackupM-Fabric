@@ -1,11 +1,8 @@
 package dev.skydynamic.quickbackupmulti.utils;
 
 import dev.morphia.query.filters.Filters;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
-import dev.skydynamic.quickbackupmulti.utils.storage.BackupInfo;
-import dev.skydynamic.quickbackupmulti.utils.storage.DimensionFormat;
-import dev.skydynamic.quickbackupmulti.utils.storage.FileHashes;
-import dev.skydynamic.quickbackupmulti.utils.storage.IndexFile;
+import dev.skydynamic.quickbackupmulti.config.Config;
+import dev.skydynamic.quickbackupmulti.storage.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -15,10 +12,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
@@ -28,6 +22,8 @@ import static dev.skydynamic.quickbackupmulti.utils.hash.HashUtils.compareFileHa
 import static dev.skydynamic.quickbackupmulti.utils.hash.HashUtils.getFileHash;
 
 public class MakeUtils {
+    private static final List<String> notFilterFolderList = Arrays.asList("playerdata", "stats", "advancements", "DIM1", "DIM-1", "data", "region", "poi", "entities");
+
     public static void copyFileAndMakeDirs(File destDir, File file) throws IOException {
         if (file.isDirectory()) {
             if (!file.getParentFile().getName().equals(Config.TEMP_CONFIG.worldName)) new File(destDir, file.getName()).mkdirs();
@@ -98,7 +94,7 @@ public class MakeUtils {
                 // 获取索引
                 String index = indexFile.isIndexAndGetIndex(file.getParentFile(), file);
                 // 如果最新备份中该文件没有索引到别的备份中, 则索引到最新存档中的文件
-                if (index != null) index = latestBackupName;
+                if (index == null) index = latestBackupName;
                 indexMap.put(file.getName(), index);
                 // 如果索引的备份列表中没有索引文件的出处，则添加到索引列表
                 if (!indexBackupList.contains(index)) {
@@ -116,6 +112,7 @@ public class MakeUtils {
         return returnMap;
     }
 
+    @SuppressWarnings("unchecked")
     public static int make(ServerCommandSource commandSource, String name, String desc) {
         long startTime = System.currentTimeMillis();
         if (checkSlotExist(name)) {
@@ -156,8 +153,10 @@ public class MakeUtils {
             // if (!firstBackup) indexBackupList.add(latestBackupName);
             // 开始循环存档文件夹
             for (File file : saveFiles) {
-                // 判断是否是文件夹
+                // 判断是否是文件夹，并过滤mod创建的文件夹
                 if (file.isDirectory()) {
+                    // 过滤掉非原版文件夹，不备份
+                    if (!notFilterFolderList.contains(file.getName())) continue;
                     // 新建一些表来临时用
                     HashMap<String, String> hashMap = new HashMap<>(); // hashMap     文件哈希临时存储Map
                     HashMap<String, String> indexMap = new HashMap<>(); // indexMap   文件索引临时存储Map
@@ -185,12 +184,6 @@ public class MakeUtils {
                             fileHashes.setDim(file.getName(), dimHashData);
                             indexFile.setDim(file.getName(), dimIndexData);
                         } else {
-                            // 正常来说除了datapacks文件夹外，别的原版文件夹下没有文件夹了, 现在临时过滤掉datapacks下的文件夹
-                            if (file.getName().equals("datapacks")) {
-                                if(dirFile.isDirectory()) {
-                                    continue;
-                                }
-                            }
                             HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, dirFile, destDir, hashMap, indexMap, indexBackupList);
                             hashMap = (HashMap<String, String>) resultMap.get("hash");
                             indexMap = (HashMap<String, String>) resultMap.get("index");
@@ -227,7 +220,7 @@ public class MakeUtils {
                 serverWorld.savingDisabled = false;
             }
         } catch (Exception e) {
-            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getMessage())));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getCause() + e.getMessage())));
             backupDir.resolve(name).toFile().deleteOnExit();
         }
         return 1;

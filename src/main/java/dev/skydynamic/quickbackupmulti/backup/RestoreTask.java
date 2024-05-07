@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.backup;
 
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;

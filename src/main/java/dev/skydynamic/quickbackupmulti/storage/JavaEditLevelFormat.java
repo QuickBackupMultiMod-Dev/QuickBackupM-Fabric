@@ -1,28 +1,20 @@
-package dev.skydynamic.quickbackupmulti.utils.storage;
+package dev.skydynamic.quickbackupmulti.storage;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class JavaEditLevelFormat extends DimensionFormat{
+public class JavaEditLevelFormat extends DimensionFormat {
     private HashMap<String, String> root;
     private HashMap<String, String> playerdata;
     private HashMap<String, String> stats;
     private HashMap<String, String> advancements;
-    private HashMap<String, String> datapacks;
     private DimensionFormat DIM1;
     private DimensionFormat DIM_1;
 
-    public static List<String> saveFormatDirs = Arrays.asList(".", "playerdata", "stats", "advancements", "datapacks", "DIM1", "DIM-1");
+    public static List<String> saveFormatDirs = Arrays.asList(".", "playerdata", "stats", "advancements", "DIM1", "DIM-1");
     public static List<String> dimFormatDirs = Arrays.asList("region", "data", "entities", "poi");
-
-    public HashMap<String, String> getDatapacks() {
-        return datapacks != null ? datapacks : new HashMap<>();
-    }
-
-    public void setDatapacks(HashMap<String, String> datapacks) {
-        this.datapacks = datapacks;
-    }
 
     public HashMap<String, String> getRoot() {
         return root != null ? root : new HashMap<>();
@@ -72,15 +64,16 @@ public class JavaEditLevelFormat extends DimensionFormat{
         this.DIM_1 = DIM_1;
     }
 
+    @Nullable
     public DimensionFormat getDim(String s) {
         switch (s) {
-            case "DIM1" -> {
+            case "DIM1" : {
                 return getDIM1();
             }
-            case "DIM-1" -> {
+            case "DIM-1" : {
                 return getDIM_1();
             }
-            default -> {
+            default : {
                 return null;
             }
         }
@@ -88,43 +81,46 @@ public class JavaEditLevelFormat extends DimensionFormat{
 
     public void setDim(String s, DimensionFormat value) {
         switch (s) {
-            case "DIM1" -> setDIM1(value);
-            case "DIM-1" -> setDIM_1(value);
+            case "DIM1" : {
+                setDIM1(value);
+                break;
+            }
+            case "DIM-1" : {
+                setDIM_1(value);
+                break;
+            }
         }
     }
 
     @Override
     public HashMap<String, String> get(String s) {
         switch (s) {
-            case "data" -> {
+            case "data" : {
                 return getData();
             }
-            case "datapacks" -> {
-                return getDatapacks();
-            }
-            case "poi" -> {
+            case "poi" : {
                 return getPoi();
             }
-            case "entities" -> {
+            case "entities" : {
                 return getEntities();
             }
-            case "region" -> {
+            case "region" : {
                 return getRegion();
             }
-            case "." -> {
+            case "." : {
                 return getRoot();
             }
-            case "playerdata" -> {
+            case "playerdata" : {
                 return getPlayerdata();
             }
-            case "stats" -> {
+            case "stats" : {
                 return getStats();
             }
-            case "advancements" -> {
+            case "advancements" : {
                 return getAdvancements();
             }
-            default -> {
-                return null;
+            default : {
+                return new HashMap<>();
             }
         }
     }
@@ -132,15 +128,38 @@ public class JavaEditLevelFormat extends DimensionFormat{
     @Override
     public void set(String s, HashMap<String, String> value) {
         switch (s) {
-            case "data" -> setData(value);
-            case "poi" -> setPoi(value);
-            case "entities" -> setEntities(value);
-            case "region" -> setRegion(value);
-            case "root" -> setRoot(value);
-            case "playerdata" -> setPlayerdata(value);
-            case "stats" -> setStats(value);
-            case "advancements" -> setAdvancements(value);
-            case "datapacks" -> setDatapacks(value);
+            case "data" : {
+                setData(value);
+                break;
+            }
+            case "poi" : {
+                setPoi(value);
+                break;
+            }
+            case "entities" : {
+                setEntities(value);
+                break;
+            }
+            case "region" : {
+                setRegion(value);
+                break;
+            }
+            case "root" : {
+                setRoot(value);
+                break;
+            }
+            case "playerdata" : {
+                setPlayerdata(value);
+                break;
+            }
+            case "stats" : {
+                setStats(value);
+                break;
+            }
+            case "advancements" : {
+                setAdvancements(value);
+                break;
+            }
         }
     }
 }

@@ -15,12 +15,13 @@ import dev.morphia.mapping.MapperOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.filters.Filters;
 import dev.skydynamic.quickbackupmulti.QbmConstant;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
-import dev.skydynamic.quickbackupmulti.utils.storage.BackupInfo;
-import dev.skydynamic.quickbackupmulti.utils.storage.IndexFile;
-import dev.skydynamic.quickbackupmulti.utils.storage.codec.DimensionFormatCodec;
+import dev.skydynamic.quickbackupmulti.config.Config;
+import dev.skydynamic.quickbackupmulti.storage.BackupInfo;
+import dev.skydynamic.quickbackupmulti.storage.IndexFile;
+import dev.skydynamic.quickbackupmulti.storage.codec.DimensionFormatCodec;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,12 +37,13 @@ import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 public final class DataBase {
     private MongoServer server;
     private Datastore datastore;
+    MongoClient mongoClient;
 
     private static final InsertOneOptions INSERT_OPTIONS = new InsertOneOptions();
     private static final DeleteOptions DELETE_OPTIONS = new DeleteOptions();
 
     public DataBase(String worldName) {
-        File qbmDir = new File(QbmConstant.gameDir + "/QuickBackupMulti/");
+        File qbmDir = new File(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
         if (!qbmDir.exists()) qbmDir.mkdirs();
 
         String connectionString = Config.INSTANCE.getMongoDBUri();
@@ -50,10 +52,9 @@ public final class DataBase {
             LOGGER.info("Started local MongoDB server at " + server.getConnectionString());
         }
 
-        MongoClient mongoClient;
         mongoClient = MongoClients.create(connectionString);
 
-        var codecProvider = CodecRegistries.fromCodecs(
+        CodecRegistry codecProvider = CodecRegistries.fromCodecs(
             new DimensionFormatCodec()
         );
 
@@ -63,7 +64,8 @@ public final class DataBase {
             .codecProvider(codecProvider)
             .build();
 
-        datastore = Morphia.createDatastore(mongoClient, "QuickBackupMulti-" + worldName.replace(" ", ""), mapperOptions);
+        String newWorldName = worldName.replace(" ", "").replace(".", "");
+        datastore = Morphia.createDatastore(mongoClient, "QuickBackupMulti-" + newWorldName, mapperOptions);
         // database = mongoClient.getDatabase("QuickBackupMulti");
     }
 
@@ -135,12 +137,13 @@ public final class DataBase {
     }
 
     private String startInternalMongoServer() {
-        server = new MongoServer(new H2Backend(QbmConstant.gameDir + "/QuickBackupMulti/qbm.mv"));
+        server = new MongoServer(new H2Backend(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/qbm.mv"));
         server.bind();
         return server.getConnectionString();
     }
 
     public void stopInternalMongoServer() {
+        if (mongoClient != null) mongoClient.close();
         if (server != null) server.shutdownNow();
         server = null;
     }

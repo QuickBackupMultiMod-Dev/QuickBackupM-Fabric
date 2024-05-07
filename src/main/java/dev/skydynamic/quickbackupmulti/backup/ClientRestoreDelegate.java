@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.backup;
 
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.restoreClient;
-import static dev.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.shutdownSchedule;
 
 @Environment(EnvType.CLIENT)
 public class ClientRestoreDelegate {
@@ -39,11 +38,11 @@ public class ClientRestoreDelegate {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                minecraftClient.execute(() -> minecraftClient.setScreen(null));
+                restoreClient(slot);
+                Config.TEMP_CONFIG.setIsBackupValue(false);
+                getDataBase().stopInternalMongoServer();
                 minecraftClient.execute(() -> {
-                    minecraftClient.setScreen(null);
-                    restoreClient(slot);
-                    Config.TEMP_CONFIG.setIsBackupValue(false);
-                    getDataBase().stopInternalMongoServer();
                     Text title = Text.of(tr("quickbackupmulti.toast.end_title"));
                     Text content = Text.of(tr("quickbackupmulti.toast.end_content"));
                     //#if MC>=11800

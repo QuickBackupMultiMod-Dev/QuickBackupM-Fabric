@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.utils;
 
-import dev.skydynamic.quickbackupmulti.utils.storage.BackupInfo;
+import dev.skydynamic.quickbackupmulti.storage.BackupInfo;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;

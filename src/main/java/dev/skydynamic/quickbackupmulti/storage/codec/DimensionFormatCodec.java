@@ -1,6 +1,6 @@
-package dev.skydynamic.quickbackupmulti.utils.storage.codec;
+package dev.skydynamic.quickbackupmulti.storage.codec;
 
-import dev.skydynamic.quickbackupmulti.utils.storage.DimensionFormat;
+import dev.skydynamic.quickbackupmulti.storage.DimensionFormat;
 import org.bson.BsonReader;
 import org.bson.BsonType;
 import org.bson.BsonWriter;
