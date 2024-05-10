@@ -11,6 +11,7 @@
   ],
   "client": [
     "MinecraftClientMixin",
-    "MinecraftServer_ClientMixin"
+    "MinecraftServer_ClientMixin",
+    "TitleScreenMixin"
   ]
 }

@@ -5,9 +5,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.MessageScreen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableTextContent;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,6 +44,19 @@ public class ClientRestoreDelegate {
                 minecraftClient.execute(() -> minecraftClient.setScreen(null));
                 restoreClient(slot);
                 Config.TEMP_CONFIG.setIsBackupValue(false);
+                if (minecraftClient.currentScreen instanceof TitleScreen) {
+                    minecraftClient.currentScreen.children()
+                        .stream()
+                        .filter(it -> it instanceof ClickableWidget)
+                        //#if MC>=11900
+                        .filter(it -> ((ClickableWidget) it).getMessage().getContent() instanceof TranslatableTextContent)
+                        //#else
+                        //$$ .filter(it -> ((ClickableWidget) it).getMessage() instanceof TranslatableText)
+                        //#endif
+                        .filter(it -> ((TranslatableTextContent) ((ClickableWidget) it).getMessage())
+                                .getKey().contentEquals("menu.singleplayer"))
+                        .forEach(it -> ((ClickableWidget) it).active = true);
+                }
                 getDataBase().stopInternalMongoServer();
                 minecraftClient.execute(() -> {
                     Text title = Text.of(tr("quickbackupmulti.toast.end_title"));
