@@ -132,7 +132,7 @@ public class ListUtils {
                 totalBackupSizeB += backupSizeB;
                 resultText.append(getSlotText(name, page, j, backupSizeB));
             } catch (IOException e) {
-                LOGGER.error("FileNotFoundException: " + e.getMessage());
+                LOGGER.error("", e);
             }
         }
         double totalBackupSizeMB = (double) totalBackupSizeB / FileUtils.ONE_MB;
@@ -151,7 +151,7 @@ public class ListUtils {
                 long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
                 resultText.append(getSlotText(name, 1, i, backupSizeB));
             } catch (IOException e) {
-                LOGGER.error("FileNotFoundException: " + e.getMessage());
+                LOGGER.error("", e);
             }
         }
         return resultText;

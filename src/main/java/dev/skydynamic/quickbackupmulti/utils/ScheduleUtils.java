@@ -6,6 +6,7 @@ import org.quartz.SchedulerException;
 
 import java.text.SimpleDateFormat;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.*;
 import static dev.skydynamic.quickbackupmulti.utils.schedule.CronUtil.getSeconds;
@@ -30,6 +31,7 @@ public class ScheduleUtils {
             Config.TEMP_CONFIG.scheduler.start();
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.success", nextBackupTimeString)));
         } catch (SchedulerException e) {
+            LOGGER.error("Start schedule backup fail: ", e);
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
         }
     }
@@ -41,7 +43,8 @@ public class ScheduleUtils {
                 startSchedule(commandSource);
             }
         } catch (SchedulerException e) {
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.fail", e)));
+            LOGGER.error("Switch schedule mode backup fail: ", e);
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.fail", e.getMessage())));
             return 0;
         }
         Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.set", mode)));
@@ -55,7 +58,8 @@ public class ScheduleUtils {
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.success")));
             return 1;
         } catch (SchedulerException e) {
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.fail", e)));
+            LOGGER.error("Close schedule backup fail: ", e);
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.fail", e.getMessage())));
             return 0;
         }
     }

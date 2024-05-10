@@ -124,7 +124,7 @@ public class QuickBackupMulti implements ModInitializer {
 
 	public static boolean shouldFilterMessage(String message) {
 		// 仅过滤INFO，Debug / ERROR不过滤
-		if (message.toUpperCase().contains("INFO")) {
+		if (message.contains("INFO")) {
 			return message.contains("Mongo") || message.contains("H2Backend") || message.contains("cluster");
 		}
 		return false;

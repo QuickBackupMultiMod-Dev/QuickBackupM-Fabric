@@ -14,6 +14,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
@@ -220,6 +221,7 @@ public class MakeUtils {
                 serverWorld.savingDisabled = false;
             }
         } catch (Exception e) {
+            LOGGER.error("", e);
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getCause() + e.getMessage())));
             backupDir.resolve(name).toFile().deleteOnExit();
         }
