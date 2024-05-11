@@ -206,7 +206,7 @@ public class MakeUtils {
             fileHashes.save();
             indexFile.save();
 
-            FileUtils.deleteDirectory(getBackupDir().resolve(name).resolve(Config.TEMP_CONFIG.worldName).toFile());
+            // FileUtils.deleteDirectory(getBackupDir().resolve(name).resolve(Config.TEMP_CONFIG.worldName).toFile());
 
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;
