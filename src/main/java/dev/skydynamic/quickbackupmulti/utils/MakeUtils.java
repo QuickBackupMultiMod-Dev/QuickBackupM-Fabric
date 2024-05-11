@@ -222,7 +222,7 @@ public class MakeUtils {
             }
         } catch (Exception e) {
             LOGGER.error("", e);
-            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail", e.getCause() + e.getMessage())));
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail",  e.getMessage())));
             backupDir.resolve(name).toFile().deleteOnExit();
         }
         return 1;
