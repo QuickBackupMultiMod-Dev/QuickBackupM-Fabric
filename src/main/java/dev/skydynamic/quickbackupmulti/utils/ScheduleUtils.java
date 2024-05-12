@@ -32,7 +32,7 @@ public class ScheduleUtils {
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.success", nextBackupTimeString)));
         } catch (SchedulerException e) {
             LOGGER.error("Start schedule backup fail: ", e);
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e.toString())));
         }
     }
 
@@ -44,7 +44,7 @@ public class ScheduleUtils {
             }
         } catch (SchedulerException e) {
             LOGGER.error("Switch schedule mode backup fail: ", e);
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.fail", e.getMessage())));
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.fail", e.toString())));
             return 0;
         }
         Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.switch.set", mode)));
@@ -59,7 +59,7 @@ public class ScheduleUtils {
             return 1;
         } catch (SchedulerException e) {
             LOGGER.error("Close schedule backup fail: ", e);
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.fail", e.getMessage())));
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.fail", e.toString())));
             return 0;
         }
     }

@@ -221,8 +221,8 @@ public class MakeUtils {
                 serverWorld.savingDisabled = false;
             }
         } catch (Exception e) {
-            LOGGER.error("", e);
-            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail",  e.getMessage())));
+            LOGGER.error(e.toString());
+            Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.fail",  e.toString())));
             backupDir.resolve(name).toFile().deleteOnExit();
         }
         return 1;

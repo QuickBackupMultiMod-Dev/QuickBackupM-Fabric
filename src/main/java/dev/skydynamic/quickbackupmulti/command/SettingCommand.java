@@ -151,7 +151,7 @@ public class SettingCommand {
             startSchedule(commandSource);
             return 1;
         } catch (SchedulerException e) {
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e.toString())));
             return 0;
         }
     }
