@@ -4,3 +4,4 @@ accessible method net/minecraft/server/MinecraftServer runServer ()V
 accessible field net/minecraft/server/MinecraftServer stopped Z
 accessible field net/minecraft/server/MinecraftServer running Z
 accessible field net/minecraft/client/MinecraftClient toastManager Lnet/minecraft/client/toast/ToastManager;
+accessible field net/minecraft/client/gui/tooltip/Tooltip content Lnet/minecraft/text/Text;

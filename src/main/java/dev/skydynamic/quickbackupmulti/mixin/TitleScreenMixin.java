@@ -10,9 +10,15 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 //#endif
 import net.minecraft.client.gui.widget.ButtonWidget;
 
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TranslatableTextContent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 
 @Mixin(TitleScreen.class)
 public class TitleScreenMixin {
@@ -32,5 +38,27 @@ public class TitleScreenMixin {
             ((ButtonWidget) element).active = false;
         }
         return element;
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void setButtonActive(CallbackInfo ci) {
+        if (!Config.TEMP_CONFIG.isBackup) {
+            TitleScreen screen = (TitleScreen) (Object) this;
+            screen.children()
+                .stream()
+                .filter(e -> e instanceof ButtonWidget)
+                //#if MC>=11900
+                .filter(it -> ((ButtonWidget) it).getMessage().getContent() instanceof TranslatableTextContent)
+                //#else
+                //$$ .filter(it -> ((ClickableWidget) it).getMessage() instanceof TranslatableText)
+                //#endif
+                .filter(it -> ((ClickableWidget) it).getMessage().toString().contains("menu.singleplayer"))
+                .forEach(e -> {
+                    ((ButtonWidget) e).active = true;
+                    if (((ButtonWidget) e).getTooltip() != null) {
+                        ((ButtonWidget) e).setTooltip(null);
+                    }
+                });
+        }
     }
 }
