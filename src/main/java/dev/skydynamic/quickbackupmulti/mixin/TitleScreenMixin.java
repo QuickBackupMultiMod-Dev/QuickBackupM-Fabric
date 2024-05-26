@@ -55,9 +55,9 @@ public class TitleScreenMixin {
                 .filter(it -> ((ClickableWidget) it).getMessage().toString().contains("menu.singleplayer"))
                 .forEach(e -> {
                     ((ButtonWidget) e).active = true;
-                    if (((ButtonWidget) e).getTooltip() != null) {
-                        ((ButtonWidget) e).setTooltip(null);
-                    }
+                    //#if MC>=11900
+                    ((ButtonWidget) e).setTooltip(null);
+                    //#endif
                 });
         }
     }
