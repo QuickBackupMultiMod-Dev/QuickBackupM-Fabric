@@ -23,10 +23,10 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class SettingCommand {
 
-    public static LiteralArgumentBuilder<ServerCommandSource> settingCommand = literal("setting").requires(me -> me.hasPermissionLevel(2))
+    public static LiteralArgumentBuilder<ServerCommandSource> settingCommand = literal("setting").requires(QuickBackupMultiCommand::checkPermission)
         .then(literal("lang")
             .then(literal("get").executes(it -> getLang(it.getSource())))
-            .then(literal("set").requires(me -> me.hasPermissionLevel(2))
+            .then(literal("set").requires(QuickBackupMultiCommand::checkPermission)
                 .then(CommandManager.argument("lang", StringArgumentType.string())
                     .suggests(new LangSuggestionProvider())
                     .executes(it -> setLang(it.getSource(), StringArgumentType.getString(it, "lang"))))))

@@ -8,13 +8,33 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.text.SimpleDateFormat;
 
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.make;
+import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class MakeCommand {
+    static class makeRunnable implements Runnable {
+        ServerCommandSource commandSource;
+        String name;
+        String desc;
+
+        makeRunnable(ServerCommandSource commandSource, String name, String desc) {
+            this.commandSource = commandSource;
+            this.name = name;
+            this.desc = desc;
+        }
+
+        @Override
+        public void run() {
+            LOGGER.info("Make Backup thread started...");
+            make(commandSource, name, desc);
+            LOGGER.info("Make Backup thread close");
+        }
+    }
+
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
 
-    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(me -> me.hasPermissionLevel(2))
+    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(QuickBackupMultiCommand::checkPermission)
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
         .then(CommandManager.argument("name", StringArgumentType.string())
             .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))
@@ -25,6 +45,7 @@ public class MakeCommand {
 //            .executes(it -> makeSaveBackup(it.getSource(), String.valueOf(System.currentTimeMillis()), StringArgumentType.getString(it, "desc"))));
 
     private static int makeSaveBackup(ServerCommandSource commandSource, String name, String desc) {
-        return make(commandSource, name, desc);
+        new makeRunnable(commandSource, name, desc).run();
+        return 1;
     }
 }
