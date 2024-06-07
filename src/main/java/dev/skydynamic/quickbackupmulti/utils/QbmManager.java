@@ -194,7 +194,7 @@ public class QbmManager {
             double intervalTime = (endTime - startTime) / 1000.0;
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
             writeBackupInfo(name, desc);
-            startSchedule(commandSource);
+            if (Config.INSTANCE.getScheduleBackup()) startSchedule(commandSource);
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
                 serverWorld.savingDisabled = false;

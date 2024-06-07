@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.network.PacketByteBuf;
 
 //#if MC>=11900
+import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 //#else
@@ -43,6 +44,10 @@ public final class QuickBackupMulti implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		final JavaUtilLog4jFilter filter = new JavaUtilLog4jFilter();
+		java.util.logging.Logger.getLogger("").setFilter(filter);
+		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(filter);
+
 		Config.INSTANCE.load();
 		Translate.handleResourceReload(Config.INSTANCE.getLang());
 
@@ -89,5 +94,9 @@ public final class QuickBackupMulti implements ModInitializer {
 				Config.INSTANCE.setConfigStorage(result);
 			}
 		});
+	}
+
+	public static boolean shouldFilterMessage(String message) {
+		return message.contains("Quartz");
 	}
 }
