@@ -69,14 +69,16 @@ public class QuickBackupMulti implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			if (Config.TEMP_CONFIG.isBackup) {
-				if (env == EnvType.SERVER) {
+			if (env == EnvType.SERVER) {
+				if (Config.TEMP_CONFIG.isBackup) {
 					restore(Config.TEMP_CONFIG.backupSlot);
 					getDataBase().stopInternalMongoServer();
 					Config.TEMP_CONFIG.setIsBackupValue(false);
 					Config.TEMP_CONFIG.server.stopped = false;
 					Config.TEMP_CONFIG.server.running = true;
 					Config.TEMP_CONFIG.server.runServer();
+				} else {
+					getDataBase().stopInternalMongoServer();
 				}
 			}
 			Config.TEMP_CONFIG.server = null;
