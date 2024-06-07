@@ -8,7 +8,7 @@ import dev.skydynamic.quickbackupmulti.i18n.LangSuggestionProvider;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
 import dev.skydynamic.quickbackupmulti.utils.ScheduleUtils;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -151,7 +151,7 @@ public class SettingCommand {
             startSchedule(commandSource);
             return 1;
         } catch (SchedulerException e) {
-            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e)));
+            Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.fail", e.toString())));
             return 0;
         }
     }
@@ -165,8 +165,14 @@ public class SettingCommand {
         if (Config.INSTANCE.getScheduleBackup()) {
             String nextBackupTimeString = "";
             switch (Config.INSTANCE.getScheduleMode()) {
-                case "cron" -> nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
-                case "interval" -> nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Config.TEMP_CONFIG.latestScheduleExecuteTime + Config.INSTANCE.getScheduleInrerval() * 1000L);
+                case "cron" : {
+                    nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
+                    break;
+                }
+                case "interval" : {
+                    nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Config.TEMP_CONFIG.latestScheduleExecuteTime + Config.INSTANCE.getScheduleInrerval() * 1000L);
+                    break;
+                }
             }
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.get", nextBackupTimeString)));
             return 1;

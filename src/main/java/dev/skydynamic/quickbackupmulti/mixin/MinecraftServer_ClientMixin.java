@@ -1,7 +1,7 @@
 package dev.skydynamic.quickbackupmulti.mixin;
 
 import dev.skydynamic.quickbackupmulti.QbmConstant;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.server.MinecraftServer;
@@ -29,7 +29,7 @@ public class MinecraftServer_ClientMixin {
         Path saveDirectoryPath = server.getSavePath(WorldSavePath.ROOT);
         String worldName = saveDirectoryPath.getParent().getFileName().toString();
         Config.TEMP_CONFIG.setWorldName(worldName);
-        Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/").resolve(worldName);
+        Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/").resolve(worldName);
         createBackupDir(backupDir);
         setDataBase(worldName);
         startSchedule();

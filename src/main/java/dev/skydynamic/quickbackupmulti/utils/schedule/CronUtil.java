@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.utils.schedule;
 
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

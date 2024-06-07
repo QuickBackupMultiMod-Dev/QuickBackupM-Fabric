@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils.config;
+package dev.skydynamic.quickbackupmulti.config;
 
 public class Config {
     public static QuickBackupMultiConfig INSTANCE = new QuickBackupMultiConfig();

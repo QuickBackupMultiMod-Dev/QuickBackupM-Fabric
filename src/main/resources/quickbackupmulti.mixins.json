@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "dev.skydynamic.quickbackupmulti.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "/*JAVA_VERSION*/",
   "mixins": [],
   "injectors": {
     "defaultRequire": 1
@@ -11,6 +11,7 @@
   ],
   "client": [
     "MinecraftClientMixin",
-    "MinecraftServer_ClientMixin"
+    "MinecraftServer_ClientMixin",
+    "TitleScreenMixin"
   ]
 }

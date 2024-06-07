@@ -1,7 +1,7 @@
 package dev.skydynamic.quickbackupmulti.screen;
 
-import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
-import dev.skydynamic.quickbackupmulti.utils.storage.BackupInfo;
+import dev.skydynamic.quickbackupmulti.config.ConfigStorage;
+import dev.skydynamic.quickbackupmulti.storage.BackupInfo;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 

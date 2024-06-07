@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils.config;
+package dev.skydynamic.quickbackupmulti.config;
 
 import dev.skydynamic.quickbackupmulti.utils.DataBase;
 import net.fabricmc.api.EnvType;

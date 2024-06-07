@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils.storage;
+package dev.skydynamic.quickbackupmulti.storage;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;

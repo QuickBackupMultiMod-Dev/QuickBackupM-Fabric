@@ -73,7 +73,7 @@ quickbackupmulti:
     no_slot: 未找到可用槽位，§a备份§r中断!
     success: §a备份§r完成，耗时§6%s§r秒
     fail: §a备份§r失败，错误原因%s
-    fail_exist: "§a备份§r失败，错误原因: 槽位已存在"
+    fail_exists: "§a备份§r失败，错误原因: 槽位已存在"
 
   delete:
     success: 删除槽位§6%s§r§a完成§r

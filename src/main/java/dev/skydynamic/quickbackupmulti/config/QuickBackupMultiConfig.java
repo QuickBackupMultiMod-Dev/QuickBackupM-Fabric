@@ -1,4 +1,4 @@
-package dev.skydynamic.quickbackupmulti.utils.config;
+package dev.skydynamic.quickbackupmulti.config;
 
 import dev.skydynamic.quickbackupmulti.QbmConstant;
 
@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import static dev.skydynamic.quickbackupmulti.QbmConstant.gson;
 
 public class QuickBackupMultiConfig {
     private final Object lock = new Object();
-    private final Path configPath = QbmConstant.configDir;
+    private final Path configPath = QbmConstant.pathGetter.getConfigPath();
     private ConfigStorage configStorage;
     File path = configPath.toFile();
     File config = configPath.resolve("QuickBackupMulti.json").toFile();
@@ -29,8 +28,8 @@ public class QuickBackupMultiConfig {
                 if (!config.exists()) {
                     saveModifiedConfig(ConfigStorage.DEFAULT);
                 }
-                var reader = new FileReader(config);
-                var result = gson.fromJson(reader, ConfigStorage.class);
+                FileReader reader = new FileReader(config);
+                ConfigStorage result = gson.fromJson(reader, ConfigStorage.class);
                 this.configStorage = fixFields(result, ConfigStorage.DEFAULT);
                 saveModifiedConfig(this.configStorage);
                 reader.close();
@@ -45,7 +44,7 @@ public class QuickBackupMultiConfig {
             try {
                 if (config.exists()) config.delete();
                 if (!config.exists()) config.createNewFile();
-                var writer = new FileWriter(config);
+                FileWriter writer = new FileWriter(config);
                 gson.toJson(fixFields(c, ConfigStorage.DEFAULT), writer);
                 writer.close();
             } catch (Exception e) {
@@ -62,13 +61,13 @@ public class QuickBackupMultiConfig {
             return t;
         }
         try {
-            var clazz = t.getClass();
+            Class<?> clazz = t.getClass();
             for (Field declaredField : clazz.getDeclaredFields()) {
                 if (Arrays.stream(declaredField.getDeclaredAnnotations()).anyMatch(it -> it.annotationType() == Ignore.class))
                     continue;
                 declaredField.setAccessible(true);
-                var value = declaredField.get(t);
-                var dv = declaredField.get(defaultVal);
+                Object value = declaredField.get(t);
+                Object dv = declaredField.get(defaultVal);
                 if (value == null) {
                     declaredField.set(t, dv);
                 }

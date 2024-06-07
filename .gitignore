@@ -40,4 +40,4 @@ replay_*.log
 *.jfr
 
 # preprocess
-/versions/*/src/
+/.run/

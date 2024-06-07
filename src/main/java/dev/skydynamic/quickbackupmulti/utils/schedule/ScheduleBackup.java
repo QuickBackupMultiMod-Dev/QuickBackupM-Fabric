@@ -1,7 +1,7 @@
 package dev.skydynamic.quickbackupmulti.utils.schedule;
 
 import dev.skydynamic.quickbackupmulti.utils.Messenger;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.quartz.Job;
@@ -29,8 +29,14 @@ public class ScheduleBackup implements Job {
                 Config.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
                 String nextExecuteTime = "";
                 switch (Config.INSTANCE.getScheduleMode()) {
-                    case "interval" -> nextExecuteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
-                    case "cron" -> nextExecuteTime = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), true);
+                    case "interval" : {
+                        nextExecuteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInrerval() * 1000L);
+                        break;
+                    }
+                    case "cron" : {
+                        nextExecuteTime = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), true);
+                        break;
+                    }
                 }
                 for (ServerPlayerEntity player : finalPlayerList) {
                     player.sendMessage(Messenger.literal(tr("quickbackupmulti.schedule.execute.finish", nextExecuteTime)), false);

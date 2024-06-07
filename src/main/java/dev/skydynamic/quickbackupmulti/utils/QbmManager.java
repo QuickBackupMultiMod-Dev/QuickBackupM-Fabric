@@ -2,12 +2,12 @@ package dev.skydynamic.quickbackupmulti.utils;
 
 import dev.skydynamic.quickbackupmulti.QbmConstant;
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 
-import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
+import dev.skydynamic.quickbackupmulti.config.ConfigStorage;
 // import dev.skydynamic.quickbackupmulti.utils.filefilter.NonRecursiveDirFilter;
-import dev.skydynamic.quickbackupmulti.utils.storage.DimensionFormat;
-import dev.skydynamic.quickbackupmulti.utils.storage.IndexFile;
+import dev.skydynamic.quickbackupmulti.storage.DimensionFormat;
+import dev.skydynamic.quickbackupmulti.storage.IndexFile;
 import net.fabricmc.api.EnvType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
@@ -28,11 +28,11 @@ import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.ScheduleUtils.*;
-import static dev.skydynamic.quickbackupmulti.utils.storage.JavaEditLevelFormat.dimFormatDirs;
-import static dev.skydynamic.quickbackupmulti.utils.storage.JavaEditLevelFormat.saveFormatDirs;
+import static dev.skydynamic.quickbackupmulti.storage.JavaEditLevelFormat.dimFormatDirs;
+import static dev.skydynamic.quickbackupmulti.storage.JavaEditLevelFormat.saveFormatDirs;
 
 public class QbmManager {
-    public static Path backupDir = Path.of(QbmConstant.gameDir + "/QuickBackupMulti/");
+    public static Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
     public static Path savePath = Config.TEMP_CONFIG.server.getSavePath(WorldSavePath.ROOT);
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
     // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();

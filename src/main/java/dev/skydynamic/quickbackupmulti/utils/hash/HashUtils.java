@@ -1,6 +1,6 @@
 package dev.skydynamic.quickbackupmulti.utils.hash;
 
-import dev.skydynamic.quickbackupmulti.utils.storage.FileHashes;
+import dev.skydynamic.quickbackupmulti.storage.FileHashes;
 
 import java.io.File;
 import java.nio.file.Files;

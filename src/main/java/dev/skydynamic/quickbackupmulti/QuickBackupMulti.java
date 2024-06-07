@@ -2,14 +2,17 @@ package dev.skydynamic.quickbackupmulti;
 
 import dev.skydynamic.quickbackupmulti.i18n.Translate;
 import dev.skydynamic.quickbackupmulti.utils.DataBase;
-import dev.skydynamic.quickbackupmulti.utils.config.Config;
+import dev.skydynamic.quickbackupmulti.config.Config;
 
-import dev.skydynamic.quickbackupmulti.utils.config.ConfigStorage;
+import dev.skydynamic.quickbackupmulti.config.ConfigStorage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
+//#if MC>=12005
+//$$ import net.minecraft.server.network.ServerPlayerEntity;
+//#endif
 //#if MC>=11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //#else
@@ -44,7 +47,10 @@ public class QuickBackupMulti implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		final var filter = new JavaUtilLog4jFilter();
+		//#if MC>=12005
+		//$$ Packets.registerPacketCodec();
+		//#endif
+		final JavaUtilLog4jFilter filter = new JavaUtilLog4jFilter();
 		java.util.logging.Logger.getLogger("").setFilter(filter);
 		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(filter);
 
@@ -63,13 +69,16 @@ public class QuickBackupMulti implements ModInitializer {
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
-			if (Config.TEMP_CONFIG.isBackup) {
-				if (env == EnvType.SERVER) {
+			if (env == EnvType.SERVER) {
+				if (Config.TEMP_CONFIG.isBackup) {
 					restore(Config.TEMP_CONFIG.backupSlot);
+					getDataBase().stopInternalMongoServer();
 					Config.TEMP_CONFIG.setIsBackupValue(false);
 					Config.TEMP_CONFIG.server.stopped = false;
 					Config.TEMP_CONFIG.server.running = true;
 					Config.TEMP_CONFIG.server.runServer();
+				} else {
+					getDataBase().stopInternalMongoServer();
 				}
 			}
 			Config.TEMP_CONFIG.server = null;
@@ -77,17 +86,37 @@ public class QuickBackupMulti implements ModInitializer {
 	}
 
 	public static void registerPacketHandler() {
+		//#if MC>=12005
+		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.RequestOpenConfigGuiPacket.PACKET_ID, (payload, context) -> {
+		//#else
 		ServerPlayNetworking.registerGlobalReceiver(REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+		//#endif
+			//#if MC>=12005
+			//$$ ServerPlayerEntity player = context.player();
+			//$$ if (player.hasPermissionLevel(2)) ServerPlayNetworking.send(player, new Packets.OpenConfigGuiPacket(Config.INSTANCE.getConfigStorage()));
+			//#else
 			if (player.hasPermissionLevel(2)) {
 				PacketByteBuf sendBuf = PacketByteBufs.create();
 				sendBuf.writeString(Config.INSTANCE.getConfigStorage());
 				ServerPlayNetworking.send(player, QbmConstant.OPEN_CONFIG_GUI_PACKET_ID, sendBuf);
 			}
+			//#endif
 		});
 
+		//#if MC>=12005
+		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.SaveConfigPacket.PACKET_ID, (payload, context) -> {
+		//#else
 		ServerPlayNetworking.registerGlobalReceiver(QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+		//#endif
+			//#if MC>=12005
+			//$$ ServerPlayerEntity player = context.player();
+			//#endif
 			if (player.hasPermissionLevel(2)) {
+				//#if MC>=12005
+				//$$ String configStorage = payload.config();
+				//#else
 				String configStorage = buf.readString();
+				//#endif
 				ConfigStorage c = gson.fromJson(configStorage, ConfigStorage.class);
 				// Verify config
 				ConfigStorage result = verifyConfig(c, player);
@@ -97,7 +126,11 @@ public class QuickBackupMulti implements ModInitializer {
 	}
 
 	public static boolean shouldFilterMessage(String message) {
-		return message.contains("Mongo") || message.contains("H2Backend") || message.contains("cluster");
+		// 仅过滤INFO，Debug / ERROR不过滤
+		if (message.contains("INFO")) {
+			return message.contains("Mongo") || message.contains("H2Backend") || message.contains("cluster");
+		}
+		return false;
 	}
 
 	public static DataBase getDataBase() {
