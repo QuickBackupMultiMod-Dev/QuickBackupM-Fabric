@@ -87,7 +87,7 @@ public class MakeUtils {
         List<String> indexBackupList // 索引列表
     ) throws Exception {
         // 获取文件Hash
-        String fileHash = getFileHash(file.toPath());
+        String fileHash = getFileHash(file.toPath(), null);
         // 如果不是第一次备份
         if (!isFirstBackup) {
             // 对比文件Hash

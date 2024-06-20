@@ -1,18 +1,20 @@
 package dev.skydynamic.quickbackupmulti.config;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class ConfigStorage {
     @Ignore
     public static final ConfigStorage DEFAULT = new ConfigStorage(
-        new ArrayList<>(),
-        "zh_cn",
-        false,
-        "* * 0/4 * * ?",
-        14400,
-        "interval",
-        true,
-        "mongodb://localhost:27017"
+            new ArrayList<>(),
+            "zh_cn",
+            false,
+            "* * 0/4 * * ?",
+            14400,
+            "interval",
+            true,
+            "mongodb://localhost:27017",
+            false
     );
 
     public ArrayList<String> ignoredFiles;
@@ -24,16 +26,18 @@ public class ConfigStorage {
 
     public boolean useInternalDataBase;
     public String mongoDBUri;
+    public boolean useFastHash;
 
     public ConfigStorage(
-        ArrayList<String> IgnoredFiles,
-        String lang,
-        boolean scheduleBackup,
-        String scheduleCron,
-        int scheduleInterval,
-        String scheduleMode,
-        boolean useInternalDataBase,
-        String mongoDBUri) {
+            ArrayList<String> IgnoredFiles,
+            String lang,
+            boolean scheduleBackup,
+            String scheduleCron,
+            int scheduleInterval,
+            String scheduleMode,
+            boolean useInternalDataBase,
+            String mongoDBUri,
+            boolean useFastHash) {
         this.ignoredFiles = IgnoredFiles;
         this.lang = lang;
         this.scheduleBackup = scheduleBackup;
@@ -42,6 +46,7 @@ public class ConfigStorage {
         this.scheduleMode = scheduleMode;
         this.useInternalDataBase = useInternalDataBase;
         this.mongoDBUri = mongoDBUri;
+        this.useFastHash = useFastHash;
     }
 
     public boolean getScheduleBackup() {
