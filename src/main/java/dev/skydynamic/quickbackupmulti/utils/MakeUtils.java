@@ -2,7 +2,10 @@ package dev.skydynamic.quickbackupmulti.utils;
 
 import dev.morphia.query.filters.Filters;
 import dev.skydynamic.quickbackupmulti.config.Config;
-import dev.skydynamic.quickbackupmulti.storage.*;
+import dev.skydynamic.quickbackupmulti.storage.BackupInfo;
+import dev.skydynamic.quickbackupmulti.storage.DimensionFormat;
+import dev.skydynamic.quickbackupmulti.storage.FileHashes;
+import dev.skydynamic.quickbackupmulti.storage.IndexFile;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -15,8 +18,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
-import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
+import static dev.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static dev.skydynamic.quickbackupmulti.utils.QbmManager.*;
 import static dev.skydynamic.quickbackupmulti.utils.ScheduleUtils.startSchedule;
 import static dev.skydynamic.quickbackupmulti.utils.hash.HashUtils.compareFileHash;
@@ -168,12 +171,14 @@ public class MakeUtils {
                         if (file.getName().equals("DIM1") || file.getName().equals("DIM-1")) {
                             // 如果是文件夹（原版情况下一般只有文件夹了xwx, 但还是要判断）
                             if (dirFile.isDirectory()) {
+                                // 使用DIM的目标文件夹
+                                File dimDestDir = getBackupDir().resolve(name + "/" + file.getName()).toFile();
                                 // 初始化
                                 hashMap = new HashMap<>();
                                 indexMap = new HashMap<>();
                                 for (File dirFile1 : dirFile.listFiles()) {
                                     // 该处同root与别的文件夹
-                                    HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, dirFile1, destDir, hashMap, indexMap, indexBackupList);
+                                    HashMap<String, Object> resultMap = compareAndIndex(firstBackup, latestBackupName, fileHashedDocument, indexFileDocument, dirFile1, dimDestDir, hashMap, indexMap, indexBackupList);
                                     hashMap = (HashMap<String, String>) resultMap.get("hash");
                                     indexMap = (HashMap<String, String>) resultMap.get("index");
                                     indexBackupList = (List<String>) resultMap.get("indexBackupList");
