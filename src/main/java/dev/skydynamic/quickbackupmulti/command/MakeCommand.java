@@ -46,8 +46,7 @@ public class MakeCommand {
 //            .executes(it -> makeSaveBackup(it.getSource(), String.valueOf(System.currentTimeMillis()), StringArgumentType.getString(it, "desc"))));
 
     private static int makeSaveBackup(ServerCommandSource commandSource, String name, String desc) {
-        Thread.startVirtualThread(new makeRunnable(commandSource, name, desc));
-//        new makeRunnable(commandSource, name, desc).run();
+        new Thread(new makeRunnable(commandSource, name, desc)).start();
         return 1;
     }
 }
