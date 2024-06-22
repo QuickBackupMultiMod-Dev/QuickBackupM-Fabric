@@ -12,6 +12,14 @@ on:
       - "main"
       - "dev"
 
+  pull_request:
+    paths:
+      - "*.gradle"
+      - "gradle.properties"
+      - "src/**"
+      - "versions/**"
+      - ".github/**"
+
 
 jobs:
   build:
