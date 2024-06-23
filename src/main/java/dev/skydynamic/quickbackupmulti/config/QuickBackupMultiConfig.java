@@ -141,6 +141,12 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public boolean getUseFastHash() {
+        synchronized (lock) {
+            return configStorage.useFastHash;
+        }
+    }
+
     public void setLang(String lang) {
         synchronized (lock) {
             configStorage.lang = lang;

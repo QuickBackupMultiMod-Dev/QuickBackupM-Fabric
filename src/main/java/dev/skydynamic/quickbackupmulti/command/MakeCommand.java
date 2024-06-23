@@ -26,9 +26,10 @@ public class MakeCommand {
 
         @Override
         public void run() {
+            long l = System.currentTimeMillis();
             LOGGER.info("Make Backup thread started...");
             make(commandSource, name, desc);
-            LOGGER.info("Make Backup thread close");
+            LOGGER.info("Make Backup thread close => {}ms", System.currentTimeMillis() - l);
         }
     }
 
@@ -45,7 +46,7 @@ public class MakeCommand {
 //            .executes(it -> makeSaveBackup(it.getSource(), String.valueOf(System.currentTimeMillis()), StringArgumentType.getString(it, "desc"))));
 
     private static int makeSaveBackup(ServerCommandSource commandSource, String name, String desc) {
-        new makeRunnable(commandSource, name, desc).run();
+        new Thread(new makeRunnable(commandSource, name, desc)).start();
         return 1;
     }
 }

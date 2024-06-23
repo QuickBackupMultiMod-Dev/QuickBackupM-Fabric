@@ -66,6 +66,7 @@ dependencies {
     include(implementation('org.mongodb:mongodb-driver-core:4.11.1'))
     include(implementation('org.mongodb:bson:4.11.1'))
     include(implementation('com.h2database:h2:2.2.224'))
+    include(implementation('org.lz4:lz4-java:1.8.0'))
 
 }
 
