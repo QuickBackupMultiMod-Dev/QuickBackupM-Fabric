@@ -14,10 +14,20 @@ configurations {
 
 repositories {
     maven {
+        name 'aliyunMavenCentralMirror'
         url 'https://maven.aliyun.com/repository/central'
     }
     maven {
+        name 'mavenCentral'
         url 'https://repo1.maven.org/maven2/'
+    }
+    maven {
+        name 'nekoMaven'
+        url 'https://maven.takeneko.icu/releases'
+    }
+    maven {
+        name 'CjsahMaven'
+        url 'https://server.cjsah.net:1002/maven/'
     }
 }
 
@@ -55,6 +65,8 @@ dependencies {
     implementation('commons-io:commons-io:2.15.1')
 
     include(implementation('org.yaml:snakeyaml:2.0'))
+
+    include(implementation('io.github.skydynamic:incremental-storage-lib:1.0.2'))
 
     include(implementation('org.quartz-scheduler:quartz:2.3.2'))
 

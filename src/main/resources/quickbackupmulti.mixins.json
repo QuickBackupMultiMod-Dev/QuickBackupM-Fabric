@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "dev.skydynamic.quickbackupmulti.mixin",
+  "package": "io.github.skydynamic.quickbackupmulti.mixin",
   "compatibilityLevel": "/*JAVA_VERSION*/",
   "mixins": [],
   "injectors": {
