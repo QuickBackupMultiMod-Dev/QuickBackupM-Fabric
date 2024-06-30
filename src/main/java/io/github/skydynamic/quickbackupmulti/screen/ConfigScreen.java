@@ -10,7 +10,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 //#if MC>=12005
-//$$ import dev.skydynamic.quickbackupmulti.Packets;
+//$$ import io.github.skydynamic.quickbackupmulti.Packets;
 //#endif
 //#if MC>=12000
 import net.minecraft.client.gui.DrawContext;
@@ -48,7 +48,7 @@ public class ConfigScreen extends Screen {
             (button) -> {
             TempConfig.tempConfig.config.setLang(langTextField.getText());
             //#if MC>=12005
-            //$$ ClientPlayNetworking.send(new Packets.SaveConfigPacket(gson.toJson(tempConfig.config)));
+            //$$ ClientPlayNetworking.send(new Packets.SaveConfigPacket(gson.toJson(TempConfig.tempConfig.config)));
             //#else
             PacketByteBuf sendBuf = PacketByteBufs.create();
             sendBuf.writeString(gson.toJson(TempConfig.tempConfig.config));

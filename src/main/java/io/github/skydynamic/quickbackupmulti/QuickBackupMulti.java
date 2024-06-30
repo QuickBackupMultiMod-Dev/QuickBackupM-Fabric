@@ -14,9 +14,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-//#if MC>=12005
-//$$ import net.minecraft.server.network.ServerPlayerEntity;
-//#endif
 //#if MC>=11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //#else
@@ -24,6 +21,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 //#endif
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
+//#if MC>=12005
+//$$ import net.minecraft.server.network.ServerPlayerEntity;
+//#endif
 import net.minecraft.network.PacketByteBuf;
 
 import org.apache.logging.log4j.Level;
@@ -31,13 +31,12 @@ import org.apache.logging.log4j.LogManager;
 //#if MC>=11900
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
 //#else
 //$$ import org.apache.logging.log4j.Logger;
 //#endif
+import java.nio.file.Path;
+
+import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
 
 
 public class QuickBackupMulti implements ModInitializer {
@@ -67,9 +66,13 @@ public class QuickBackupMulti implements ModInitializer {
 		Translate.handleResourceReload(Config.INSTANCE.getLang());
 
 		//#if MC>=11900
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> QuickBackupMultiCommand.RegisterCommand(dispatcher));
+		CommandRegistrationCallback.EVENT.register(
+			(dispatcher, registryAccess, environment) -> QuickBackupMultiCommand.RegisterCommand(dispatcher)
+		);
 		//#else
-		//$$ CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> RegisterCommand(dispatcher));
+		//$$ CommandRegistrationCallback.EVENT.register(
+		//$$ 	(dispatcher, registryAccess) -> QuickBackupMultiCommand.RegisterCommand(dispatcher)
+		//$$ );
 		//#endif
 		registerPacketHandler();
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
@@ -96,13 +99,17 @@ public class QuickBackupMulti implements ModInitializer {
 
 	public static void registerPacketHandler() {
 		//#if MC>=12005
-		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.RequestOpenConfigGuiPacket.PACKET_ID, (payload, context) -> {
+		//$$ ServerPlayNetworking.registerGlobalReceiver(
+		//$$ Packets.RequestOpenConfigGuiPacket.PACKET_ID, (payload, context) -> {
 		//#else
-		ServerPlayNetworking.registerGlobalReceiver(QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+		ServerPlayNetworking.registerGlobalReceiver(
+			QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
 		//#endif
 			//#if MC>=12005
 			//$$ ServerPlayerEntity player = context.player();
-			//$$ if (player.hasPermissionLevel(2)) ServerPlayNetworking.send(player, new Packets.OpenConfigGuiPacket(Config.INSTANCE.getConfigStorage()));
+			//$$ if (player.hasPermissionLevel(2)) ServerPlayNetworking.send(
+			//$$ 	player, new Packets.OpenConfigGuiPacket(gson.toJson(Config.INSTANCE.getConfigStorage()))
+			//$$ );
 			//#else
 			if (player.hasPermissionLevel(2)) {
 				PacketByteBuf sendBuf = PacketByteBufs.create();
@@ -115,7 +122,8 @@ public class QuickBackupMulti implements ModInitializer {
 		//#if MC>=12005
 		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.SaveConfigPacket.PACKET_ID, (payload, context) -> {
 		//#else
-		ServerPlayNetworking.registerGlobalReceiver(QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+		ServerPlayNetworking.registerGlobalReceiver(
+			QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
 		//#endif
 			//#if MC>=12005
 			//$$ ServerPlayerEntity player = context.player();

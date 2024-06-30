@@ -1,13 +1,13 @@
-package dev.skydynamic.quickbackupmulti;
+package io.github.skydynamic.quickbackupmulti;
 
  import io.netty.buffer.ByteBuf;
  import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
  import net.minecraft.network.codec.PacketCodec;
  import net.minecraft.network.codec.PacketCodecs;
  import net.minecraft.network.packet.CustomPayload;
- import static dev.skydynamic.quickbackupmulti.QbmConstant.OPEN_CONFIG_GUI_PACKET_ID;
- import static dev.skydynamic.quickbackupmulti.QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID;
- import static dev.skydynamic.quickbackupmulti.QbmConstant.SAVE_CONFIG_PACKET_ID;
+ import static io.github.skydynamic.quickbackupmulti.QbmConstant.OPEN_CONFIG_GUI_PACKET_ID;
+ import static io.github.skydynamic.quickbackupmulti.QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID;
+ import static io.github.skydynamic.quickbackupmulti.QbmConstant.SAVE_CONFIG_PACKET_ID;
 
 public class Packets {
     public static void registerPacketCodec() {
