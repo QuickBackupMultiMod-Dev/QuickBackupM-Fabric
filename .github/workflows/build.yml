@@ -8,6 +8,11 @@ on:
         required: false
         description: ''
         default: false
+      pre_version:
+        type: string
+        required: false
+        description: ''
+        default: ''
       target_subproject:
         description: The subproject name of the specified Minecraft version to be built. Leave it empty to build all
         type: string
@@ -47,6 +52,7 @@ jobs:
         env:
           BUILD_ID: ${{ github.run_number }}
           BUILD_RELEASE: ${{ inputs.release }}
+          PRE_VERSION: ${{ inputs.pre_version }}
 
       - name: Upload JAR file
         uses: actions/upload-artifact@v3

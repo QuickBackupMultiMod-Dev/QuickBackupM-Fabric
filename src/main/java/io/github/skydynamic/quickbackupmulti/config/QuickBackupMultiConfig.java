@@ -134,7 +134,7 @@ public class QuickBackupMultiConfig {
 
     public boolean getUseInternalDataBase() {
         synchronized (lock) {
-            return configStorage.getUserInternalDataBase();
+            return configStorage.getUseInternalDataBase();
         }
     }
 

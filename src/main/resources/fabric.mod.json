@@ -27,7 +27,7 @@
 	],
 	"accessWidener": "qbm.accesswidener",
 	"depends": {
-		"fabricloader": ">=0.14.24",
+		"fabricloader": ">=${fabric_loader}",
 		"minecraft": "${minecraft_support}",
 		"${fabric_api_id}": "*"
 	}

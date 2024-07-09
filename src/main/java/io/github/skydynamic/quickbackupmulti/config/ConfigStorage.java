@@ -109,7 +109,7 @@ public class ConfigStorage implements IConfig {
     }
 
     @Override
-    public boolean getUserInternalDataBase() {
+    public boolean getUseInternalDataBase() {
         return this.useInternalDataBase;
     }
 
