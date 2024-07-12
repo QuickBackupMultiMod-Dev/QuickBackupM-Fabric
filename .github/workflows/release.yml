@@ -155,6 +155,9 @@ jobs:
           modrinth-id: DgWBIBY5  # https://modrinth.com/mod/quickbackupmulti
           modrinth-token: ${{ secrets.MODRINTH_API_TOKEN }}
 
+          curseforge-id: 951047 # https://www.curseforge.com/minecraft/mc-mods/quickbackupmulti
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
           github-tag: ${{ steps.release_info.outputs.tag_name }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
