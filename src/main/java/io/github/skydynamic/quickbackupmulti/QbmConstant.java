@@ -8,7 +8,7 @@ import net.minecraft.util.Identifier;
 public final class QbmConstant {
     public static final Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
     public static final ServerPathUtils pathGetter = new ServerPathUtils();
-    public static final Identifier REQUEST_OPEN_CONFIG_GUI_PACKET_ID = new Identifier("quickbackupmulti", "request_open_config_gui");
-    public static final Identifier OPEN_CONFIG_GUI_PACKET_ID = new Identifier("quickbackupmulti", "open_config_gui");
-    public static final Identifier SAVE_CONFIG_PACKET_ID = new Identifier("quickbackupmulti", "save_config");
+    public static final Identifier REQUEST_OPEN_CONFIG_GUI_PACKET_ID = Identifier.tryParse("quickbackupmulti:request_open_config_gui");
+    public static final Identifier OPEN_CONFIG_GUI_PACKET_ID = Identifier.tryParse("quickbackupmulti:open_config_gui");
+    public static final Identifier SAVE_CONFIG_PACKET_ID = Identifier.tryParse("quickbackupmulti:save_config");
 }
