@@ -3,7 +3,7 @@
 [![Modrinth](https://img.shields.io/modrinth/dt/DgWBIBY5?label=Modrinth%20Downloads)](https://modrinth.com/mod/quickbackupmulti)
 
 <div align="center">
-<a><img src="./indexImg.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+<a><img src="./indexImg.png" width="180" height="180" alt="Logo"></a>
 </div>
 <div align="center">
 
@@ -28,6 +28,10 @@ Idea come from: [QuickBackupMulti](https://github.com/TISUnion/QuickBackupM)
 - Support schedule backup and custom cron expression.
 
 ## How to use
+> [!WARNING]  
+> It is strictly prohibited to delete all backup files in the backup folder by oneself.
+> If you need to delete them, please enter the game and use the command to delete them!
+
 > Please install Fabric Loader before install this mod
 
 Go to [release](https://github.com/SkyDynamic/QuickBackupM-Fabric/releases) to download the latest mod and put the `.jar` file in `mods` dir

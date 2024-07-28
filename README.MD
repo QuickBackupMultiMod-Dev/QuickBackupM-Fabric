@@ -3,7 +3,7 @@
 [![Modrinth](https://img.shields.io/modrinth/dt/DgWBIBY5?label=Modrinth%20Downloads)](https://modrinth.com/mod/quickbackupmulti)
 
 <div align="center">
-<a><img src="./indexImg.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+<a><img src="./indexImg.png" width="180" height="180" alt="Logo"></a>
 </div>
 <div align="center">
 
@@ -28,6 +28,9 @@ _✨ MC备份 / 回档模组 ✨_
 - 支持定时备份, 并支持自定义cron表达式
 
 ## 使用方式
+> [!WARNING]  
+> 严禁自行删除备份文件夹内的所有备份文件, 如需删除请进入游戏内进行手动删除! 
+
 > 在使用mod前请确保你已安装Fabric Loader
 
 将本mod放进`mods`文件夹即可
