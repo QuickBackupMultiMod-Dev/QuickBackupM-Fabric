@@ -1,6 +1,8 @@
 [![License](https://img.shields.io/github/license/SkyDynamic/QuickBackupM-Fabric.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Issues](https://img.shields.io/github/issues/SkyDynamic/QuickBackupM-Fabric.svg)](https://github.com/SkyDynamic/QuickBackupM-Fabric/issues)
+[![Issues](https://img.shields.io/github/issues/QuickBackupMultiMod-Dev/QuickBackupM-Fabric.svg)](https://github.com/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/issues)
 [![Modrinth](https://img.shields.io/modrinth/dt/DgWBIBY5?label=Modrinth%20Downloads)](https://modrinth.com/mod/quickbackupmulti)
+[![CurseForge](https://img.shields.io/curseforge/dt/951047?label=CurseForge%20Downloads)](https://www.curseforge.com/minecraft/mc-mods/quickbackupmulti)
+[![Github Release](https://img.shields.io/github/downloads/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/total?label=Github%20Downloads)](https://github.com/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/releases)
 
 <div align="center">
 <a><img src="./indexImg.png" width="180" height="180" alt="Logo"></a>
