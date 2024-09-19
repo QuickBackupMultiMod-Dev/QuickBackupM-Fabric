@@ -1,7 +1,7 @@
 plugins {
 	id "fabric-loom" version "1.7-SNAPSHOT" apply false
 	id "maven-publish"
-	id "com.replaymod.preprocess" version "SNAPSHOT"
+	id "com.replaymod.preprocess" version "88169fcbc9"
 }
 
 preprocess {
@@ -13,30 +13,8 @@ preprocess {
 	def mc1210 = createNode("1.21", 1_21_00, "yarn")
 
 	mc118.link(mc119, file("versions/mapping-1.18-1.19.txt"))
-	mc119.link(mc1200, file("versions/mapping-empty.txt"))
-	mc1200.link(mc1203, file("versions/mapping-empty.txt"))
-	mc1203.link(mc1205, file("versions/mapping-empty.txt"))
-	mc1205.link(mc1210, file("versions/mapping-empty.txt"))
-}
-
-tasks.register("buildAndGather") {
-	subprojects {
-		dependsOn project.name + ":remapJar"
-	}
-	doFirst {
-		delete fileTree(project.projectDir.toPath().resolve('build/libs')) {
-			include '*'
-		}
-		copy {
-			subprojects {
-				def libDir = project.projectDir.toPath().resolve('build/libs')
-				from(libDir) {
-					include '*.jar'
-					exclude '*-dev.jar', '*-sources.jar'
-				}
-				into 'build/libs/'
-				duplicatesStrategy DuplicatesStrategy.INCLUDE
-			}
-		}
-	}
+	mc119.link(mc1200, null)
+	mc1200.link(mc1203, null)
+	mc1203.link(mc1205, null)
+	mc1205.link(mc1210, null)
 }

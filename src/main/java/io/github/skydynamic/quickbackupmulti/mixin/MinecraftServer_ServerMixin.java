@@ -2,10 +2,13 @@ package io.github.skydynamic.quickbackupmulti.mixin;
 
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
 import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,7 +23,9 @@ import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils
 
 @Environment(EnvType.SERVER)
 @Mixin(MinecraftServer.class)
-public class MinecraftServer_ServerMixin {
+public abstract class MinecraftServer_ServerMixin {
+    @Shadow public abstract Path getSavePath(WorldSavePath worldSavePath);
+
     @Inject(method = "<init>", at = @At("TAIL"))
     private void setServer(CallbackInfo ci) {
         Config.TEMP_CONFIG.setServerValue((MinecraftServer)(Object)this);
@@ -30,6 +35,7 @@ public class MinecraftServer_ServerMixin {
     private void initQuickBackupMulti(CallbackInfo ci) {
         Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
         Config.TEMP_CONFIG.setWorldName("");
+        QbmManager.savePath = this.getSavePath(WorldSavePath.ROOT);
         createBackupDir(backupDir);
         setDataBase("server");
         startSchedule();

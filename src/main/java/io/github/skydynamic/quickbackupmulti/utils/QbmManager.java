@@ -10,7 +10,6 @@ import net.fabricmc.api.EnvType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import net.minecraft.util.WorldSavePath;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -33,7 +32,7 @@ import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
 
 public class QbmManager {
     public static Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
-    public static Path savePath = Config.TEMP_CONFIG.server.getSavePath(WorldSavePath.ROOT);
+    public static Path savePath;
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
     // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();
 

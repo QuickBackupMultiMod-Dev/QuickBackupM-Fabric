@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 pluginManagement {
 	repositories {
 		maven {
@@ -15,7 +17,7 @@ pluginManagement {
 			eachPlugin {
 				switch (requested.id.id) {
 					case "com.replaymod.preprocess": {
-						useModule("com.github.SkyDynamic:preprocessor:${requested.version}")
+						useModule("com.github.Fallen-Breath:preprocessor:${requested.version}")
 						break
 					}
 				}
@@ -26,19 +28,13 @@ pluginManagement {
 	}
 }
 
-def versions = Arrays.asList(
-		"1.18.2",
-		"1.19.4",
-		"1.20",
-		"1.20.3",
-		"1.20.5",
-		"1.21"
-)
+Map<String, List<String>> settings = file("settings.json").withReader {
+	new JsonSlurper().parse(it) as Map<String, List<String>>
+}
 
-for (String version : versions) {
+for (String version : settings.get("versions")) {
 	include(":$version")
-
-	def proj = project(":$version")
-	proj.projectDir = file("versions/$version")
-	proj.buildFileName = "../../common.gradle"
+	ProjectDescriptor proj = project(":$version")
+	proj.setProjectDir(file("versions/$version"))
+	proj.setBuildFileName("../${settings.versions.get(0)}/build.gradle")
 }
