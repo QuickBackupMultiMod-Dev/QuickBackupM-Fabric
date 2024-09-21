@@ -28,10 +28,12 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class SettingCommand {
 
-    public static LiteralArgumentBuilder<ServerCommandSource> settingCommand = literal("setting").requires(QuickBackupMultiCommand::checkPermission)
+    public static LiteralArgumentBuilder<ServerCommandSource> settingCommand = literal("setting")
+        .requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
         .then(literal("lang")
             .then(literal("get").executes(it -> getLang(it.getSource())))
-            .then(literal("set").requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("set")
+                .requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
                 .then(CommandManager.argument("lang", StringArgumentType.string())
                     .suggests(new LangSuggestionProvider())
                     .executes(it -> setLang(it.getSource(), StringArgumentType.getString(it, "lang"))))))
@@ -89,7 +91,7 @@ public class SettingCommand {
             )
         )
         .then(literal("dataBase")
-            .requires(QuickBackupMultiCommand::checkPermission)
+            .requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
             .then(literal("useInternalDataBase")
                 .then(literal("set")
                     .then(CommandManager.argument("value", BoolArgumentType.bool())

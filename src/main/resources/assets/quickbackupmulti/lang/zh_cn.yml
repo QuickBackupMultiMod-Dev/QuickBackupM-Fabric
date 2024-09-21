@@ -109,3 +109,8 @@ quickbackupmulti:
     back_button: "§2[点击回档]"
     delete_button: "§c[点击删除]"
     fail: 槽位不存在
+
+  permission:
+    set: "设置§g%s§r的权限为§3%s"
+    get: "§g%s§r当前的权限为§3%s"
+    reload: "重载权限配置文件完成"

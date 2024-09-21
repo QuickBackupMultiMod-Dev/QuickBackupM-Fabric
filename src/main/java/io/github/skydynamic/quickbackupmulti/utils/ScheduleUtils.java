@@ -16,6 +16,7 @@ public class ScheduleUtils {
     public static void startSchedule(ServerCommandSource commandSource) {
         String nextBackupTimeString = "";
         try {
+            Config.TEMP_CONFIG.scheduler.shutdown();
             // 照顾Java8
             switch (Config.INSTANCE.getScheduleMode()) {
                 case "cron": {

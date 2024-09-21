@@ -35,7 +35,8 @@ public class MakeCommand {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HHmmss");
 
-    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make").requires(QuickBackupMultiCommand::checkPermission)
+    public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make")
+        .requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.HELPER))
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
         .then(CommandManager.argument("name", StringArgumentType.string())
             .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))

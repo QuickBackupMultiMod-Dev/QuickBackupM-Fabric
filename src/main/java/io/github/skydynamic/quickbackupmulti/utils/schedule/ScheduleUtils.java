@@ -15,7 +15,7 @@ public class ScheduleUtils {
                 Config.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
                 LOGGER.info("QBM Schedule backup started.");
             } catch (SchedulerException e) {
-                LOGGER.error("QBM schedule backup start error: " + e);
+                LOGGER.error("QBM schedule backup start error: " , e);
             }
         }
     }

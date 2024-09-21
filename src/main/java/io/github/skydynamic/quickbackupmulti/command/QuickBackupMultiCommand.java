@@ -33,7 +33,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static io.github.skydynamic.quickbackupmulti.QbmConstant.permissionManager;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getStorager;
+import static io.github.skydynamic.quickbackupmulti.command.PermissionCommand.permissionCommand;
 import static io.github.skydynamic.quickbackupmulti.command.SettingCommand.settingCommand;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static io.github.skydynamic.quickbackupmulti.utils.ListUtils.list;
@@ -57,11 +59,11 @@ public class QuickBackupMultiCommand {
 
             .then(MakeCommand.makeCommand)
 
-            .then(literal("back").requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("back").requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
                     .then(CommandManager.argument("name", StringArgumentType.string())
                             .executes(it -> restoreSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
-            .then(literal("confirm").requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("confirm").requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
                     .executes(it -> {
                         try {
                             executeRestore(it.getSource());
@@ -71,10 +73,10 @@ public class QuickBackupMultiCommand {
                         return 0;
                     }))
 
-            .then(literal("cancel").requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("cancel").requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
                     .executes(it -> cancelRestore(it.getSource())))
 
-            .then(literal("delete").requires(QuickBackupMultiCommand::checkPermission)
+            .then(literal("delete").requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
                     .then(CommandManager.argument("name", StringArgumentType.string())
                             .executes(it -> deleteSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
@@ -84,6 +86,8 @@ public class QuickBackupMultiCommand {
             .then(literal("show")
                 .then(CommandManager.argument("name", StringArgumentType.string())
                     .executes(it -> showBackupDetail(it.getSource(), StringArgumentType.getString(it, "name")))))
+
+            .then(permissionCommand)
         );
 
         dispatcher.register(literal("quickbackupm").redirect(QuickBackupMultiShortCommand));
@@ -208,23 +212,5 @@ public class QuickBackupMultiCommand {
         MutableText resultText = list(page);
         Messenger.sendMessage(commandSource, resultText);
         return 1;
-    }
-
-    public static boolean checkPermission(@NotNull ServerCommandSource source) {
-         try {
-            return getPermission(source);
-         } catch (CommandSyntaxException e) {
-            return false;
-         }
-    }
-
-    private static boolean getPermission(ServerCommandSource source) throws CommandSyntaxException{
-        boolean flag = source.hasPermissionLevel(2);
-        ServerPlayerEntity player;
-        MinecraftServer server;
-        if (!flag && (server = source.getServer()).isSingleplayer() && (player = source.getPlayer()) != null) {
-            flag = server.isHost(player.getGameProfile());
-        }
-        return flag;
     }
 }

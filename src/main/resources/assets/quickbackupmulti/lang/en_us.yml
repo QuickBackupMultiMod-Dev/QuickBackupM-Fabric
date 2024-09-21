@@ -109,3 +109,8 @@ quickbackupmulti:
     back_button: "§2[Click to back]"
     delete_button: "§c[Click to delete]"
     fail: Backup Not Found
+
+  permission:
+    set: "Set §g%s§r permission to §3%s"
+    get: "§g%s's§r current permission is §3%s"
+    reload: "Reload permission config success"

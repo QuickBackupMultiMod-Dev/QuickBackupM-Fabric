@@ -13,6 +13,7 @@ public class ConfigStorage implements IConfig {
             "* * 0/4 * * ?",
             14400,
             "interval",
+            10,
             true,
             "mongodb://localhost:27017",
             "QuickBackupMulti"
@@ -24,6 +25,7 @@ public class ConfigStorage implements IConfig {
     private String scheduleCron;
     private int scheduleInterval;
     private String scheduleMode;
+    private int maxScheduleBackup;
 
     private boolean useInternalDataBase;
     private String mongoDBUri;
@@ -36,6 +38,7 @@ public class ConfigStorage implements IConfig {
             String scheduleCron,
             int scheduleInterval,
             String scheduleMode,
+            int maxScheduleBackup,
             boolean useInternalDataBase,
             String mongoDBUri,
             String storagePath) {
@@ -45,6 +48,7 @@ public class ConfigStorage implements IConfig {
         this.scheduleCron = scheduleCron;
         this.scheduleInterval = scheduleInterval;
         this.scheduleMode = scheduleMode;
+        this.maxScheduleBackup = maxScheduleBackup;
         this.useInternalDataBase = useInternalDataBase;
         this.mongoDBUri = mongoDBUri;
         this.storagePath = storagePath;
@@ -92,6 +96,14 @@ public class ConfigStorage implements IConfig {
 
     public String getScheduleMode() {
         return scheduleMode;
+    }
+
+    public int getMaxScheduleBackup() {
+        return maxScheduleBackup;
+    }
+
+    public void setMaxScheduleBackup(int maxScheduleBackup) {
+        this.maxScheduleBackup = maxScheduleBackup;
     }
 
     public void setScheduleMode(String scheduleMode) {
