@@ -17,6 +17,7 @@ import java.util.Map;
 
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.permissionManager;
+import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.getPlayerFromCommandSource;
 
 public class PermissionManager {
     private static final Path configPath = QbmConstant.pathGetter.getConfigPath();
@@ -90,7 +91,7 @@ public class PermissionManager {
         int mcPermission,
         PermissionType modPermission
     ) {
-        ServerPlayerEntity player = source.getPlayer();
+        ServerPlayerEntity player = getPlayerFromCommandSource(source);
         if (player != null) {
             if (checkLocalGamePermission(source)) {
                 return true;

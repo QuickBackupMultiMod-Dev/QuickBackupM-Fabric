@@ -9,6 +9,7 @@ import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 import net.fabricmc.api.EnvType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import org.apache.commons.io.FileUtils;
@@ -150,5 +151,17 @@ public class QbmManager {
         }
 
         return c;
+    }
+
+    public static ServerPlayerEntity getPlayerFromCommandSource(ServerCommandSource source) {
+        //#if MC<11900
+        //$$ try {
+        //$$     return source.getPlayer();
+        //$$ } catch (Exception e) {
+        //$$     throw new RuntimeException("Cannot get ServerPlayerEntity from ServerCommandSource");
+        //$$ }
+        //#else
+        return source.getPlayer();
+        //#endif
     }
 }
