@@ -2,16 +2,14 @@ package io.github.skydynamic.quickbackupmulti.utils;
 
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
-import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.config.Config;
-
 import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
+import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import net.fabricmc.api.EnvType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.NameFileFilter;
@@ -21,8 +19,11 @@ import org.quartz.SchedulerException;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,12 +49,20 @@ public class QbmManager {
     public static void restoreClient(String slot) {
         File targetBackupSlot = getBackupDir().resolve(slot).toFile();
         try {
-            FileUtils.deleteDirectory(savePath.toFile());
+            final Iterator<Path> iterator = Files.walk(savePath)
+                    .sorted(Comparator.reverseOrder())
+                    .iterator();
+            while (iterator.hasNext()) {
+                Path p = iterator.next();
+                if (p.equals(savePath)) continue;
+                Files.delete(p);
+            }
+            //FileUtils.deleteDirectory(savePath.toFile());
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(
-                slot,
-                Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
-                savePath.toFile()
+                    slot,
+                    Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
+                    savePath.toFile()
             );
         } catch (IOException e) {
             LOGGER.error("Restore Failed", e);
@@ -68,9 +77,9 @@ public class QbmManager {
             }
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(
-                slot,
-                Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
-                savePath.toFile()
+                    slot,
+                    Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
+                    savePath.toFile()
             );
         } catch (IOException e) {
             LOGGER.error("Restore Failed", e);
@@ -111,7 +120,7 @@ public class QbmManager {
         // schedule enable
         if (c.isScheduleBackup() && !Config.INSTANCE.getScheduleBackup()) {
             ScheduleUtils.startSchedule(commandSource);
-        } else if (!c.isScheduleBackup() && Config.INSTANCE.getScheduleBackup()){
+        } else if (!c.isScheduleBackup() && Config.INSTANCE.getScheduleBackup()) {
             ScheduleUtils.disableSchedule(commandSource);
         }
 
@@ -125,7 +134,7 @@ public class QbmManager {
                 ScheduleUtils.setScheduleCron(commandSource, c.getScheduleCron());
             } catch (SchedulerException e) {
                 Messenger.sendMessage(commandSource,
-                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
+                        Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
             }
         }
 
@@ -135,7 +144,7 @@ public class QbmManager {
                 ScheduleUtils.setScheduleInterval(commandSource, c.getScheduleInterval());
             } catch (SchedulerException e) {
                 Messenger.sendMessage(commandSource,
-                    Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
+                        Messenger.literal(tr("quickbackupmulti.schedule.cron.set_fail", e)));
             }
         }
 
