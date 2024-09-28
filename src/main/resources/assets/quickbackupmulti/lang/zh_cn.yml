@@ -114,3 +114,7 @@ quickbackupmulti:
     set: "设置§g%s§r的权限为§3%s"
     get: "§g%s§r当前的权限为§3%s"
     reload: "重载权限配置文件完成"
+
+  restartmode:
+    get: "当前重启方式为: §4§l%s§r"
+    switch: "重启方式切换为: §a%s"

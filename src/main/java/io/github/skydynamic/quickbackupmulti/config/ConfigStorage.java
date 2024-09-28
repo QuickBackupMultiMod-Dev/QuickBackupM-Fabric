@@ -14,6 +14,7 @@ public class ConfigStorage implements IConfig {
             14400,
             "interval",
             10,
+            Config.AutoRestartMode.DEFAULT,
             true,
             "mongodb://localhost:27017",
             "QuickBackupMulti"
@@ -27,6 +28,8 @@ public class ConfigStorage implements IConfig {
     private String scheduleMode;
     private int maxScheduleBackup;
 
+    private Config.AutoRestartMode autoRestartMode;
+
     private boolean useInternalDataBase;
     private String mongoDBUri;
     private String storagePath;
@@ -39,6 +42,7 @@ public class ConfigStorage implements IConfig {
             int scheduleInterval,
             String scheduleMode,
             int maxScheduleBackup,
+            Config.AutoRestartMode autoRestartMode,
             boolean useInternalDataBase,
             String mongoDBUri,
             String storagePath) {
@@ -49,6 +53,7 @@ public class ConfigStorage implements IConfig {
         this.scheduleInterval = scheduleInterval;
         this.scheduleMode = scheduleMode;
         this.maxScheduleBackup = maxScheduleBackup;
+        this.autoRestartMode = autoRestartMode;
         this.useInternalDataBase = useInternalDataBase;
         this.mongoDBUri = mongoDBUri;
         this.storagePath = storagePath;
@@ -108,6 +113,14 @@ public class ConfigStorage implements IConfig {
 
     public void setScheduleMode(String scheduleMode) {
         this.scheduleMode = scheduleMode;
+    }
+
+    public Config.AutoRestartMode getAutoRestartMode() {
+        return autoRestartMode;
+    }
+
+    public void setAutoRestartMode(Config.AutoRestartMode autoRestartMode) {
+        this.autoRestartMode = autoRestartMode;
     }
 
     @Override

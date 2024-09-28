@@ -132,6 +132,12 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public Config.AutoRestartMode getAutoRestartMode() {
+        synchronized (lock) {
+            return configStorage.getAutoRestartMode();
+        }
+    }
+
     public boolean getUseInternalDataBase() {
         synchronized (lock) {
             return configStorage.getUseInternalDataBase();
@@ -181,6 +187,13 @@ public class QuickBackupMultiConfig {
     public void setScheduleMode(String mode) {
         synchronized (lock) {
             configStorage.setScheduleMode(mode);
+            saveModifiedConfig(configStorage);
+        }
+    }
+
+    public void setAutoRestartMode(Config.AutoRestartMode mode) {
+        synchronized (lock) {
+            configStorage.setAutoRestartMode(mode);
             saveModifiedConfig(configStorage);
         }
     }

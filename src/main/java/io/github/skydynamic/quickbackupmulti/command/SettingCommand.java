@@ -4,7 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.github.skydynamic.quickbackupmulti.i18n.LangSuggestionProvider;
+import io.github.skydynamic.quickbackupmulti.command.suggestion.AutoRestartModeSuggestionProvider;
+import io.github.skydynamic.quickbackupmulti.command.suggestion.LangSuggestionProvider;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import io.github.skydynamic.quickbackupmulti.utils.ScheduleUtils;
@@ -35,7 +36,7 @@ public class SettingCommand {
             .then(literal("set")
                 .requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
                 .then(CommandManager.argument("lang", StringArgumentType.string())
-                    .suggests(new LangSuggestionProvider())
+                    .suggests(LangSuggestionProvider.lang())
                     .executes(it -> setLang(it.getSource(), StringArgumentType.getString(it, "lang"))))))
         .then(literal("schedule")
             .then(literal("enable").executes(it -> enableScheduleBackup(it.getSource())))
@@ -99,7 +100,31 @@ public class SettingCommand {
                     )
                 )
             )
+        )
+        .then(literal("restartMode")
+            .requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
+            .then(literal("set")
+                .then(CommandManager.argument("mode", StringArgumentType.string())
+                    .suggests(AutoRestartModeSuggestionProvider.mode())
+                    .executes(it -> setAutoRestartMode(it.getSource(), StringArgumentType.getString(it, "mode")))
+                )
+            )
+            .then(literal("get").executes(it -> getAutoRestartMode(it.getSource())))
         );
+
+    private static int getAutoRestartMode(ServerCommandSource commandSource) {
+        Messenger.sendMessage(commandSource,
+            Messenger.literal(tr("quickbackupmulti.restartmode.get", Config.INSTANCE.getAutoRestartMode().name())));
+        return 1;
+    }
+
+    private static int setAutoRestartMode(ServerCommandSource commandSource, String mode) {
+        Config.AutoRestartMode newMode = Config.AutoRestartMode.valueOf(mode.toUpperCase());
+        Config.INSTANCE.setAutoRestartMode(newMode);
+        Messenger.sendMessage(commandSource,
+            Messenger.literal(tr("quickbackupmulti.restartmode.switch", newMode.name())));
+        return 1;
+    }
 
     private static int setUseInternalDataBase(ServerCommandSource commandSource, Boolean value) {
         if (value != Config.INSTANCE.getUseInternalDataBase()) {

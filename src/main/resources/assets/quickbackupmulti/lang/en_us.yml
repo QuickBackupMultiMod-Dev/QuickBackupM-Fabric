@@ -114,3 +114,7 @@ quickbackupmulti:
     set: "Set §g%s§r permission to §3%s"
     get: "§g%s's§r current permission is §3%s"
     reload: "Reload permission config success"
+
+  restartmode:
+    get: "The current §arestart mode§r is: §4§l%s§r"
+    switch: "§aRestart mode§r switch to: §4§l%s§r"

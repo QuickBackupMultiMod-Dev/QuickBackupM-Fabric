@@ -2,10 +2,9 @@ package io.github.skydynamic.quickbackupmulti;
 
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.increment.storage.lib.util.Storager;
+import io.github.skydynamic.increment.storage.lib.database.DataBase;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.config.Config;
-
-import io.github.skydynamic.increment.storage.lib.database.DataBase;
 import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 import io.github.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
@@ -86,9 +85,15 @@ public class QuickBackupMulti implements ModInitializer {
 					QbmManager.restore(Config.TEMP_CONFIG.backupSlot);
 					getDataBase().stopInternalMongoServer();
 					Config.TEMP_CONFIG.setIsBackupValue(false);
-					Config.TEMP_CONFIG.server.stopped = false;
-					Config.TEMP_CONFIG.server.running = true;
-					Config.TEMP_CONFIG.server.runServer();
+					switch (Config.INSTANCE.getAutoRestartMode()) {
+						case DISABLE -> {}
+						case DEFAULT -> {
+							Config.TEMP_CONFIG.server.stopped = false;
+							Config.TEMP_CONFIG.server.running = true;
+							Config.TEMP_CONFIG.server.runServer();
+						}
+						case MCSM -> new Thread(() -> System.exit(-4000)).start();
+					}
 				} else {
 					getDataBase().stopInternalMongoServer();
 				}

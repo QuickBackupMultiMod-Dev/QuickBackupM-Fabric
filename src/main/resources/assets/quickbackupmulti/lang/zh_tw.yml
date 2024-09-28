@@ -114,3 +114,7 @@ quickbackupmulti:
     set: "設定§g%s§r的權限為§3%s"
     get: "§g%s§r目前的權限為§3%s"
     reload: "重載權限設定檔完成"
+
+  restartmode:
+    get: "目前設定的§a自動重啟模式§r為：§4§l%s§r"
+    switch: "自動重啟模式切換到：§a%s"
