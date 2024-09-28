@@ -1,4 +1,4 @@
-package io.github.skydynamic.quickbackupmulti.command;
+package io.github.skydynamic.quickbackupmulti.command.permission;
 
 public enum PermissionType {
     USER(0),

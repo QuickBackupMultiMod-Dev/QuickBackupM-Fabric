@@ -2,6 +2,8 @@ package io.github.skydynamic.quickbackupmulti.command;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.CommandManager;

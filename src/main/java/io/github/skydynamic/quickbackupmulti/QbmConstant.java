@@ -2,7 +2,7 @@ package io.github.skydynamic.quickbackupmulti;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.github.skydynamic.quickbackupmulti.command.PermissionManager;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
 import io.github.skydynamic.quickbackupmulti.utils.ServerPathUtils;
 import net.minecraft.util.Identifier;
 

@@ -1,4 +1,4 @@
-package io.github.skydynamic.quickbackupmulti.command;
+package io.github.skydynamic.quickbackupmulti.command.permission;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
@@ -41,7 +41,7 @@ public class PermissionManager {
     }
 
     public PermissionType getPlayerPermission(ServerPlayerEntity player) {
-        return permissionConfig.perm.get(player.getName().getString());
+        return permissionConfig.perm.getOrDefault(player.getName().getString(), PermissionType.USER);
     }
 
     public int getPlayerPermissionLevel(ServerPlayerEntity player) {
@@ -97,7 +97,7 @@ public class PermissionManager {
                 return true;
             } else {
                 return source.hasPermissionLevel(mcPermission)
-                    || permissionManager.getPlayerPermission(player).level >= modPermission.level;
+                    || permissionManager.getPlayerPermissionLevel(player) >= modPermission.level;
             }
         }
         return true;

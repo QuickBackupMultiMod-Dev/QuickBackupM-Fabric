@@ -3,12 +3,13 @@ package io.github.skydynamic.quickbackupmulti.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 //#if MC<=11820
 //$$ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 //#endif
 import io.github.skydynamic.quickbackupmulti.backup.RestoreTask;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import io.github.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
@@ -22,7 +23,6 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.permissionManager;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getStorager;
 import static io.github.skydynamic.quickbackupmulti.command.PermissionCommand.permissionCommand;
 import static io.github.skydynamic.quickbackupmulti.command.SettingCommand.settingCommand;

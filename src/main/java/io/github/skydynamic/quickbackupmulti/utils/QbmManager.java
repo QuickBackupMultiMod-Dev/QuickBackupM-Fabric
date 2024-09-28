@@ -57,6 +57,7 @@ public class QbmManager {
                 if (p.equals(savePath)) continue;
                 Files.delete(p);
             }
+            FileUtils.deleteDirectory(savePath.toFile());
             //FileUtils.deleteDirectory(savePath.toFile());
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(

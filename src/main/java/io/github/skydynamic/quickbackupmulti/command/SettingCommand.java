@@ -4,6 +4,8 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.command.suggestion.AutoRestartModeSuggestionProvider;
 import io.github.skydynamic.quickbackupmulti.command.suggestion.LangSuggestionProvider;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
