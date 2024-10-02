@@ -59,7 +59,7 @@ public class QuickBackupMultiClient implements ClientModInitializer {
             client.execute(() -> client.setScreen(new ConfigScreen(client.currentScreen, c)));
         });
         //#else
-        //$$ ClientPlayNetworking.registerGlobalReceiver(Packets.OpenConfigGuiPacket.PACKET_ID, (payload, context) -> {
+        //$$ ClientPlayNetworking.registerGlobalReceiver(Packets.OpenConfigGuiPacket.ID, (payload, context) -> {
         //$$     String config = payload.config();
         //$$     ConfigStorage c = gson.fromJson(config, ConfigStorage.class);
         //$$     MinecraftClient client = context.client();

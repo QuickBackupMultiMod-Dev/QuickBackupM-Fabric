@@ -3,6 +3,7 @@ package io.github.skydynamic.quickbackupmulti;
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.increment.storage.lib.util.Storager;
 import io.github.skydynamic.increment.storage.lib.database.DataBase;
+import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.config.Config;
 import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
+import static io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager.hasPermission;
 
 
 public class QuickBackupMulti implements ModInitializer {
@@ -105,7 +107,7 @@ public class QuickBackupMulti implements ModInitializer {
 	public static void registerPacketHandler() {
 		//#if MC>=12005
 		//$$ ServerPlayNetworking.registerGlobalReceiver(
-		//$$ Packets.RequestOpenConfigGuiPacket.PACKET_ID, (payload, context) -> {
+		//$$ Packets.RequestOpenConfigGuiPacket.ID, (payload, context) -> {
 		//#else
 		ServerPlayNetworking.registerGlobalReceiver(
 			QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
@@ -116,7 +118,7 @@ public class QuickBackupMulti implements ModInitializer {
 			//$$ 	player, new Packets.OpenConfigGuiPacket(gson.toJson(Config.INSTANCE.getConfigStorage()))
 			//$$ );
 			//#else
-			if (player.hasPermissionLevel(2)) {
+			if (hasPermission(player.getCommandSource(), 2, PermissionType.HELPER)) {
 				PacketByteBuf sendBuf = PacketByteBufs.create();
 				sendBuf.writeString(gson.toJson(Config.INSTANCE.getConfigStorage()));
 				ServerPlayNetworking.send(player, QbmConstant.OPEN_CONFIG_GUI_PACKET_ID, sendBuf);
@@ -125,7 +127,7 @@ public class QuickBackupMulti implements ModInitializer {
 		});
 
 		//#if MC>=12005
-		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.SaveConfigPacket.PACKET_ID, (payload, context) -> {
+		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.SaveConfigPacket.ID, (payload, context) -> {
 		//#else
 		ServerPlayNetworking.registerGlobalReceiver(
 			QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
