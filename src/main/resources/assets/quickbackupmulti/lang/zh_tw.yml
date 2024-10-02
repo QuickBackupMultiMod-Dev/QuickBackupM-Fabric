@@ -1,13 +1,13 @@
 quickbackupmulti:
   empty_comment: §7空§r
-  list_empty: "§7目前没有任何備份"
+  list_empty: "§7目前沒有任何備份"
 
   config_page:
     save_button: "儲存"
     close_button: "關閉"
     back: "返回"
     title: "QuickBackupMulti 設定頁面"
-    open_schedule_config_button: "打開定時備份設定介面"
+    open_schedule_config_button: "開啟定時備份設定介面"
     lang: "語言"
     schedule:
       switch: "定時備份：%s"
@@ -44,16 +44,16 @@ quickbackupmulti:
     set_success: "設定成功"
     set_fail: "設定失敗，原因：%s"
     set_success_but: "設定成功，但發生了錯誤：%s"
-    value_equal_config: "目前的值已經為§b%s"
+    value_equal_config: "目前的值已經為 §b%s"
 
   search:
     success: "§a搜尋成功§r，結果如下："
     fail: "§4沒有搜尋到任何結果"
 
   toast:
-    start_title: 正在進行回檔...請稍等！
+    start_title: 正在進行回溯...請稍等！
     start_content: 在此期間請勿進入存檔！
-    end_title: 回檔完成！
+    end_title: 回溯完成！
     end_content: 您現在可以進入存檔了！
 
   lang:
@@ -70,51 +70,51 @@ quickbackupmulti:
 
   make:
     start: §a備份§r中...請稍等
-    no_slot: 未找到可用槽位，§a備份§r中斷！
+    no_slot: 未找到可用欄位，§a備份§r中斷！
     success: §a備份§r完成，耗時§6%s§r秒
     fail: §a備份§r失敗，錯誤原因 %s
-    fail_exists: "§a備份§r失敗，錯誤原因：槽位已存在"
+    fail_exists: "§a備份§r失敗，錯誤原因：欄位已存在"
 
   delete:
-    success: 刪除槽位§6%s§r§a完成§r
-    fail: 刪除槽位§6%s§r§4失敗§r
+    success: 刪除欄位§6%s§r§a完成§r
+    fail: 刪除欄位§6%s§r§4失敗§r
 
   list_backup:
-    title: "§d[第§b%s§d頁槽位資訊]§r"
+    title: "§d[第§b%s§d頁欄位資訊]§r"
     back_page: 上一頁
     next_page: 下一頁
-    page_msg: "[第§b%s§r頁 / 共§b%s§r頁]"
+    page_msg: "[第 §b%s§r 頁 / 共 §b%s§r 頁]"
     slot:
       header: "[§6#%s§r]"
-      restore: 點選回檔至槽位§6%s§r
-      delete: 點選刪除槽位§6%s§r
-      show: 點選查看槽位§6%s§r詳情
+      restore: 點選回溯至欄位§6%s§r
+      delete: 點選刪除欄位§6%s§r
+      show: 點選查看欄位§6%s§r詳情
       total_space: "目前頁面備份總占用空間：§a%s§r"
 
   restore:
     countdown:
-      intro: "%s 執行回檔，10 秒後關閉伺服器§c回檔§r"
-      text: "還有 %s 秒，將§c回檔§r為槽位§6%s§r，"
-      hover: 點選終止回檔！
-    abort: 已取消§c回檔§r任務！
-    fail: "回檔§4失敗§r：槽位§4不存在§r！"
-    confirm_hint: 使用§7/qb confirm§r 確認§c回檔§r
-    abort_hint: 已確認回檔，如需取消請輸入§7/qb cancel§r
+      intro: "%s 執行回溯，10 秒後關閉伺服器§c回溯§r"
+      text: "還有 %s 秒，將§c回溯§r為欄位§6%s§r，"
+      hover: 點選終止回溯！
+    abort: 已取消§c回溯§r任務！
+    fail: "回溯§4失敗§r：欄位§4不存在§r！"
+    confirm_hint: 使用§7/qb confirm§r 確認§c回溯§r
+    abort_hint: 已確認回溯，如需取消請輸入 §7/qb cancel§r
 
   show:
-    header: "§d[槽位資訊]§r"
+    header: "§d[欄位資訊]§r"
     name: "§b名稱"
     desc: "§b描述"
     time: "§b備份時間"
-    back_button: "§2[點選回檔]"
+    back_button: "§2[點選回溯]"
     delete_button: "§c[點選刪除]"
-    fail: 槽位不存在
+    fail: 欄位不存在
 
   permission:
     set: "設定§g%s§r的權限為§3%s"
     get: "§g%s§r目前的權限為§3%s"
-    reload: "重載權限設定檔完成"
+    reload: "重新載入權限設定檔完成"
 
   restartmode:
-    get: "目前設定的§a自動重啟模式§r為：§4§l%s§r"
-    switch: "自動重啟模式切換到：§a%s"
+    get: "目前設定的§a自動重新啟動模式§r為：§4§l%s§r"
+    switch: "自動重新啟動模式切換到：§a%s"
