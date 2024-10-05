@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -96,7 +97,7 @@ public class QuickBackupMultiConfig {
 
     public List<String> getIgnoredFiles() {
         synchronized (lock) {
-            List<String> list = configStorage.getIgnoredFiles();
+            List<String> list = new ArrayList<>(configStorage.getIgnoredFiles());
             list.add("session.lock");
             return list;
         }
@@ -129,6 +130,12 @@ public class QuickBackupMultiConfig {
     public String getScheduleMode() {
         synchronized (lock) {
             return configStorage.getScheduleMode();
+        }
+    }
+
+    public int getScheduleMaxBackup() {
+        synchronized (lock) {
+            return configStorage.getMaxScheduleBackup();
         }
     }
 

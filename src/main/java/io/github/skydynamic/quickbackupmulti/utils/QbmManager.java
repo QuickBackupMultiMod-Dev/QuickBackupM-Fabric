@@ -1,5 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.utils;
 
+import io.github.skydynamic.increment.storage.lib.database.index.type.StorageInfo;
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
 import io.github.skydynamic.quickbackupmulti.config.Config;
@@ -26,8 +27,10 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
+import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getStorager;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
@@ -113,6 +116,11 @@ public class QbmManager {
 
     public static void createBackupDir(Path path) {
         if (!path.toFile().exists()) path.toFile().mkdirs();
+    }
+
+    public static List<StorageInfo> getScheduleBackupList() {
+        Stream<StorageInfo> backupStream = getDataBase().getDatastore().find(StorageInfo.class).stream();
+        return backupStream.filter(it -> it.getName().startsWith("ScheduleBackup-")).toList();
     }
 
     public static ConfigStorage verifyConfig(ConfigStorage c, PlayerEntity player) {

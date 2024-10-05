@@ -203,7 +203,9 @@ public class SettingCommand {
     private static int enableScheduleBackup(ServerCommandSource commandSource) {
         try {
             Config.INSTANCE.setScheduleBackup(true);
-            if (Config.TEMP_CONFIG.scheduler != null) Config.TEMP_CONFIG.scheduler.shutdown();
+            if (Config.TEMP_CONFIG.scheduler != null) {
+                Config.TEMP_CONFIG.scheduler.shutdown();
+            }
             startSchedule(commandSource);
             return 1;
         } catch (SchedulerException e) {

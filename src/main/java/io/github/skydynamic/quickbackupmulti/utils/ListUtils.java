@@ -103,7 +103,7 @@ public class ListUtils {
         backText.styled(style ->
                 style.withClickEvent(
                     new ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
+                        ClickEvent.Action.SUGGEST_COMMAND,
                         "/qb back " + name)
                 )
             ).styled(style ->
@@ -131,7 +131,7 @@ public class ListUtils {
         nameText.styled(style ->
                 style.withClickEvent(
                     new ClickEvent(
-                        ClickEvent.Action.RUN_COMMAND,
+                        ClickEvent.Action.SUGGEST_COMMAND,
                         "/qb show " + name)
                 )
             ).styled(style ->
@@ -228,7 +228,7 @@ public class ListUtils {
             MutableText deleteText = Messenger.literal(tr("quickbackupmulti.show.delete_button"));
             backText.styled(style ->
                     style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb back " + name)
+                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb back " + name)
                     )
                 ).styled(style ->
                     style.withHoverEvent(

@@ -2,6 +2,8 @@ package io.github.skydynamic.quickbackupmulti.config;
 
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.quartz.Scheduler;
 
 public class QbmTempConfig {
@@ -10,7 +12,7 @@ public class QbmTempConfig {
     public String backupSlot;
     public EnvType env;
     public String worldName;
-    public Scheduler scheduler;
+    public @Nullable Scheduler scheduler;
     public long latestScheduleExecuteTime;
 
     public void setIsBackupValue(Boolean value) {
@@ -33,7 +35,7 @@ public class QbmTempConfig {
         this.worldName = worldName;
     }
 
-    public void setScheduler(Scheduler scheduler) {
+    public void setScheduler(@NotNull Scheduler scheduler) {
         this.scheduler = scheduler;
     }
 
