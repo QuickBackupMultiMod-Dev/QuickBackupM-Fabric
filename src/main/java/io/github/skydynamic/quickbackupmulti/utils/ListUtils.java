@@ -104,7 +104,7 @@ public class ListUtils {
                 style.withClickEvent(
                     new ClickEvent(
                         ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb back " + name)
+                        "/qb back \"%s\"".formatted(name))
                 )
             ).styled(style ->
             style.withHoverEvent(
@@ -118,7 +118,7 @@ public class ListUtils {
                 style.withClickEvent(
                     new ClickEvent(
                         ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb delete " + name)
+                        "/qb delete \"%S\"".formatted(name))
                 )
             ).styled(style ->
             style.withHoverEvent(
@@ -132,7 +132,7 @@ public class ListUtils {
                 style.withClickEvent(
                     new ClickEvent(
                         ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb show " + name)
+                        "/qb show \"%s\"".formatted(name))
                 )
             ).styled(style ->
             style.withHoverEvent(
@@ -228,7 +228,7 @@ public class ListUtils {
             MutableText deleteText = Messenger.literal(tr("quickbackupmulti.show.delete_button"));
             backText.styled(style ->
                     style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb back " + name)
+                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb back \"%s\"".formatted(name))
                     )
                 ).styled(style ->
                     style.withHoverEvent(
@@ -239,7 +239,7 @@ public class ListUtils {
                 );
             deleteText.styled(style ->
                     style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete " + name))
+                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete \"%s\"".formatted(name)))
                 ).styled(style ->
                 style.withHoverEvent(
                     new HoverEvent(
