@@ -1,5 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.command;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
@@ -40,13 +41,13 @@ public class MakeCommand {
     public static LiteralArgumentBuilder<ServerCommandSource> makeCommand = literal("make")
         .requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.HELPER))
         .executes(it -> makeSaveBackup(it.getSource(), dateFormat.format(System.currentTimeMillis()), ""))
-        .then(CommandManager.argument("name", MessageArgumentType.message())
-            .executes(it -> makeSaveBackup(it.getSource(), MessageArgumentType.getMessage(it, "name").getString(), ""))
-            .then(CommandManager.argument("desc", MessageArgumentType.message())
+        .then(CommandManager.argument("name", StringArgumentType.string())
+            .executes(it -> makeSaveBackup(it.getSource(), StringArgumentType.getString(it, "name"), ""))
+            .then(CommandManager.argument("desc", StringArgumentType.string())
                 .executes(it -> makeSaveBackup(
                     it.getSource(),
-                    MessageArgumentType.getMessage(it, "name").getString(),
-                    MessageArgumentType.getMessage(it, "desc").getString()
+                    StringArgumentType.getString(it, "name"),
+                    StringArgumentType.getString(it, "desc")
                 )))
         );
 //        .then(CommandManager.argument("desc", StringArgumentType.string())

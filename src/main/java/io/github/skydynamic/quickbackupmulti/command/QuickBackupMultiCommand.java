@@ -14,7 +14,6 @@ import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import io.github.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.command.argument.MessageArgumentType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -54,14 +53,14 @@ public class QuickBackupMultiCommand {
                     .executes(it -> listSaveBackups(it.getSource(), IntegerArgumentType.getInteger(it, "page")))))
 
             .then(literal("search")
-                .then(CommandManager.argument("name", MessageArgumentType.message())
-                    .executes(it -> searchSaveBackups(it.getSource(), MessageArgumentType.getMessage(it, "name").getString()))))
+                .then(CommandManager.argument("name", StringArgumentType.string())
+                    .executes(it -> searchSaveBackups(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(MakeCommand.makeCommand)
 
             .then(literal("back").requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
-                    .then(CommandManager.argument("name", MessageArgumentType.message())
-                            .executes(it -> restoreSaveBackup(it.getSource(), MessageArgumentType.getMessage(it, "name").getString()))))
+                    .then(CommandManager.argument("name", StringArgumentType.string())
+                            .executes(it -> restoreSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(literal("confirm").requires(it -> PermissionManager.hasPermission(it, 4, PermissionType.ADMIN))
                     .executes(it -> {
@@ -77,14 +76,14 @@ public class QuickBackupMultiCommand {
                     .executes(it -> cancelRestore(it.getSource())))
 
             .then(literal("delete").requires(it -> PermissionManager.hasPermission(it, 2, PermissionType.HELPER))
-                    .then(CommandManager.argument("name", MessageArgumentType.message())
-                        .executes(it -> deleteSaveBackup(it.getSource(), MessageArgumentType.getMessage(it, "name").getString()))))
+                    .then(CommandManager.argument("name", StringArgumentType.string())
+                        .executes(it -> deleteSaveBackup(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(settingCommand)
 
             .then(literal("show")
-                .then(CommandManager.argument("name", MessageArgumentType.message())
-                    .executes(it -> showBackupDetail(it.getSource(), MessageArgumentType.getMessage(it, "name").getString()))))
+                .then(CommandManager.argument("name", StringArgumentType.string())
+                    .executes(it -> showBackupDetail(it.getSource(), StringArgumentType.getString(it, "name")))))
 
             .then(permissionCommand)
         );
