@@ -8,6 +8,7 @@ public class ConfigStorage implements IConfig {
     @Ignore
     public static final ConfigStorage DEFAULT = new ConfigStorage(
             new ArrayList<>(),
+            new ArrayList<>(),
             "zh_cn",
             false,
             "* * 0/4 * * ?",
@@ -21,6 +22,7 @@ public class ConfigStorage implements IConfig {
     );
 
     private ArrayList<String> ignoredFiles;
+    private ArrayList<String> ignoredFolders;
     private String lang;
     private boolean scheduleBackup;
     private String scheduleCron;
@@ -36,6 +38,7 @@ public class ConfigStorage implements IConfig {
 
     public ConfigStorage(
             ArrayList<String> IgnoredFiles,
+            ArrayList<String> ignoredFolders,
             String lang,
             boolean scheduleBackup,
             String scheduleCron,
@@ -47,6 +50,7 @@ public class ConfigStorage implements IConfig {
             String mongoDBUri,
             String storagePath) {
         this.ignoredFiles = IgnoredFiles;
+        this.ignoredFolders = ignoredFolders;
         this.lang = lang;
         this.scheduleBackup = scheduleBackup;
         this.scheduleCron = scheduleCron;
@@ -65,6 +69,14 @@ public class ConfigStorage implements IConfig {
 
     public void setIgnoredFiles(ArrayList<String> ignoredFiles) {
         this.ignoredFiles = ignoredFiles;
+    }
+
+    public ArrayList<String> getIgnoredFolders() {
+        return ignoredFolders;
+    }
+
+    public void setIgnoredFolders(ArrayList<String> ignoredFolders) {
+        this.ignoredFolders = ignoredFolders;
     }
 
     public String getLang() {

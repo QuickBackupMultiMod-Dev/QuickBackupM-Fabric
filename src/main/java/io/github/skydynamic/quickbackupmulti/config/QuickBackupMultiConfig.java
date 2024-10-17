@@ -103,6 +103,12 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public List<String> getIgnoredFolders() {
+        synchronized (lock) {
+            return configStorage.getIgnoredFolders();
+        }
+    }
+
     public String getLang() {
         synchronized (lock) {
             return configStorage.getLang();

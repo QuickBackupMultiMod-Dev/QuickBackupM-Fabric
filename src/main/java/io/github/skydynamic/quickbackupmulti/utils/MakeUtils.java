@@ -33,7 +33,7 @@ public class MakeUtils {
 
             StorageInfo storageInfo = new StorageInfo(name, desc, System.currentTimeMillis(), true, new ArrayList<>());
 
-            getStorager().incrementalStorage(storageInfo, savePath, getBackupDir().resolve(name), fileFilter, null);
+            getStorager().incrementalStorage(storageInfo, savePath, getBackupDir().resolve(name), fileFilter, folderFilter);
 
             long endTime = System.currentTimeMillis();
             double intervalTime = (endTime - startTime) / 1000.0;

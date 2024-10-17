@@ -38,7 +38,8 @@ import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
 public class QbmManager {
     public static Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
     public static Path savePath;
-    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
+    public static IOFileFilter folderFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFolders()));
+    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles())).and(folderFilter);
     // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();
 
     public static Path getBackupDir() {
@@ -81,9 +82,9 @@ public class QbmManager {
             }
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(
-                    slot,
-                    Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
-                    savePath.toFile()
+                slot,
+                Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
+                savePath.toFile()
             );
         } catch (IOException e) {
             LOGGER.error("Restore Failed", e);
