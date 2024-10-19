@@ -39,10 +39,6 @@ repositories {
         url 'https://repo1.maven.org/maven2/'
     }
     maven {
-        name 'nekoMaven'
-        url 'https://maven.takeneko.icu/releases'
-    }
-    maven {
         name 'CjsahMaven'
         url 'https://server.cjsah.net:1002/maven/'
     }
