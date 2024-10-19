@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
-import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.restoreClient;
+import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.restore;
 
 @Environment(EnvType.CLIENT)
 public class ClientRestoreDelegate {
@@ -39,7 +39,7 @@ public class ClientRestoreDelegate {
                     throw new RuntimeException(e);
                 }
                 minecraftClient.execute(() -> minecraftClient.setScreen(null));
-                restoreClient(slot);
+                restore(slot);
                 Config.TEMP_CONFIG.setIsBackupValue(false);
                 getDataBase().stopInternalMongoServer();
                 minecraftClient.execute(() -> {

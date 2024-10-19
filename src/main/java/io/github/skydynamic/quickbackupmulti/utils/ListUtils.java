@@ -118,7 +118,7 @@ public class ListUtils {
                 style.withClickEvent(
                     new ClickEvent(
                         ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb delete \"%S\"".formatted(name))
+                        "/qb delete \"%s\"".formatted(name))
                 )
             ).styled(style ->
             style.withHoverEvent(

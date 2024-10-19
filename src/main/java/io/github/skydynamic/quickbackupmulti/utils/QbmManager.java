@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +40,7 @@ public class QbmManager {
     public static Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
     public static Path savePath;
     public static IOFileFilter folderFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFolders()));
-    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles())).and(folderFilter);
+    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
     // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();
 
     public static Path getBackupDir() {
@@ -50,36 +51,14 @@ public class QbmManager {
         }
     }
 
-    public static void restoreClient(String slot) {
-        File targetBackupSlot = getBackupDir().resolve(slot).toFile();
-        try {
-            final Iterator<Path> iterator = Files.walk(savePath)
-                    .sorted(Comparator.reverseOrder())
-                    .iterator();
-            while (iterator.hasNext()) {
-                Path p = iterator.next();
-                if (p.equals(savePath)) continue;
-                Files.delete(p);
-            }
-            FileUtils.deleteDirectory(savePath.toFile());
-            //FileUtils.deleteDirectory(savePath.toFile());
-            FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
-            IndexUtil.copyIndexFile(
-                    slot,
-                    Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
-                    savePath.toFile()
-            );
-        } catch (IOException e) {
-            LOGGER.error("Restore Failed", e);
-        }
-    }
-
     public static void restore(String slot) {
         File targetBackupSlot = getBackupDir().resolve(slot).toFile();
         try {
-            for (File file : Objects.requireNonNull(savePath.toFile().listFiles((FilenameFilter) fileFilter))) {
+            for (File file : FileUtils.listFiles(savePath.toFile(), fileFilter, folderFilter)) {
+                if (file.equals(savePath.toFile())) continue;
                 FileUtils.forceDelete(file);
             }
+
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(
                 slot,

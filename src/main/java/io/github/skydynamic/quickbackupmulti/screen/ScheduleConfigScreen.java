@@ -20,7 +20,7 @@ import static io.github.skydynamic.quickbackupmulti.screen.ScreenUtils.buildButt
 import static io.github.skydynamic.quickbackupmulti.screen.TempConfig.tempConfig;
 
 @Environment(EnvType.CLIENT)
-public class ScheduleConfigScreen  extends Screen {
+public class ScheduleConfigScreen extends Screen {
     private final Screen parent;
     private TextFieldWidget cronTextField;
     private TextFieldWidget intervalTextField;
