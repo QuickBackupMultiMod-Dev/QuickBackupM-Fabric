@@ -79,7 +79,7 @@ dependencies {
 
     include(implementation('org.yaml:snakeyaml:2.0'))
 
-    include(implementation('io.github.skydynamic:incremental-storage-lib:1.0.5'))
+    include(implementation('io.github.skydynamic:incremental-storage-lib:1.0.6'))
 
     include(implementation('org.quartz-scheduler:quartz:2.3.2'))
 

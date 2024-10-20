@@ -1,4 +1,4 @@
-package io.github.skydynamic.quickbackupmulti.mixin;
+package io.github.skydynamic.quickbackupmulti.mixin.client;
 
 import io.github.skydynamic.quickbackupmulti.config.Config;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;

@@ -6,23 +6,16 @@ import java.nio.file.Path;
 
 public class DataBaseManager implements IDataBaseManager {
     String fileName;
-    String collectionName;
     Path dataBasePath;
 
-    public DataBaseManager(String fileName, String collectionName, Path dataBasePath) {
+    public DataBaseManager(String fileName, Path dataBasePath) {
         this.fileName = fileName;
-        this.collectionName = collectionName;
         this.dataBasePath = dataBasePath;
     }
 
     @Override
     public void setFileName(String s) {
         this.fileName = s;
-    }
-
-    @Override
-    public void setCollectionName(String s) {
-        this.collectionName = s;
     }
 
     @Override
@@ -33,11 +26,6 @@ public class DataBaseManager implements IDataBaseManager {
     @Override
     public String getFileName() {
         return this.fileName;
-    }
-
-    @Override
-    public String getCollectionName() {
-        return this.collectionName;
     }
 
     @Override

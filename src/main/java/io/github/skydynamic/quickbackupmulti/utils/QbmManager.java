@@ -18,19 +18,15 @@ import org.apache.commons.io.filefilter.NotFileFilter;
 import org.quartz.SchedulerException;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
+import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.deleteDataStore;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getStorager;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
@@ -43,11 +39,15 @@ public class QbmManager {
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
     // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();
 
+    public static Path getRootBackupDir() {
+        return backupDir;
+    }
+
     public static Path getBackupDir() {
         if (Config.TEMP_CONFIG.env == EnvType.SERVER) {
-            return backupDir;
+            return getRootBackupDir();
         } else {
-            return backupDir.resolve(Config.TEMP_CONFIG.worldName);
+            return getRootBackupDir().resolve(Config.TEMP_CONFIG.worldName);
         }
     }
 
@@ -92,6 +92,15 @@ public class QbmManager {
                 return false;
             }
         } else return false;
+    }
+
+    public static void deleteWorld(String worldName) {
+        try {
+            FileUtils.deleteDirectory(getRootBackupDir().resolve(worldName).toFile());
+            deleteDataStore(worldName);
+        } catch (IOException e) {
+            LOGGER.error("Delete World Backup Data Failed", e);
+        }
     }
 
     public static void createBackupDir(Path path) {

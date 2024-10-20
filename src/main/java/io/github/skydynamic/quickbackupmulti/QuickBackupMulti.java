@@ -66,6 +66,8 @@ public class QuickBackupMulti implements ModInitializer {
 		Config.INSTANCE.load();
 		Translate.handleResourceReload(Config.INSTANCE.getLang());
 
+		initDataBase();
+
 		//#if MC>=11900
 		CommandRegistrationCallback.EVENT.register(
 			(dispatcher, registryAccess, environment) -> QuickBackupMultiCommand.RegisterCommand(dispatcher)
@@ -102,6 +104,17 @@ public class QuickBackupMulti implements ModInitializer {
 			}
 			Config.TEMP_CONFIG.server = null;
 		});
+	}
+
+	public void initDataBase() {
+		DataBaseManager dataBaseManager = new DataBaseManager(
+			"QuickBackupMulti",
+			Path.of(Config.INSTANCE.getStoragePath())
+		);
+
+		dataBase = new DataBase(dataBaseManager, Config.INSTANCE.getConfigStorage());
+
+		IndexUtil.setDataBase(dataBase);
 	}
 
 	public static void registerPacketHandler() {
@@ -167,14 +180,12 @@ public class QuickBackupMulti implements ModInitializer {
 		return storager;
 	}
 
-	public static void setDataBase(String worldName) {
-		DataBaseManager dataBaseManager = new DataBaseManager(
-			"QuickBackupMulti",
-			modName + "-" + worldName,
-            Path.of(Config.INSTANCE.getStoragePath())
-		);
-		dataBase = new DataBase(dataBaseManager, Config.INSTANCE.getConfigStorage());
+	public static void setDataStore(String worldName) {
 		storager = new Storager(dataBase);
-		IndexUtil.setDataBase(dataBase);
+		dataBase.newDataStore(modName + "-" + worldName);
+	}
+
+	public static void deleteDataStore(String worldName) {
+		dataBase.deleteCollection(modName + "-" + worldName);
 	}
 }

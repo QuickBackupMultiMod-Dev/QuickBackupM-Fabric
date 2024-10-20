@@ -1,4 +1,4 @@
-package io.github.skydynamic.quickbackupmulti.mixin;
+package io.github.skydynamic.quickbackupmulti.mixin.client;
 
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
 import io.github.skydynamic.quickbackupmulti.config.Config;
@@ -14,15 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.nio.file.Path;
 
-import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
-import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.setDataBase;
+import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.setDataStore;
 import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.createBackupDir;
 import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.shutdownSchedule;
 import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.startSchedule;
 
 @Environment(EnvType.CLIENT)
 @Mixin(MinecraftServer.class)
-public class MinecraftServer_ClientMixin {
+public class MinecraftServerMixin {
     @Inject(method = "loadWorld", at = @At("RETURN"))
     private void initQuickBackupMultiClient(CallbackInfo ci) {
         MinecraftServer server = (MinecraftServer) (Object) this;
@@ -33,13 +32,12 @@ public class MinecraftServer_ClientMixin {
         Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/").resolve(worldName);
         QbmManager.savePath = saveDirectoryPath;
         createBackupDir(backupDir);
-        setDataBase(worldName);
+        setDataStore(worldName);
         startSchedule();
     }
 
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void stopSchedule(CallbackInfo ci) {
-        shutdownSchedule();
-        if (!Config.TEMP_CONFIG.isBackup) getDataBase().stopInternalMongoServer();
+        if (!Config.TEMP_CONFIG.isBackup) shutdownSchedule();
     }
 }

@@ -20,7 +20,7 @@ import org.quartz.SchedulerException;
 import java.text.SimpleDateFormat;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
-import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.setDataBase;
+import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.setDataStore;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.supportLanguage;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
 import static io.github.skydynamic.quickbackupmulti.utils.ScheduleUtils.disableSchedule;
@@ -133,10 +133,10 @@ public class SettingCommand {
             Config.INSTANCE.setUseInternalDataBase(value);
             try {
                 if (value) {
-                    setDataBase(Config.TEMP_CONFIG.worldName);
+                    setDataStore(Config.TEMP_CONFIG.worldName);
                 } else {
                     getDataBase().stopInternalMongoServer();
-                    setDataBase(Config.TEMP_CONFIG.worldName);
+                    setDataStore(Config.TEMP_CONFIG.worldName);
                 }
                 Messenger.sendMessage(commandSource,
                     Messenger.literal(tr("quickbackupmulti.database.set_success")));
