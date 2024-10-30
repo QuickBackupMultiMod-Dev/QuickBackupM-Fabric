@@ -13,8 +13,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
@@ -167,13 +170,18 @@ public class ListUtils {
         return resultText;
     }
 
+    private static <T> List<T> toList(Stream<T> stream) {
+        //noinspection unchecked
+        return (List<T>) new ArrayList<>(Arrays.asList(stream.toArray()));
+    }
+
     public static MutableText list(int page) {
         long totalBackupSizeB = 0;
         Path backupDir = getBackupDir();
         // List<String> backupsList = getBackupsList();
-        List<Map.Entry<String, StorageInfo>> backupsInfoList = new ArrayList<>(getBackupsList().stream()
-            .map(name -> Map.entry(name, getDataBase().getStorageInfo(name)))
-            .toList());
+        List<Map.Entry<String, StorageInfo>> backupsInfoList = toList(
+            getBackupsList().stream().map(name -> Map.entry(name, getDataBase().getStorageInfo(name)))
+        );
         backupsInfoList.sort((c1, c2) -> -Long.compare(c1.getValue().getTimestamp(), c2.getValue().getTimestamp()));
         // if (backupsList.isEmpty() || getPageCount(backupsList, page) == 0) {
         if (backupsInfoList.isEmpty() || getPageCount(backupsInfoList, page) == 0) {
