@@ -171,8 +171,9 @@ public class ListUtils {
     }
 
     private static <T> List<T> toList(Stream<T> stream) {
-        //noinspection unchecked
-        return (List<T>) new ArrayList<>(Arrays.asList(stream.toArray()));
+        List<T> result = new ArrayList<>();
+        stream.forEach(result::add);
+        return result;
     }
 
     public static MutableText list(int page) {
