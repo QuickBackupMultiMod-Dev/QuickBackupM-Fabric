@@ -37,7 +37,6 @@ public class QbmManager {
     public static Path savePath;
     public static IOFileFilter folderFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFolders()));
     public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
-    // public static IOFileFilter dirFilter = new NonRecursiveDirFilter();
 
     public static Path getRootBackupDir() {
         return backupDir;

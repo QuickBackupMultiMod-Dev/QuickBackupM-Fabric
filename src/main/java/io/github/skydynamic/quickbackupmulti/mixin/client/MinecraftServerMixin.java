@@ -38,6 +38,6 @@ public class MinecraftServerMixin {
 
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void stopSchedule(CallbackInfo ci) {
-        if (!Config.TEMP_CONFIG.isBackup) shutdownSchedule();
+        shutdownSchedule();
     }
 }
