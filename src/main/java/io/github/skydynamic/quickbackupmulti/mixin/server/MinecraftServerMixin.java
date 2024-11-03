@@ -43,7 +43,7 @@ public abstract class MinecraftServerMixin {
 
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void injectShutDown(CallbackInfo ci) {
-        if (!Config.TEMP_CONFIG.isBackup) shutdownSchedule();
-        getDataBase().stopInternalMongoServer();
+        shutdownSchedule();
+        if (!Config.TEMP_CONFIG.isBackup) getDataBase().stopInternalMongoServer();
     }
 }

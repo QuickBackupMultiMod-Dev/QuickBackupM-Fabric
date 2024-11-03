@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.LOGGER;
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
@@ -34,18 +36,18 @@ public class ListUtils {
         }
     }
 
-    private static int getPageCount(List<String>backupsDirList, int page) {
+    private static int getPageCount(List<?> backupsDirList, int page) {
         int size = backupsDirList.size();
-        if (!(size < 5*page)) {
+        if (!(size < 5 * page)) {
             return 5;
-        } else if (size < 5*page && (size < 5 && size > 0)){
+        } else if (size < 5 * page && (size < 5 && size > 0)) {
             return size;
         } else {
             return Math.max(size - 5 * (page - 1), 0);
         }
     }
 
-    public static int getTotalPage(List<String> backupsList) {
+    public static int getTotalPage(List<?> backupsList) {
         return (int) Math.ceil(backupsList.size() / 5.0);
     }
 
@@ -59,10 +61,10 @@ public class ListUtils {
         );
         if (page != 1 && totalPage > 1) {
             backPageText.styled(style ->
-                    style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))
-                    )
-                ).styled(style -> style.withColor(Formatting.AQUA));
+                style.withClickEvent(
+                    new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/qb list " + (page - 1))
+                )
+            ).styled(style -> style.withColor(Formatting.AQUA));
         } else if (page == 1) {
             backPageText.styled(style -> style.withColor(Formatting.DARK_GRAY));
         }
@@ -81,32 +83,35 @@ public class ListUtils {
         );
         if (page != totalPage && totalPage > 1) {
             nextPageText.styled(style ->
-                    style.withClickEvent(
-                        new ClickEvent(
-                            ClickEvent.Action.RUN_COMMAND,
-                            "/qb list " + (page + 1))
-                    )
-                ).styled(style -> style.withColor(Formatting.AQUA));
+                style.withClickEvent(
+                    new ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        "/qb list " + (page + 1))
+                )
+            ).styled(style -> style.withColor(Formatting.AQUA));
         } else if (page == totalPage) {
             nextPageText.styled(style -> style.withColor(Formatting.DARK_GRAY));
         }
         return nextPageText;
     }
 
-    private static MutableText getSlotText(String name, int page, int num, long backupSizeB) throws IOException {
+    // private static MutableText getSlotText(String name, int page, int num, long backupSizeB) throws IOException {
+    private static MutableText getSlotText(Map.Entry<String, StorageInfo> entry, int page, int num, long backupSizeB) throws IOException {
+        String name = entry.getKey();
         MutableText backText = Messenger.literal("§2[▷] ");
         MutableText deleteText = Messenger.literal("§c[×] ");
         MutableText nameText = Messenger.literal("§6" + truncateString(name, 8) + "§r ");
         MutableText resultText = Messenger.literal("");
-        StorageInfo result = getDataBase().getStorageInfo(name);
+        // StorageInfo result = getDataBase().getStorageInfo(name);
+        StorageInfo result = entry.getValue();
 
         backText.styled(style ->
-                style.withClickEvent(
-                    new ClickEvent(
-                        ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb back \"%s\"".formatted(name))
-                )
-            ).styled(style ->
+            style.withClickEvent(
+                new ClickEvent(
+                    ClickEvent.Action.SUGGEST_COMMAND,
+                    "/qb back \"%s\"".formatted(name))
+            )
+        ).styled(style ->
             style.withHoverEvent(
                 new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
@@ -115,12 +120,12 @@ public class ListUtils {
         );
 
         deleteText.styled(style ->
-                style.withClickEvent(
-                    new ClickEvent(
-                        ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb delete \"%s\"".formatted(name))
-                )
-            ).styled(style ->
+            style.withClickEvent(
+                new ClickEvent(
+                    ClickEvent.Action.SUGGEST_COMMAND,
+                    "/qb delete \"%s\"".formatted(name))
+            )
+        ).styled(style ->
             style.withHoverEvent(
                 new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
@@ -129,12 +134,12 @@ public class ListUtils {
         );
 
         nameText.styled(style ->
-                style.withClickEvent(
-                    new ClickEvent(
-                        ClickEvent.Action.SUGGEST_COMMAND,
-                        "/qb show \"%s\"".formatted(name))
-                )
-            ).styled(style ->
+            style.withClickEvent(
+                new ClickEvent(
+                    ClickEvent.Action.SUGGEST_COMMAND,
+                    "/qb show \"%s\"".formatted(name))
+            )
+        ).styled(style ->
             style.withHoverEvent(
                 new HoverEvent(
                     HoverEvent.Action.SHOW_TEXT,
@@ -147,7 +152,7 @@ public class ListUtils {
         double backupSizeMB = (double) backupSizeB / FileUtils.ONE_MB;
         double backupSizeGB = (double) backupSizeB / FileUtils.ONE_GB;
         String sizeString = (backupSizeMB >= 1000) ? String.format("%.2fGB", backupSizeGB) : String.format("%.2fMB", backupSizeMB);
-        resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header",  num + (5 * (page - 1))) + " ")
+        resultText.append("\n" + tr("quickbackupmulti.list_backup.slot.header", num + (5 * (page - 1))) + " ")
             .append(nameText)
             .append(backText)
             .append(deleteText)
@@ -165,11 +170,17 @@ public class ListUtils {
     public static MutableText list(int page) {
         long totalBackupSizeB = 0;
         Path backupDir = getBackupDir();
-        List<String> backupsList = getBackupsList();
-        if (backupsList.isEmpty() || getPageCount(backupsList, page) == 0) {
+        // List<String> backupsList = getBackupsList();
+        List<Map.Entry<String, StorageInfo>> backupsInfoList = getBackupsList().stream()
+            .map(name -> Map.entry(name, getDataBase().getStorageInfo(name)))
+            .sorted((c1, c2) -> -Long.compare(c1.getValue().getTimestamp(), c2.getValue().getTimestamp()))
+            .collect(Collectors.toList());
+        // if (backupsList.isEmpty() || getPageCount(backupsList, page) == 0) {
+        if (backupsInfoList.isEmpty() || getPageCount(backupsInfoList, page) == 0) {
             return Messenger.literal(tr("quickbackupmulti.list_empty"));
         }
-        int totalPage = getTotalPage(backupsList);
+        // int totalPage = getTotalPage(backupsList);
+        int totalPage = getTotalPage(backupsInfoList);
 
         MutableText resultText = Messenger.literal(tr("quickbackupmulti.list_backup.title", page));
         MutableText backPageText = getBackPageText(page, totalPage);
@@ -180,13 +191,16 @@ public class ListUtils {
             .append(tr("quickbackupmulti.list_backup.page_msg", page, totalPage))
             .append("  ")
             .append(nextPageText);
-
-        for (int j=1;j<=getPageCount(backupsList, page);j++) {
+        // for (int j = 1; j <= getPageCount(backupsList, page); j++) {
+        for (int j = 1; j <= getPageCount(backupsInfoList, page); j++) {
             try {
-                String name = backupsList.get(((j-1)+5*(page-1)));
+                // String name = backupsList.get(((j - 1) + 5 * (page - 1)));
+                Map.Entry<String, StorageInfo> entry = backupsInfoList.get(((j - 1) + 5 * (page - 1)));
+                String name = entry.getKey();
                 long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
                 totalBackupSizeB += backupSizeB;
-                resultText.append(getSlotText(name, page, j, backupSizeB));
+                // resultText.append(getSlotText(name, page, j, backupSizeB));
+                resultText.append(getSlotText(entry, page, j, backupSizeB));
             } catch (IOException e) {
                 LOGGER.error("", e);
             }
@@ -204,11 +218,12 @@ public class ListUtils {
     public static MutableText search(List<String> searchResultList) {
         MutableText resultText = Messenger.literal(tr("quickbackupmulti.search.success"));
         Path backupDir = getBackupDir();
-        for (int i=1;i<=searchResultList.size();i++) {
+        for (int i = 1; i <= searchResultList.size(); i++) {
             try {
-                String name = searchResultList.get(i-1);
+                String name = searchResultList.get(i - 1);
+                StorageInfo result = getDataBase().getStorageInfo(name);
                 long backupSizeB = getDirSize(backupDir.resolve(name).toFile());
-                resultText.append(getSlotText(name, 1, i, backupSizeB));
+                resultText.append(getSlotText(Map.entry(name, result), 1, i, backupSizeB));
             } catch (IOException e) {
                 LOGGER.error("", e);
             }
@@ -227,20 +242,20 @@ public class ListUtils {
             MutableText backText = Messenger.literal(tr("quickbackupmulti.show.back_button"));
             MutableText deleteText = Messenger.literal(tr("quickbackupmulti.show.delete_button"));
             backText.styled(style ->
-                    style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb back \"%s\"".formatted(name))
-                    )
-                ).styled(style ->
-                    style.withHoverEvent(
-                        new HoverEvent(
-                            HoverEvent.Action.SHOW_TEXT,
-                            Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))
-                    )
-                );
+                style.withClickEvent(
+                    new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb back \"%s\"".formatted(name))
+                )
+            ).styled(style ->
+                style.withHoverEvent(
+                    new HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        Text.of(tr("quickbackupmulti.list_backup.slot.restore", name)))
+                )
+            );
             deleteText.styled(style ->
-                    style.withClickEvent(
-                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete \"%s\"".formatted(name)))
-                ).styled(style ->
+                style.withClickEvent(
+                    new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/qb delete \"%s\"".formatted(name)))
+            ).styled(style ->
                 style.withHoverEvent(
                     new HoverEvent(
                         HoverEvent.Action.SHOW_TEXT,
