@@ -40,7 +40,7 @@ public class UpdateChecker {
                 }
 
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                QuickBackupMulti.LOGGER.error(e.getMessage(), e);
             }
         }, "QuickBackupM-Fabric-Update-Checker").start();
     }
