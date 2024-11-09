@@ -48,6 +48,9 @@ public class QuickBackupMulti implements ModInitializer {
 	//#else
 	//$$ public static final Logger LOGGER = LogManager.getLogger(QuickBackupMulti.class);
 	//#endif
+
+	public static final UpdateChecker updateChecker = new UpdateChecker();
+
 	public static final String modName = "QuickBackupMulti";
 	public static final String modId = "quickbackupmulti";
 
@@ -110,7 +113,7 @@ public class QuickBackupMulti implements ModInitializer {
 			Config.TEMP_CONFIG.server = null;
 		});
 
-		UpdateChecker.checkUpdate();
+		updateChecker.start();
 	}
 
 	public void initDataBase() {

@@ -12,36 +12,42 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
-public class UpdateChecker {
+public class UpdateChecker extends Thread {
 
     private static final HttpClient CLIENT = HttpClients.createDefault();
     private static final String RELEASE_API_URL = "https://api.github.com/repos/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/releases/latest";
 
-    public static void checkUpdate() {
-        new Thread(() -> {
-            try {
-                if (Config.TEMP_CONFIG.modVersion == null) {
-                    QuickBackupMulti.LOGGER.warn("Current mod version is not found.");
-                    return;
-                }
-                HttpResponse httpResponse = CLIENT.execute(new HttpGet(RELEASE_API_URL));
-                String body = EntityUtils.toString(httpResponse.getEntity());
+    public String latestVersion;
 
-                JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
-                String tag = jsonObject.get("tag_name").getAsString()
-                    .replaceAll("\\+.*", "")
-                    .replaceFirst("^v", "");
-                String currentVersion = Config.TEMP_CONFIG.modVersion
-                    .replaceAll("\\+.*", "")
-                    .replaceFirst("^v", "");
+    public UpdateChecker() {
+        super("QuickBackupM-Fabric-Update-Checker");
+    }
 
-                if (tag.compareTo(currentVersion) > 0) {
-                    QuickBackupMulti.LOGGER.info("{} has new version {}", QuickBackupMulti.modName, tag);
-                }
-
-            } catch (IOException e) {
-                QuickBackupMulti.LOGGER.error(e.getMessage(), e);
+    @Override
+    public void run() {
+        try {
+            if (Config.TEMP_CONFIG.modVersion == null) {
+                QuickBackupMulti.LOGGER.warn("Current mod version is not found.");
+                return;
             }
-        }, "QuickBackupM-Fabric-Update-Checker").start();
+            HttpResponse httpResponse = CLIENT.execute(new HttpGet(RELEASE_API_URL));
+            String body = EntityUtils.toString(httpResponse.getEntity());
+
+            JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
+            latestVersion = jsonObject.get("tag_name").getAsString();
+            String tag = latestVersion
+                .replaceAll("\\+.*", "")
+                .replaceFirst("^v", "");
+            String currentVersion = Config.TEMP_CONFIG.modVersion
+                .replaceAll("\\+.*", "")
+                .replaceFirst("^v", "");
+
+            if (tag.compareTo(currentVersion) > 0) {
+                QuickBackupMulti.LOGGER.info("{} has new version {}", QuickBackupMulti.modName, latestVersion);
+            }
+
+        } catch (IOException e) {
+            QuickBackupMulti.LOGGER.error(e.getMessage(), e);
+        }
     }
 }
