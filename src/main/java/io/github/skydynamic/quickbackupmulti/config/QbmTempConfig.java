@@ -14,6 +14,7 @@ public class QbmTempConfig {
     public String worldName;
     public @Nullable Scheduler scheduler;
     public long latestScheduleExecuteTime;
+    public String modVersion;
 
     public void setIsBackupValue(Boolean value) {
         this.isBackup = value;
@@ -41,5 +42,9 @@ public class QbmTempConfig {
 
     public void setLatestScheduleExecuteTime(long time) {
         this.latestScheduleExecuteTime = time;
+    }
+
+    public void setModVersion(String modVersion) {
+        this.modVersion = modVersion;
     }
 }
