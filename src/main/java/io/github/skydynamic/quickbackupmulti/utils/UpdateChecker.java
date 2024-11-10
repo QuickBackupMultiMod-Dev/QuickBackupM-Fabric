@@ -18,6 +18,8 @@ public class UpdateChecker extends Thread {
     private static final String RELEASE_API_URL = "https://api.github.com/repos/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/releases/latest";
 
     public String latestVersion;
+    public String latestVersionHtmUrl;
+    public boolean needUpdate = false;
 
     public UpdateChecker() {
         super("QuickBackupM-Fabric-Update-Checker");
@@ -33,8 +35,11 @@ public class UpdateChecker extends Thread {
             HttpResponse httpResponse = CLIENT.execute(new HttpGet(RELEASE_API_URL));
             String body = EntityUtils.toString(httpResponse.getEntity());
 
+            // Get Meta data
             JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
             latestVersion = jsonObject.get("tag_name").getAsString();
+            latestVersionHtmUrl = jsonObject.get("html_url").getAsString();
+
             String tag = latestVersion
                 .replaceAll("\\+.*", "")
                 .replaceFirst("^v", "");
@@ -43,11 +48,14 @@ public class UpdateChecker extends Thread {
                 .replaceFirst("^v", "");
 
             if (tag.compareTo(currentVersion) > 0) {
-                QuickBackupMulti.LOGGER.info("{} has new version {}", QuickBackupMulti.modName, latestVersion);
+                needUpdate = true;
+                QuickBackupMulti.LOGGER.info(
+                    "{} has new version {}. You can see: {}", QuickBackupMulti.modName, latestVersion, latestVersionHtmUrl
+                );
             }
 
         } catch (IOException e) {
-            QuickBackupMulti.LOGGER.error(e.getMessage(), e);
+            QuickBackupMulti.LOGGER.error("Check update failed", e);
         }
     }
 }

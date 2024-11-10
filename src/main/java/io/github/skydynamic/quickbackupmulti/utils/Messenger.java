@@ -8,7 +8,6 @@ import net.minecraft.text.Text;
 //#endif
 
 public class Messenger {
-
     public static void sendMessage(ServerCommandSource commandSource, Text text) {
         //#if MC>=11900
         commandSource.sendMessage(text);
@@ -24,5 +23,4 @@ public class Messenger {
         //$$ return new LiteralText(string);
         //#endif
     }
-
 }

@@ -113,7 +113,7 @@ public class QuickBackupMulti implements ModInitializer {
 			Config.TEMP_CONFIG.server = null;
 		});
 
-		updateChecker.start();
+		if (Config.INSTANCE.getCheckUpdata()) updateChecker.start();
 	}
 
 	public void initDataBase() {
