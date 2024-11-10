@@ -1,226 +1,220 @@
 package io.github.skydynamic.quickbackupmulti.config;
 
-import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
+import io.github.skydynamic.increment.storage.lib.Interface.IConfig;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.lang.reflect.Field;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
+public class QuickBackupMultiConfig implements IConfig {
+    private ConfigStorage config = new ConfigStorage();
 
-public class QuickBackupMultiConfig {
-    private final Object lock = new Object();
-    private final Path configPath = QbmConstant.pathGetter.getConfigPath();
-    private ConfigStorage configStorage;
-    File path = configPath.toFile();
-    File config = configPath.resolve("QuickBackupMulti.json").toFile();
+    private final Path path;
 
-    public void load() {
-        synchronized (lock) {
+    public QuickBackupMultiConfig(final Path path) {
+        this.path = path;
+    }
+
+    public ConfigStorage getConfig() {
+        return config;
+    }
+
+    public void setConfig(final ConfigStorage config) {
+        this.config = config;
+    }
+
+    public boolean save() {
+        if (!Files.exists(path)) {
             try {
-                if (!path.exists() || !path.isDirectory()) {
-                    path.mkdirs();
-                }
-                if (!config.exists()) {
-                    saveModifiedConfig(ConfigStorage.DEFAULT);
-                }
-                FileReader reader = new FileReader(config);
-                ConfigStorage result = gson.fromJson(reader, ConfigStorage.class);
-                this.configStorage = fixFields(result, ConfigStorage.DEFAULT);
-                saveModifiedConfig(this.configStorage);
-                reader.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                Files.createFile(path);
+            } catch (IOException e) {
+                QuickBackupMulti.LOGGER.error("Save {} error: create file failed.", path, e);
+                return false;
             }
         }
+        try (BufferedWriter bfw = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            QbmConstant.GSON.toJson(getConfig(), bfw);
+        } catch (IOException e) {
+            QuickBackupMulti.LOGGER.error("Save {} error: write file failed.", path, e);
+            return false;
+        }
+        return true;
     }
 
-    private void saveModifiedConfig(ConfigStorage c) {
-        synchronized (lock) {
-            try {
-                if (config.exists()) config.delete();
-                if (!config.exists()) config.createNewFile();
-                FileWriter writer = new FileWriter(config);
-                ConfigStorage fixConfig = fixFields(c, ConfigStorage.DEFAULT);
-                gson.toJson(fixConfig, writer);
-                writer.close();
-                IndexUtil.setConfig(fixConfig);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+    public boolean load() {
+        if (!Files.exists(path)) {
+            return save();
         }
+
+        try (BufferedReader bfr = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            setConfig(QbmConstant.GSON.fromJson(bfr, ConfigStorage.class));
+        } catch (IOException e) {
+            QuickBackupMulti.LOGGER.error("Load {} error: read file failed.", path, e);
+            return false;
+        }
+        return true;
     }
 
-    private ConfigStorage fixFields(ConfigStorage t, ConfigStorage defaultVal) {
-        if (t == null) {
-            throw new NullPointerException();
-        }
-        if (t.equals(defaultVal)) {
-            return t;
-        }
-        try {
-            Class<?> clazz = t.getClass();
-            for (Field declaredField : clazz.getDeclaredFields()) {
-                if (Arrays.stream(declaredField.getDeclaredAnnotations()).anyMatch(it -> it.annotationType() == Ignore.class))
-                    continue;
-                declaredField.setAccessible(true);
-                Object value = declaredField.get(t);
-                Object dv = declaredField.get(defaultVal);
-                if (value == null) {
-                    declaredField.set(t, dv);
-                }
-            }
-            return t;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean isCheckUpdate() {
+        return config.checkUpdate;
     }
 
-    public ConfigStorage getConfigStorage() {
-        synchronized (lock) {
-            return fixFields(configStorage, ConfigStorage.DEFAULT);
-        }
+    public ArrayList<String> getIgnoredFiles() {
+        return config.ignoredFiles;
     }
 
-    public void setConfigStorage(ConfigStorage configStorage) {
-        synchronized (lock) {
-            this.configStorage = configStorage;
-            saveModifiedConfig(configStorage);
-        }
+
+    public ArrayList<String> getIgnoredFolders() {
+        return config.ignoredFolders;
     }
 
-    public boolean getCheckUpdata() {
-        synchronized (lock) {
-            return configStorage.isCheckUpedate();
-        }
-    }
-
-    public List<String> getIgnoredFiles() {
-        synchronized (lock) {
-            List<String> list = new ArrayList<>(configStorage.getIgnoredFiles());
-            list.add("session.lock");
-            return list;
-        }
-    }
-
-    public List<String> getIgnoredFolders() {
-        synchronized (lock) {
-            return configStorage.getIgnoredFolders();
-        }
-    }
 
     public String getLang() {
-        synchronized (lock) {
-            return configStorage.getLang();
-        }
-    }
-
-    public boolean getScheduleBackup() {
-        synchronized (lock) {
-            return configStorage.isScheduleBackup();
-        }
-    }
-
-    public String getScheduleCron() {
-        synchronized (lock) {
-            return configStorage.getScheduleCron();
-        }
-    }
-
-    public int getScheduleInterval() {
-        synchronized (lock) {
-            return configStorage.getScheduleInterval();
-        }
-    }
-
-    public String getScheduleMode() {
-        synchronized (lock) {
-            return configStorage.getScheduleMode();
-        }
-    }
-
-    public int getScheduleMaxBackup() {
-        synchronized (lock) {
-            return configStorage.getMaxScheduleBackup();
-        }
-    }
-
-    public Config.AutoRestartMode getAutoRestartMode() {
-        synchronized (lock) {
-            return configStorage.getAutoRestartMode();
-        }
-    }
-
-    public boolean getUseInternalDataBase() {
-        synchronized (lock) {
-            return configStorage.getUseInternalDataBase();
-        }
-    }
-
-    public String getMongoDBUri() {
-        synchronized (lock) {
-            return configStorage.getMongoDBUri();
-        }
-    }
-
-    public String getStoragePath() {
-        synchronized (lock) {
-            return configStorage.getStoragePath();
-        }
+        return config.lang;
     }
 
     public void setLang(String lang) {
-        synchronized (lock) {
-            configStorage.setLang(lang);
-            saveModifiedConfig(configStorage);
-        }
+        config.lang = lang;
     }
 
-    public void setScheduleCron(String value) {
-        synchronized (lock) {
-            configStorage.setScheduleCron(value);
-            saveModifiedConfig(configStorage);
-        }
+    public boolean isScheduleBackup() {
+        return config.scheduleBackup;
     }
 
-    public void setScheduleInterval(int value) {
-        synchronized (lock) {
-            configStorage.setScheduleInterval(value);
-            saveModifiedConfig(configStorage);
-        }
+    public void setScheduleBackup(boolean scheduleBackup) {
+        config.scheduleBackup = scheduleBackup;
     }
 
-    public void setScheduleBackup(boolean value) {
-        synchronized (lock) {
-            configStorage.setScheduleBackup(value);
-            saveModifiedConfig(configStorage);
-        }
+    public String getScheduleCron() {
+        return config.scheduleCron;
     }
 
-    public void setScheduleMode(String mode) {
-        synchronized (lock) {
-            configStorage.setScheduleMode(mode);
-            saveModifiedConfig(configStorage);
-        }
+    public void setScheduleCron(String scheduleCron) {
+        config.scheduleCron = scheduleCron;
     }
 
-    public void setAutoRestartMode(Config.AutoRestartMode mode) {
-        synchronized (lock) {
-            configStorage.setAutoRestartMode(mode);
-            saveModifiedConfig(configStorage);
-        }
+    public int getScheduleInterval() {
+        return config.scheduleInterval;
     }
 
-    public void setUseInternalDataBase(boolean value) {
-        synchronized (lock) {
-            configStorage.setUseInternalDataBase(value);
-            saveModifiedConfig(configStorage);
+    public void setScheduleInterval(int scheduleInterval) {
+        config.scheduleInterval = scheduleInterval;
+    }
+
+    public String getScheduleMode() {
+        return config.scheduleMode;
+    }
+
+    public void setScheduleMode(String scheduleMode) {
+        config.scheduleMode = scheduleMode;
+    }
+
+    public int getMaxScheduleBackup() {
+        return config.maxScheduleBackup;
+    }
+
+    public AutoRestartMode getAutoRestartMode() {
+        return config.autoRestartMode;
+    }
+
+    public void setAutoRestartMode(AutoRestartMode autoRestartMode) {
+        config.autoRestartMode = autoRestartMode;
+    }
+
+
+    @Override
+    public boolean getUseInternalDataBase() {
+        return config.useInternalDataBase;
+    }
+
+    public void setUseInternalDataBase(boolean useInternalDataBase) {
+        config.useInternalDataBase = useInternalDataBase;
+    }
+
+    @Override
+    public String getMongoDBUri() {
+        return config.mongoDBUri;
+    }
+
+    @Override
+    public String getStoragePath() {
+        return config.storagePath;
+    }
+
+    @SuppressWarnings("FieldMayBeFinal")
+    public static class ConfigStorage {
+        private boolean checkUpdate = true;
+        private ArrayList<String> ignoredFiles = new ArrayList<>();
+        private ArrayList<String> ignoredFolders = new ArrayList<>();
+        private String lang = "zh_cn";
+        private boolean scheduleBackup = false;
+        private String scheduleCron = "* * 0/4 * * ?";
+        private int scheduleInterval = 14400;
+        private String scheduleMode = "interval";
+        private int maxScheduleBackup = 10;
+
+        private AutoRestartMode autoRestartMode = AutoRestartMode.DEFAULT;
+
+        private boolean useInternalDataBase = true;
+        private String mongoDBUri = "mongodb://localhost:27017";
+        private String storagePath = "QuickBackupMulti";
+
+        public void setScheduleMode(String scheduleMode) {
+            this.scheduleMode = scheduleMode;
+        }
+
+        public void setScheduleBackup(boolean scheduleBackup) {
+            this.scheduleBackup = scheduleBackup;
+        }
+
+        public void setScheduleCron(String scheduleCron) {
+            this.scheduleCron = scheduleCron;
+        }
+
+        public void setScheduleInterval(int scheduleInterval) {
+            this.scheduleInterval = scheduleInterval;
+        }
+
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+
+        public boolean isScheduleBackup() {
+            return scheduleBackup;
+        }
+
+        public String getScheduleCron() {
+            return scheduleCron;
+        }
+
+        public int getScheduleInterval() {
+            return scheduleInterval;
+        }
+
+        public String getScheduleMode() {
+            return scheduleMode;
+        }
+
+        public String getLang() {
+            return lang;
+        }
+
+        @Override
+        public String toString() {
+            return "ConfigStorage [checkUpdate=" + checkUpdate + ", ignoredFiles=" + ignoredFiles
+                + ", ignoredFolders=" + ignoredFolders + ", lang=" + lang + ", scheduleBackup=" + scheduleBackup
+                + ", scheduleCron=" + scheduleCron + ", scheduleInterval=" + scheduleInterval
+                + ", scheduleMode=" + scheduleMode + ", maxScheduleBackup=" + maxScheduleBackup
+                + ", autoRestartMode=" + autoRestartMode + ", useInternalDataBase="
+                + useInternalDataBase + ", mongoDBUri=" + mongoDBUri + ", storagePath="
+                + storagePath + "]";
         }
     }
 }
+

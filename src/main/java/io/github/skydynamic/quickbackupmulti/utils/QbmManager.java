@@ -3,8 +3,8 @@ package io.github.skydynamic.quickbackupmulti.utils;
 import io.github.skydynamic.increment.storage.lib.database.index.type.StorageInfo;
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
-import io.github.skydynamic.quickbackupmulti.config.Config;
-import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
+import io.github.skydynamic.quickbackupmulti.config.QuickBackupMultiConfig;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import net.fabricmc.api.EnvType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,18 +35,18 @@ import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
 public class QbmManager {
     public static Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
     public static Path savePath;
-    public static IOFileFilter folderFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFolders()));
-    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(Config.INSTANCE.getIgnoredFiles()));
+    public static IOFileFilter folderFilter = new NotFileFilter(new NameFileFilter(QuickBackupMulti.config.getIgnoredFolders()));
+    public static IOFileFilter fileFilter = new NotFileFilter(new NameFileFilter(QuickBackupMulti.config.getIgnoredFiles()));
 
     public static Path getRootBackupDir() {
         return backupDir;
     }
 
     public static Path getBackupDir() {
-        if (Config.TEMP_CONFIG.env == EnvType.SERVER) {
+        if (QuickBackupMulti.TEMP_CONFIG.env == EnvType.SERVER) {
             return getRootBackupDir();
         } else {
-            return getRootBackupDir().resolve(Config.TEMP_CONFIG.worldName);
+            return getRootBackupDir().resolve(QuickBackupMulti.TEMP_CONFIG.worldName);
         }
     }
 
@@ -61,7 +61,7 @@ public class QbmManager {
             FileUtils.copyDirectory(targetBackupSlot, savePath.toFile());
             IndexUtil.copyIndexFile(
                 slot,
-                Path.of(Config.INSTANCE.getStoragePath()).resolve(Config.TEMP_CONFIG.worldName),
+                Path.of(QuickBackupMulti.config.getStoragePath()).resolve(QuickBackupMulti.TEMP_CONFIG.worldName),
                 savePath.toFile()
             );
         } catch (IOException e) {
@@ -82,7 +82,7 @@ public class QbmManager {
     public static boolean delete(String name) {
         if (getStorager().storageExists(name)) {
             try {
-                IndexUtil.reIndex(name, Config.TEMP_CONFIG.worldName);
+                IndexUtil.reIndex(name, QuickBackupMulti.TEMP_CONFIG.worldName);
                 getStorager().deleteStorage(name);
                 FileUtils.deleteDirectory(getBackupDir().resolve(name).toFile());
                 return true;
@@ -111,22 +111,22 @@ public class QbmManager {
         return backupStream.filter(it -> it.getName().startsWith("ScheduleBackup-")).toList();
     }
 
-    public static ConfigStorage verifyConfig(ConfigStorage c, PlayerEntity player) {
+    public static QuickBackupMultiConfig.ConfigStorage verifyConfig(QuickBackupMultiConfig.ConfigStorage c, PlayerEntity player) {
         ServerCommandSource commandSource = player.getCommandSource();
 
         // schedule enable
-        if (c.isScheduleBackup() && !Config.INSTANCE.getScheduleBackup()) {
+        if (c.isScheduleBackup() && !QuickBackupMulti.config.isScheduleBackup()) {
             ScheduleUtils.startSchedule(commandSource);
-        } else if (!c.isScheduleBackup() && Config.INSTANCE.getScheduleBackup()) {
+        } else if (!c.isScheduleBackup() && QuickBackupMulti.config.isScheduleBackup()) {
             ScheduleUtils.disableSchedule(commandSource);
         }
 
         // schedule backup mode switch
-        if (!c.getScheduleMode().equals(Config.INSTANCE.getScheduleMode()))
+        if (!c.getScheduleMode().equals(QuickBackupMulti.config.getScheduleMode()))
             ScheduleUtils.switchScheduleMode(commandSource, c.getScheduleMode());
 
         // schedule set cron
-        if (!c.getScheduleCron().equals(Config.INSTANCE.getScheduleCron())) {
+        if (!c.getScheduleCron().equals(QuickBackupMulti.config.getScheduleCron())) {
             try {
                 ScheduleUtils.setScheduleCron(commandSource, c.getScheduleCron());
             } catch (SchedulerException e) {
@@ -136,7 +136,7 @@ public class QbmManager {
         }
 
         // schedule set interval
-        if (!((Integer) c.getScheduleInterval()).equals(Config.INSTANCE.getScheduleInterval())) {
+        if (!((Integer) c.getScheduleInterval()).equals(QuickBackupMulti.config.getScheduleInterval())) {
             try {
                 ScheduleUtils.setScheduleInterval(commandSource, c.getScheduleInterval());
             } catch (SchedulerException e) {
@@ -146,10 +146,10 @@ public class QbmManager {
         }
 
         // lang
-        if (!c.getLang().equals(Config.INSTANCE.getLang())) {
+        if (!c.getLang().equals(QuickBackupMulti.config.getLang())) {
             if (!supportLanguage.contains(c.getLang())) {
                 Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.failed")));
-                c.setLang(Config.INSTANCE.getLang());
+                c.setLang(QuickBackupMulti.config.getLang());
             } else {
                 Translate.handleResourceReload(c.getLang());
                 Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.set", c.getLang())));

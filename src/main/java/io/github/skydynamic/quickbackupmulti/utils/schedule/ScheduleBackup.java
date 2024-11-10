@@ -1,8 +1,8 @@
 package io.github.skydynamic.quickbackupmulti.utils.schedule;
 
 import io.github.skydynamic.increment.storage.lib.database.index.type.StorageInfo;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
-import io.github.skydynamic.quickbackupmulti.config.Config;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -27,7 +27,7 @@ public class ScheduleBackup implements Job {
 
     private static void checkAndDeleteOldScheduleBackup() {
         List<StorageInfo> scheduleList = QbmManager.getScheduleBackupList();
-        if (scheduleList.size() >= Config.INSTANCE.getScheduleMaxBackup()) {
+        if (scheduleList.size() >= QuickBackupMulti.config.getMaxScheduleBackup()) {
             StorageInfo oldest;
             Optional<StorageInfo> oldestOpt = scheduleList.stream().min(
                 Comparator.comparingLong(StorageInfo::getTimestamp)
@@ -41,21 +41,21 @@ public class ScheduleBackup implements Job {
 
     @Override
     public void execute(JobExecutionContext context) {
-        if (Config.TEMP_CONFIG.server != null) {
-            MinecraftServer server = Config.TEMP_CONFIG.server;
+        if (QuickBackupMulti.TEMP_CONFIG.server != null) {
+            MinecraftServer server = QuickBackupMulti.TEMP_CONFIG.server;
             checkAndDeleteOldScheduleBackup();
             if (scheduleMake(server.getCommandSource(), generateName())) {
                 List<ServerPlayerEntity> finalPlayerList = new ArrayList<>(server.getPlayerManager().getPlayerList());
-                Config.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
+                QuickBackupMulti.TEMP_CONFIG.setLatestScheduleExecuteTime(System.currentTimeMillis());
                 String nextExecuteTime = "";
-                switch (Config.INSTANCE.getScheduleMode()) {
+                switch (QuickBackupMulti.config.getScheduleMode()) {
                     case "interval" : {
                         nextExecuteTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                            .format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInterval() * 1000L);
+                            .format(System.currentTimeMillis() + QuickBackupMulti.config.getScheduleInterval() * 1000L);
                         break;
                     }
                     case "cron" : {
-                        nextExecuteTime = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), true);
+                        nextExecuteTime = getNextExecutionTime(QuickBackupMulti.config.getScheduleCron(), true);
                         break;
                     }
                 }

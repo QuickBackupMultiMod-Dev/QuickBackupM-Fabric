@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.backup;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -40,7 +40,7 @@ public class ClientRestoreDelegate {
                 }
                 minecraftClient.execute(() -> minecraftClient.setScreen(null));
                 restore(slot);
-                Config.TEMP_CONFIG.setIsBackupValue(false);
+                QuickBackupMulti.TEMP_CONFIG.setIsBackupValue(false);
                 getDataBase().stopInternalMongoServer();
                 minecraftClient.execute(() -> {
                     Text title = Text.of(Translate.tr("quickbackupmulti.toast.end_title"));

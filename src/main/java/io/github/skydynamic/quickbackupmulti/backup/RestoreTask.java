@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.backup;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand;
 import net.fabricmc.api.EnvType;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -24,13 +24,13 @@ public class RestoreTask extends TimerTask {
     @Override
     public void run() {
         QuickBackupMultiCommand.QbDataHashMap.clear();
-        Config.TEMP_CONFIG.setIsBackupValue(true);
+        QuickBackupMulti.TEMP_CONFIG.setIsBackupValue(true);
         if (env == EnvType.SERVER) {
             for (ServerPlayerEntity player : playerList) {
                 player.networkHandler.disconnect(Text.of("Server restore backup"));
             }
-            Config.TEMP_CONFIG.setIsBackupValue(true);
-            Config.TEMP_CONFIG.server.stop(true);
+            QuickBackupMulti.TEMP_CONFIG.setIsBackupValue(true);
+            QuickBackupMulti.TEMP_CONFIG.server.stop(true);
         } else {
             //不分到另一个class中执行 会找不到Screen然后炸（
             new ClientRestoreDelegate(playerList, slot).run();

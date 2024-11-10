@@ -4,14 +4,15 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.command.suggestion.AutoRestartModeSuggestionProvider;
 import io.github.skydynamic.quickbackupmulti.command.suggestion.LangSuggestionProvider;
+import io.github.skydynamic.quickbackupmulti.config.AutoRestartMode;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import io.github.skydynamic.quickbackupmulti.utils.ScheduleUtils;
-import io.github.skydynamic.quickbackupmulti.config.Config;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -116,27 +117,27 @@ public class SettingCommand {
 
     private static int getAutoRestartMode(ServerCommandSource commandSource) {
         Messenger.sendMessage(commandSource,
-            Messenger.literal(tr("quickbackupmulti.restartmode.get", Config.INSTANCE.getAutoRestartMode().name())));
+            Messenger.literal(tr("quickbackupmulti.restartmode.get", QuickBackupMulti.config.getAutoRestartMode().name())));
         return 1;
     }
 
     private static int setAutoRestartMode(ServerCommandSource commandSource, String mode) {
-        Config.AutoRestartMode newMode = Config.AutoRestartMode.valueOf(mode.toUpperCase());
-        Config.INSTANCE.setAutoRestartMode(newMode);
+        AutoRestartMode newMode = AutoRestartMode.valueOf(mode.toUpperCase());
+        QuickBackupMulti.config.setAutoRestartMode(newMode);
         Messenger.sendMessage(commandSource,
             Messenger.literal(tr("quickbackupmulti.restartmode.switch", newMode.name())));
         return 1;
     }
 
     private static int setUseInternalDataBase(ServerCommandSource commandSource, Boolean value) {
-        if (value != Config.INSTANCE.getUseInternalDataBase()) {
-            Config.INSTANCE.setUseInternalDataBase(value);
+        if (value != QuickBackupMulti.config.getUseInternalDataBase()) {
+            QuickBackupMulti.config.setUseInternalDataBase(value);
             try {
                 if (value) {
-                    setDataStore(Config.TEMP_CONFIG.worldName);
+                    setDataStore(QuickBackupMulti.TEMP_CONFIG.worldName);
                 } else {
                     getDataBase().stopInternalMongoServer();
-                    setDataStore(Config.TEMP_CONFIG.worldName);
+                    setDataStore(QuickBackupMulti.TEMP_CONFIG.worldName);
                 }
                 Messenger.sendMessage(commandSource,
                     Messenger.literal(tr("quickbackupmulti.database.set_success")));
@@ -158,7 +159,7 @@ public class SettingCommand {
     }
 
     private static int getLang(ServerCommandSource commandSource) {
-        Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.get", Config.INSTANCE.getLang())));
+        Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.get", QuickBackupMulti.config.getLang())));
         return 1;
     }
 
@@ -169,12 +170,12 @@ public class SettingCommand {
         }
         Translate.handleResourceReload(lang);
         Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.lang.set", lang)));
-        Config.INSTANCE.setLang(lang);
+        QuickBackupMulti.config.setLang(lang);
         return 1;
     }
 
     private static int switchMode(ServerCommandSource commandSource, String mode) {
-        Config.INSTANCE.setScheduleMode(mode);
+        QuickBackupMulti.config.setScheduleMode(mode);
         return switchScheduleMode(commandSource, mode);
     }
 
@@ -202,9 +203,9 @@ public class SettingCommand {
 
     private static int enableScheduleBackup(ServerCommandSource commandSource) {
         try {
-            Config.INSTANCE.setScheduleBackup(true);
-            if (Config.TEMP_CONFIG.scheduler != null) {
-                Config.TEMP_CONFIG.scheduler.shutdown();
+            QuickBackupMulti.config.setScheduleBackup(true);
+            if (QuickBackupMulti.TEMP_CONFIG.scheduler != null) {
+                QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
             }
             startSchedule(commandSource);
             return 1;
@@ -220,23 +221,23 @@ public class SettingCommand {
     public static int getScheduleMode(ServerCommandSource commandSource) {
         Messenger.sendMessage(
             commandSource,
-            Text.of(tr("quickbackupmulti.schedule.mode.get", Config.INSTANCE.getScheduleMode()))
+            Text.of(tr("quickbackupmulti.schedule.mode.get", QuickBackupMulti.config.getScheduleMode()))
         );
         return 1;
     }
 
     public static int getNextBackupTime(ServerCommandSource commandSource) {
-        if (Config.INSTANCE.getScheduleBackup()) {
+        if (QuickBackupMulti.config.isScheduleBackup()) {
             String nextBackupTimeString = "";
-            switch (Config.INSTANCE.getScheduleMode()) {
+            switch (QuickBackupMulti.config.getScheduleMode()) {
                 case "cron" : {
-                    nextBackupTimeString = getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
+                    nextBackupTimeString = getNextExecutionTime(QuickBackupMulti.config.getScheduleCron(), false);
                     break;
                 }
                 case "interval" : {
                     nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                         .format(
-                            Config.TEMP_CONFIG.latestScheduleExecuteTime + Config.INSTANCE.getScheduleInterval() * 1000L
+                            QuickBackupMulti.TEMP_CONFIG.latestScheduleExecuteTime + QuickBackupMulti.config.getScheduleInterval() * 1000L
                         );
                     break;
                 }

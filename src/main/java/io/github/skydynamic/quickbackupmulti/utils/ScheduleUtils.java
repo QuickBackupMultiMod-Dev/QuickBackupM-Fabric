@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.utils;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.utils.schedule.CronUtil;
 import net.minecraft.server.command.ServerCommandSource;
@@ -16,20 +16,20 @@ public class ScheduleUtils {
     public static void startSchedule(ServerCommandSource commandSource) {
         String nextBackupTimeString = "";
         try {
-            Config.TEMP_CONFIG.scheduler.shutdown();
+            QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
             // 照顾Java8
-            switch (Config.INSTANCE.getScheduleMode()) {
+            switch (QuickBackupMulti.config.getScheduleMode()) {
                 case "cron": {
-                    nextBackupTimeString = CronUtil.getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false);
+                    nextBackupTimeString = CronUtil.getNextExecutionTime(QuickBackupMulti.config.getScheduleCron(), false);
                     break;
                 }
                 case "interval": {
-                    nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInterval() * 1000L);
+                    nextBackupTimeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis() + QuickBackupMulti.config.getScheduleInterval() * 1000L);
                     break;
                 }
             }
             CronUtil.buildScheduler();
-            Config.TEMP_CONFIG.scheduler.start();
+            QuickBackupMulti.TEMP_CONFIG.scheduler.start();
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.enable.success", nextBackupTimeString)));
         } catch (SchedulerException e) {
             LOGGER.error("Start schedule backup fail: ", e);
@@ -39,8 +39,8 @@ public class ScheduleUtils {
 
     public static int switchScheduleMode(ServerCommandSource commandSource, String mode) {
         try {
-            if (Config.INSTANCE.getScheduleBackup()) {
-                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+            if (QuickBackupMulti.config.isScheduleBackup()) {
+                if (QuickBackupMulti.TEMP_CONFIG.scheduler.isStarted()) QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
                 startSchedule(commandSource);
             }
         } catch (SchedulerException e) {
@@ -54,8 +54,8 @@ public class ScheduleUtils {
 
     public static int disableSchedule(ServerCommandSource commandSource) {
         try {
-            Config.TEMP_CONFIG.scheduler.shutdown();
-            Config.INSTANCE.setScheduleBackup(false);
+            QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
+            QuickBackupMulti.config.setScheduleBackup(false);
             Messenger.sendMessage(commandSource, Messenger.literal(tr("quickbackupmulti.schedule.disable.success")));
             return 1;
         } catch (SchedulerException e) {
@@ -67,15 +67,15 @@ public class ScheduleUtils {
 
     public static int setScheduleCron(ServerCommandSource commandSource, String value) throws SchedulerException {
         if (CronUtil.cronIsValid(value)) {
-            if (Config.TEMP_CONFIG.scheduler != null) {
-                if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+            if (QuickBackupMulti.TEMP_CONFIG.scheduler != null) {
+                if (QuickBackupMulti.TEMP_CONFIG.scheduler.isStarted()) QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
             }
-            Config.INSTANCE.setScheduleCron(value);
-            if (Config.INSTANCE.getScheduleBackup()) {
+            QuickBackupMulti.config.setScheduleCron(value);
+            if (QuickBackupMulti.config.isScheduleBackup()) {
                 startSchedule(commandSource);
-                if (Config.INSTANCE.getScheduleMode().equals("cron")) {
+                if (QuickBackupMulti.config.getScheduleMode().equals("cron")) {
                     Messenger.sendMessage(commandSource,
-                        Messenger.literal(Translate.tr("quickbackupmulti.schedule.cron.set_custom_success", CronUtil.getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false))));
+                        Messenger.literal(Translate.tr("quickbackupmulti.schedule.cron.set_custom_success", CronUtil.getNextExecutionTime(QuickBackupMulti.config.getScheduleCron(), false))));
                 }
             } else {
                 Messenger.sendMessage(commandSource,
@@ -89,34 +89,34 @@ public class ScheduleUtils {
     }
 
     public static int setScheduleInterval(ServerCommandSource commandSource, int value, String type) throws SchedulerException {
-        if (Config.TEMP_CONFIG.scheduler != null) {
-            if (Config.TEMP_CONFIG.scheduler.isStarted()) Config.TEMP_CONFIG.scheduler.shutdown();
+        if (QuickBackupMulti.TEMP_CONFIG.scheduler != null) {
+            if (QuickBackupMulti.TEMP_CONFIG.scheduler.isStarted()) QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
         }
         switch (type) {
             case "s" : {
-                Config.INSTANCE.setScheduleInterval(value);
+                QuickBackupMulti.config.setScheduleInterval(value);
                 break;
             }
             case "m" : {
-                Config.INSTANCE.setScheduleInterval(CronUtil.getSeconds(value, 0, 0));
+                QuickBackupMulti.config.setScheduleInterval(CronUtil.getSeconds(value, 0, 0));
                 break;
             }
             case "h" : {
-                Config.INSTANCE.setScheduleInterval(CronUtil.getSeconds(0, value, 0));
+                QuickBackupMulti.config.setScheduleInterval(CronUtil.getSeconds(0, value, 0));
                 break;
             }
             case "d" : {
-                Config.INSTANCE.setScheduleInterval(CronUtil.getSeconds(0, 0, value));
+                QuickBackupMulti.config.setScheduleInterval(CronUtil.getSeconds(0, 0, value));
                 break;
             }
         }
-        if (Config.INSTANCE.getScheduleBackup()) {
+        if (QuickBackupMulti.config.isScheduleBackup()) {
             startSchedule(commandSource);
-            if (Config.INSTANCE.getScheduleMode().equals("interval")) {
+            if (QuickBackupMulti.config.getScheduleMode().equals("interval")) {
                 Messenger.sendMessage(commandSource,
                     Messenger.literal(tr("quickbackupmulti.schedule.cron.set_success",
                         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                            .format(System.currentTimeMillis() + Config.INSTANCE.getScheduleInterval() * 1000L))
+                            .format(System.currentTimeMillis() + QuickBackupMulti.config.getScheduleInterval() * 1000L))
                     )
                 );
             }
