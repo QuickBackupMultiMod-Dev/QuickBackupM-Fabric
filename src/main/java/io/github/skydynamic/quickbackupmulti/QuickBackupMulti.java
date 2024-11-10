@@ -9,6 +9,7 @@ import io.github.skydynamic.quickbackupmulti.config.Config;
 import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 import io.github.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
+import io.github.skydynamic.quickbackupmulti.utils.UpdateChecker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -47,7 +48,11 @@ public class QuickBackupMulti implements ModInitializer {
 	//#else
 	//$$ public static final Logger LOGGER = LogManager.getLogger(QuickBackupMulti.class);
 	//#endif
+
+	public static final UpdateChecker updateChecker = new UpdateChecker();
+
 	public static final String modName = "QuickBackupMulti";
+	public static final String modId = "quickbackupmulti";
 
 	EnvType env = FabricLoader.getInstance().getEnvironmentType();
 
@@ -56,6 +61,9 @@ public class QuickBackupMulti implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		FabricLoader.getInstance().getModContainer(modId).ifPresent(modContainer ->
+			Config.TEMP_CONFIG.setModVersion(modContainer.getMetadata().getVersion().getFriendlyString()));
+
 		//#if MC>=12005
 		//$$ Packets.registerPacketCodec();
 		//#endif
@@ -104,6 +112,8 @@ public class QuickBackupMulti implements ModInitializer {
 			}
 			Config.TEMP_CONFIG.server = null;
 		});
+
+		if (Config.INSTANCE.getCheckUpdata()) updateChecker.start();
 	}
 
 	public void initDataBase() {

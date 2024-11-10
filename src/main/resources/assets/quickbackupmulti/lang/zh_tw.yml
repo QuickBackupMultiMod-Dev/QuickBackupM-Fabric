@@ -2,6 +2,10 @@ quickbackupmulti:
   empty_comment: §7空§r
   list_empty: "§7目前沒有任何備份"
 
+  check_update:
+    on_player_join: "§bQuickBackupMulti §rhas new release: §6%s"
+    click_tooltip: "Click to open release page"
+
   config_page:
     save_button: "儲存"
     close_button: "關閉"

@@ -11,6 +11,7 @@
     "server.MinecraftServerMixin"
   ],
   "client": [
+    "client.ClientPlayNetworkHandlerMixin",
     "client.MinecraftClientMixin",
     "client.MinecraftServerMixin",
     "client.TitleScreenMixin",

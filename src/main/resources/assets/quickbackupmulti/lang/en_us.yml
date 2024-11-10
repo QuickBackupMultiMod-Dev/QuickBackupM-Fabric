@@ -2,6 +2,10 @@ quickbackupmulti:
   empty_comment: §7Empty§r
   list_empty: "§7Do not have any backups now"
 
+  check_update:
+    on_player_join: "§bQuickBackupMulti §rhas new release: §6%s"
+    click_tooltip: "Click to open release page"
+
   config_page:
     save_button: "Save Config"
     close_button: "Close Screen"

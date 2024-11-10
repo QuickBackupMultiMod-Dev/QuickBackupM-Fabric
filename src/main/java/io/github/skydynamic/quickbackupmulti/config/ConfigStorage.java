@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class ConfigStorage implements IConfig {
     @Ignore
     public static final ConfigStorage DEFAULT = new ConfigStorage(
+            true,
             new ArrayList<>(),
             new ArrayList<>(),
             "zh_cn",
@@ -21,8 +22,9 @@ public class ConfigStorage implements IConfig {
             "QuickBackupMulti"
     );
 
-    private ArrayList<String> ignoredFiles;
-    private ArrayList<String> ignoredFolders;
+    private final boolean checkUpdate;
+    private final ArrayList<String> ignoredFiles;
+    private final ArrayList<String> ignoredFolders;
     private String lang;
     private boolean scheduleBackup;
     private String scheduleCron;
@@ -34,9 +36,10 @@ public class ConfigStorage implements IConfig {
 
     private boolean useInternalDataBase;
     private String mongoDBUri;
-    private String storagePath;
+    private final String storagePath;
 
     public ConfigStorage(
+            boolean checkUpdate,
             ArrayList<String> IgnoredFiles,
             ArrayList<String> ignoredFolders,
             String lang,
@@ -49,6 +52,7 @@ public class ConfigStorage implements IConfig {
             boolean useInternalDataBase,
             String mongoDBUri,
             String storagePath) {
+        this.checkUpdate = checkUpdate;
         this.ignoredFiles = IgnoredFiles;
         this.ignoredFolders = ignoredFolders;
         this.lang = lang;
@@ -63,20 +67,16 @@ public class ConfigStorage implements IConfig {
         this.storagePath = storagePath;
     }
 
+    public boolean isCheckUpedate() {
+        return checkUpdate;
+    }
+
     public ArrayList<String> getIgnoredFiles() {
         return ignoredFiles;
     }
 
-    public void setIgnoredFiles(ArrayList<String> ignoredFiles) {
-        this.ignoredFiles = ignoredFiles;
-    }
-
     public ArrayList<String> getIgnoredFolders() {
         return ignoredFolders;
-    }
-
-    public void setIgnoredFolders(ArrayList<String> ignoredFolders) {
-        this.ignoredFolders = ignoredFolders;
     }
 
     public String getLang() {

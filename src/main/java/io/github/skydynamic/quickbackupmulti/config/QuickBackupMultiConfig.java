@@ -95,6 +95,12 @@ public class QuickBackupMultiConfig {
         }
     }
 
+    public boolean getCheckUpdata() {
+        synchronized (lock) {
+            return configStorage.isCheckUpedate();
+        }
+    }
+
     public List<String> getIgnoredFiles() {
         synchronized (lock) {
             List<String> list = new ArrayList<>(configStorage.getIgnoredFiles());
