@@ -7,11 +7,11 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 //#if MC<=11820
 //$$ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 //#endif
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.backup.RestoreTask;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
-import io.github.skydynamic.quickbackupmulti.config.Config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
@@ -158,7 +158,7 @@ public class QuickBackupMultiCommand {
                     player.sendMessage(Text.of(tr("quickbackupmulti.restore.countdown.intro", executePlayerName)), false);
                 }
                 String slot = (String) QbDataHashMap.get("QBM").get("Slot");
-                Config.TEMP_CONFIG.setBackupSlot(slot);
+                QuickBackupMulti.TEMP_CONFIG.setBackupSlot(slot);
                 Timer timer = (Timer) QbDataHashMap.get("QBM").get("Timer");
                 ScheduledExecutorService countdown = (ScheduledExecutorService) QbDataHashMap.get("QBM").get("Countdown");
                 AtomicInteger countDown = new AtomicInteger(11);
@@ -197,7 +197,7 @@ public class QuickBackupMultiCommand {
                 timer.cancel();
                 countdown.shutdown();
                 QbDataHashMap.clear();
-                Config.TEMP_CONFIG.setIsBackupValue(false);
+                QuickBackupMulti.TEMP_CONFIG.setIsBackupValue(false);
                 Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.restore.abort")));
             }
         } else {

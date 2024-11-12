@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
+import static io.github.skydynamic.quickbackupmulti.QbmConstant.GSON;
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.permissionManager;
 import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.getPlayerFromCommandSource;
 
@@ -51,7 +51,7 @@ public class PermissionManager {
     private void loadPermissionByFile() {
         try {
             FileReader reader = new FileReader(config);
-            this.permissionConfig = gson.fromJson(reader, PermissionConfig.class);
+            this.permissionConfig = GSON.fromJson(reader, PermissionConfig.class);
             reader.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -63,7 +63,7 @@ public class PermissionManager {
             if (config.exists()) config.delete();
             if (!config.exists()) config.createNewFile();
             FileWriter writer = new FileWriter(config);
-            gson.toJson(this.permissionConfig, writer);
+            GSON.toJson(this.permissionConfig, writer);
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -79,7 +79,7 @@ public class PermissionManager {
             this.permissionConfig = new PermissionConfig();
             config.createNewFile();
             FileWriter writer = new FileWriter(config);
-            gson.toJson(this.permissionConfig, writer);
+            GSON.toJson(this.permissionConfig, writer);
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);

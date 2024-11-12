@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.utils.schedule;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -15,15 +15,15 @@ public class CronUtil {
 
     public static Trigger buildTrigger() {
         try {
-            if (Config.INSTANCE.getScheduleMode().equals("cron")) {
+            if (QuickBackupMulti.config.getScheduleMode().equals("cron")) {
                 return TriggerBuilder.newTrigger()
-                    .withSchedule(CronScheduleBuilder.cronSchedule(Config.INSTANCE.getScheduleCron()))
-                    .startAt(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(getNextExecutionTime(Config.INSTANCE.getScheduleCron(), false)))
+                    .withSchedule(CronScheduleBuilder.cronSchedule(QuickBackupMulti.config.getScheduleCron()))
+                    .startAt(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(getNextExecutionTime(QuickBackupMulti.config.getScheduleCron(), false)))
                     .build();
             } else {
                 return TriggerBuilder.newTrigger()
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(Config.INSTANCE.getScheduleInterval()).repeatForever())
-                    .startAt(new Date(System.currentTimeMillis() + Config.INSTANCE.getScheduleInterval() * 1000L))
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(QuickBackupMulti.config.getScheduleInterval()).repeatForever())
+                    .startAt(new Date(System.currentTimeMillis() + QuickBackupMulti.config.getScheduleInterval() * 1000L))
                     .build();
             }
         } catch (ParseException e) {
@@ -36,8 +36,8 @@ public class CronUtil {
             JobDetail jb = JobBuilder.newJob(ScheduleBackup.class).withIdentity("ScheduleBackup").build();
             Trigger t = buildTrigger();
             StdSchedulerFactory sf = new StdSchedulerFactory();
-            Config.TEMP_CONFIG.setScheduler(sf.getScheduler());
-            Config.TEMP_CONFIG.scheduler.scheduleJob(jb, t);
+            QuickBackupMulti.TEMP_CONFIG.setScheduler(sf.getScheduler());
+            QuickBackupMulti.TEMP_CONFIG.scheduler.scheduleJob(jb, t);
         } catch (SchedulerException e) {
             LOGGER.error(e.toString());
         }
@@ -53,7 +53,7 @@ public class CronUtil {
         try {
             cronExpression = new CronExpression(cronExpress);
             if (get) {
-                return simpleDateFormat.format(cronExpression.getNextValidTimeAfter(new Date(Config.TEMP_CONFIG.latestScheduleExecuteTime)));
+                return simpleDateFormat.format(cronExpression.getNextValidTimeAfter(new Date(QuickBackupMulti.TEMP_CONFIG.latestScheduleExecuteTime)));
             }
             Date nextValidTime = cronExpression.getNextValidTimeAfter(new Date());
             return simpleDateFormat.format(nextValidTime);

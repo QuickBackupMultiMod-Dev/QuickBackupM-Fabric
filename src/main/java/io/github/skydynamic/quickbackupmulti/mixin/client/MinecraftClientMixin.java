@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.mixin.client;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.toast.ToastManager;
@@ -21,7 +21,7 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "setScreen", at = @At("RETURN"))
     private void inj(CallbackInfo ci) {
-        if (Config.TEMP_CONFIG.isBackup) {
+        if (QuickBackupMulti.TEMP_CONFIG.isBackup) {
             Text title = Text.of(tr("quickbackupmulti.toast.start_title"));
             Text content = Text.of(tr("quickbackupmulti.toast.start_content"));
             //#if MC>=11800

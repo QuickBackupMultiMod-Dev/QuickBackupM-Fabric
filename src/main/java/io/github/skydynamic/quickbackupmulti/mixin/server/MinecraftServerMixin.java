@@ -1,7 +1,7 @@
 package io.github.skydynamic.quickbackupmulti.mixin.server;
 
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
@@ -28,13 +28,13 @@ public abstract class MinecraftServerMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void setServer(CallbackInfo ci) {
-        Config.TEMP_CONFIG.setServerValue((MinecraftServer)(Object)this);
+        QuickBackupMulti.TEMP_CONFIG.setServerValue((MinecraftServer)(Object)this);
     }
 
     @Inject(method = "loadWorld", at = @At("RETURN"))
     private void initQuickBackupMulti(CallbackInfo ci) {
         Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
-        Config.TEMP_CONFIG.setWorldName("");
+        QuickBackupMulti.TEMP_CONFIG.setWorldName("");
         QbmManager.savePath = this.getSavePath(WorldSavePath.ROOT);
         createBackupDir(backupDir);
         setDataStore("server");
@@ -44,6 +44,6 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "shutdown", at = @At("HEAD"))
     private void injectShutDown(CallbackInfo ci) {
         shutdownSchedule();
-        if (!Config.TEMP_CONFIG.isBackup) getDataBase().stopInternalMongoServer();
+        if (!QuickBackupMulti.TEMP_CONFIG.isBackup) getDataBase().stopInternalMongoServer();
     }
 }

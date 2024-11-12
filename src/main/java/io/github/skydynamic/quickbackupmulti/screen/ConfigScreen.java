@@ -1,8 +1,8 @@
 package io.github.skydynamic.quickbackupmulti.screen;
 
+import io.github.skydynamic.quickbackupmulti.config.QuickBackupMultiConfig;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
-import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,7 +24,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.SAVE_CONFIG_PACKET_ID;
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
+import static io.github.skydynamic.quickbackupmulti.QbmConstant.GSON;
 import static io.github.skydynamic.quickbackupmulti.screen.ScreenUtils.buildButton;
 
 @Environment(EnvType.CLIENT)
@@ -34,7 +34,7 @@ public class ConfigScreen extends Screen {
 
     int totalWidth = 2 * 100 + 20;
 
-    public ConfigScreen(Screen parent, ConfigStorage config) {
+    public ConfigScreen(Screen parent, QuickBackupMultiConfig.ConfigStorage config) {
         super(Messenger.literal("ConfigScreen"));
         this.parent = parent;
         TempConfig.tempConfig.setConfig(config);
@@ -48,10 +48,10 @@ public class ConfigScreen extends Screen {
             (button) -> {
             TempConfig.tempConfig.config.setLang(langTextField.getText());
             //#if MC>=12005
-            //$$ ClientPlayNetworking.send(new Packets.SaveConfigPacket(gson.toJson(TempConfig.tempConfig.config)));
+            //$$ ClientPlayNetworking.send(new Packets.SaveConfigPacket(GSON.toJson(TempConfig.tempConfig.config)));
             //#else
             PacketByteBuf sendBuf = PacketByteBufs.create();
-            sendBuf.writeString(gson.toJson(TempConfig.tempConfig.config));
+            sendBuf.writeString(GSON.toJson(TempConfig.tempConfig.config));
             ClientPlayNetworking.send(SAVE_CONFIG_PACKET_ID, sendBuf);
             //#endif
         });

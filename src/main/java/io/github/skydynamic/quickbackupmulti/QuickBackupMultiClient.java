@@ -1,7 +1,7 @@
 package io.github.skydynamic.quickbackupmulti;
 
+import io.github.skydynamic.quickbackupmulti.config.QuickBackupMultiConfig;
 import io.github.skydynamic.quickbackupmulti.screen.ConfigScreen;
-import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 
 import net.fabricmc.api.ClientModInitializer;
 //#if MC>=12005
@@ -55,13 +55,13 @@ public class QuickBackupMultiClient implements ClientModInitializer {
         //#if MC<12005
         ClientPlayNetworking.registerGlobalReceiver(OPEN_CONFIG_GUI_PACKET_ID, (client, handler, buf, responseSender) -> {
             String config = buf.readString();
-            ConfigStorage c = gson.fromJson(config, ConfigStorage.class);
+            QuickBackupMultiConfig.ConfigStorage c = GSON.fromJson(config, QuickBackupMultiConfig.ConfigStorage.class);
             client.execute(() -> client.setScreen(new ConfigScreen(client.currentScreen, c)));
         });
         //#else
         //$$ ClientPlayNetworking.registerGlobalReceiver(Packets.OpenConfigGuiPacket.ID, (payload, context) -> {
         //$$     String config = payload.config();
-        //$$     ConfigStorage c = gson.fromJson(config, ConfigStorage.class);
+        //$$     QuickBackupMultiConfig.ConfigStorage c = GSON.fromJson(config, QuickBackupMultiConfig.ConfigStorage.class);
         //$$     MinecraftClient client = context.client();
         //$$     client.execute(() -> client.setScreen(new ConfigScreen(client.currentScreen, c)));
         //$$ });

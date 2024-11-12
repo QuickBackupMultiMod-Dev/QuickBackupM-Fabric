@@ -1,6 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.mixin.client;
 
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import net.minecraft.client.gui.Element;
 
@@ -29,7 +29,7 @@ public class TitleScreenMixin {
         )
     )
     private Element setSinglePlayerButton(Element element) {
-        if (Config.TEMP_CONFIG.isBackup) {
+        if (QuickBackupMulti.TEMP_CONFIG.isBackup) {
             //#if MC>=11900
             ((ButtonWidget) element).setTooltip(Tooltip.of(Messenger.literal("Restore now...")));
             //#endif
@@ -40,7 +40,7 @@ public class TitleScreenMixin {
 
     @Inject(method = "tick", at = @At("RETURN"))
     private void setButtonActive(CallbackInfo ci) {
-        if (!Config.TEMP_CONFIG.isBackup) {
+        if (!QuickBackupMulti.TEMP_CONFIG.isBackup) {
             TitleScreen screen = (TitleScreen) (Object) this;
             screen.children()
                 .stream()

@@ -4,9 +4,9 @@ import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.increment.storage.lib.util.Storager;
 import io.github.skydynamic.increment.storage.lib.database.DataBase;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
+import io.github.skydynamic.quickbackupmulti.config.QbmTempConfig;
+import io.github.skydynamic.quickbackupmulti.config.QuickBackupMultiConfig;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
-import io.github.skydynamic.quickbackupmulti.config.Config;
-import io.github.skydynamic.quickbackupmulti.config.ConfigStorage;
 import io.github.skydynamic.quickbackupmulti.command.QuickBackupMultiCommand;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import io.github.skydynamic.quickbackupmulti.utils.UpdateChecker;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 //#endif
 import java.nio.file.Path;
 
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.gson;
+import static io.github.skydynamic.quickbackupmulti.QbmConstant.GSON;
 import static io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager.hasPermission;
 
 
@@ -53,16 +53,22 @@ public class QuickBackupMulti implements ModInitializer {
 
 	public static final String modName = "QuickBackupMulti";
 	public static final String modId = "quickbackupmulti";
+	public static QbmTempConfig TEMP_CONFIG = new QbmTempConfig();
 
 	EnvType env = FabricLoader.getInstance().getEnvironmentType();
 
 	private static DataBase dataBase;
 	private static Storager storager;
 
+	public static final QuickBackupMultiConfig config = new QuickBackupMultiConfig(QbmConstant.pathGetter.getConfigPath().resolve(modName + ".json"));
+
 	@Override
 	public void onInitialize() {
+		config.load();
+		config.save();
+
 		FabricLoader.getInstance().getModContainer(modId).ifPresent(modContainer ->
-			Config.TEMP_CONFIG.setModVersion(modContainer.getMetadata().getVersion().getFriendlyString()));
+			TEMP_CONFIG.setModVersion(modContainer.getMetadata().getVersion().getFriendlyString()));
 
 		//#if MC>=12005
 		//$$ Packets.registerPacketCodec();
@@ -71,8 +77,7 @@ public class QuickBackupMulti implements ModInitializer {
 		java.util.logging.Logger.getLogger("").setFilter(filter);
 		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(filter);
 
-		Config.INSTANCE.load();
-		Translate.handleResourceReload(Config.INSTANCE.getLang());
+		Translate.handleResourceReload(config.getLang());
 
 		initDataBase();
 
@@ -87,22 +92,22 @@ public class QuickBackupMulti implements ModInitializer {
 		//#endif
 		registerPacketHandler();
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			Config.TEMP_CONFIG.setServerValue(server);
-			Config.TEMP_CONFIG.setEnv(env);
+			TEMP_CONFIG.setServerValue(server);
+			TEMP_CONFIG.setEnv(env);
 		});
 
 		ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
 			if (env == EnvType.SERVER) {
-				if (Config.TEMP_CONFIG.isBackup) {
-					QbmManager.restore(Config.TEMP_CONFIG.backupSlot);
+				if (TEMP_CONFIG.isBackup) {
+					QbmManager.restore(TEMP_CONFIG.backupSlot);
 					getDataBase().stopInternalMongoServer();
-					Config.TEMP_CONFIG.setIsBackupValue(false);
-					switch (Config.INSTANCE.getAutoRestartMode()) {
+					TEMP_CONFIG.setIsBackupValue(false);
+					switch (config.getAutoRestartMode()) {
 						case DISABLE -> {}
 						case DEFAULT -> {
-							Config.TEMP_CONFIG.server.stopped = false;
-							Config.TEMP_CONFIG.server.running = true;
-							Config.TEMP_CONFIG.server.runServer();
+							TEMP_CONFIG.server.stopped = false;
+							TEMP_CONFIG.server.running = true;
+							TEMP_CONFIG.server.runServer();
 						}
 						case MCSM -> new Thread(() -> System.exit(-4000)).start();
 					}
@@ -110,19 +115,19 @@ public class QuickBackupMulti implements ModInitializer {
 					getDataBase().stopInternalMongoServer();
 				}
 			}
-			Config.TEMP_CONFIG.server = null;
+			TEMP_CONFIG.server = null;
 		});
 
-		if (Config.INSTANCE.getCheckUpdata()) updateChecker.start();
+		if (config.isCheckUpdate()) updateChecker.start();
 	}
 
 	public void initDataBase() {
 		DataBaseManager dataBaseManager = new DataBaseManager(
 			"QuickBackupMulti",
-			Path.of(Config.INSTANCE.getStoragePath())
+			Path.of(config.getStoragePath())
 		);
 
-		dataBase = new DataBase(dataBaseManager, Config.INSTANCE.getConfigStorage());
+		dataBase = new DataBase(dataBaseManager, config);
 
 		IndexUtil.setDataBase(dataBase);
 	}
@@ -138,12 +143,12 @@ public class QuickBackupMulti implements ModInitializer {
 			//#if MC>=12005
 			//$$ ServerPlayerEntity player = context.player();
 			//$$ if (player.hasPermissionLevel(2)) ServerPlayNetworking.send(
-			//$$ 	player, new Packets.OpenConfigGuiPacket(gson.toJson(Config.INSTANCE.getConfigStorage()))
+			//$$ 	player, new Packets.OpenConfigGuiPacket(GSON.toJson(config.getConfig()))
 			//$$ );
 			//#else
 			if (hasPermission(player.getCommandSource(), 2, PermissionType.HELPER)) {
 				PacketByteBuf sendBuf = PacketByteBufs.create();
-				sendBuf.writeString(gson.toJson(Config.INSTANCE.getConfigStorage()));
+				sendBuf.writeString(GSON.toJson(config.getConfig()));
 				ServerPlayNetworking.send(player, QbmConstant.OPEN_CONFIG_GUI_PACKET_ID, sendBuf);
 			}
 			//#endif
@@ -164,10 +169,10 @@ public class QuickBackupMulti implements ModInitializer {
 				//#else
 				String configStorage = buf.readString();
 				//#endif
-				ConfigStorage c = QbmConstant.gson.fromJson(configStorage, ConfigStorage.class);
+				QuickBackupMultiConfig.ConfigStorage c = QbmConstant.GSON.fromJson(configStorage, QuickBackupMultiConfig.ConfigStorage.class);
 				// Verify config
-				ConfigStorage result = QbmManager.verifyConfig(c, player);
-				Config.INSTANCE.setConfigStorage(result);
+				QuickBackupMultiConfig.ConfigStorage result = QbmManager.verifyConfig(c, player);
+				config.setConfig(result);
 			}
 		});
 	}

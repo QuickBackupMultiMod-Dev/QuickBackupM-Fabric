@@ -3,7 +3,6 @@ package io.github.skydynamic.quickbackupmulti.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
-import io.github.skydynamic.quickbackupmulti.config.Config;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -28,7 +27,7 @@ public class UpdateChecker extends Thread {
     @Override
     public void run() {
         try {
-            if (Config.TEMP_CONFIG.modVersion == null) {
+            if (QuickBackupMulti.TEMP_CONFIG.modVersion == null) {
                 QuickBackupMulti.LOGGER.warn("Current mod version is not found.");
                 return;
             }
@@ -43,7 +42,7 @@ public class UpdateChecker extends Thread {
             String tag = latestVersion
                 .replaceAll("\\+.*", "")
                 .replaceFirst("^v", "");
-            String currentVersion = Config.TEMP_CONFIG.modVersion
+            String currentVersion = QuickBackupMulti.TEMP_CONFIG.modVersion
                 .replaceAll("\\+.*", "")
                 .replaceFirst("^v", "");
 

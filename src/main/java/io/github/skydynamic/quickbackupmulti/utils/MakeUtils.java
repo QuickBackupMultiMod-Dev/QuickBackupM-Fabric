@@ -1,7 +1,7 @@
 package io.github.skydynamic.quickbackupmulti.utils;
 
 import io.github.skydynamic.increment.storage.lib.database.index.type.StorageInfo;
-import io.github.skydynamic.quickbackupmulti.config.Config;
+import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
@@ -39,7 +39,7 @@ public class MakeUtils {
             double intervalTime = (endTime - startTime) / 1000.0;
             Messenger.sendMessage(commandSource, Text.of(tr("quickbackupmulti.make.success", intervalTime)));
 
-            if (Config.INSTANCE.getScheduleBackup()) startSchedule(commandSource);
+            if (QuickBackupMulti.config.isScheduleBackup()) startSchedule(commandSource);
 
             for (ServerWorld serverWorld : server.getWorlds()) {
                 if (serverWorld == null || !serverWorld.savingDisabled) continue;
