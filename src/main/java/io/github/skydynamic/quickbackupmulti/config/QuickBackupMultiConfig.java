@@ -66,7 +66,9 @@ public class QuickBackupMultiConfig implements IConfig {
     }
 
     public ArrayList<String> getIgnoredFiles() {
-        return config.ignoredFiles;
+        ArrayList<String> ignoredFiles = new ArrayList<>(config.ignoredFiles);
+        ignoredFiles.add("session.lock");
+        return ignoredFiles;
     }
 
 
