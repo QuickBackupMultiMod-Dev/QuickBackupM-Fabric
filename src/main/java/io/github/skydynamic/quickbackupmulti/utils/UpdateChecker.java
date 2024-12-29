@@ -3,17 +3,18 @@ package io.github.skydynamic.quickbackupmulti.utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
+
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class UpdateChecker extends Thread {
 
-    private static final HttpClient CLIENT = HttpClients.createDefault();
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
     private static final String RELEASE_API_URL = "https://api.github.com/repos/QuickBackupMultiMod-Dev/QuickBackupM-Fabric/releases/latest";
 
     public String latestVersion;
@@ -31,11 +32,13 @@ public class UpdateChecker extends Thread {
                 QuickBackupMulti.LOGGER.warn("Current mod version is not found.");
                 return;
             }
-            HttpResponse httpResponse = CLIENT.execute(new HttpGet(RELEASE_API_URL));
-            String body = EntityUtils.toString(httpResponse.getEntity());
+            HttpResponse<String> response = CLIENT.send(
+                HttpRequest.newBuilder().uri(new URI(RELEASE_API_URL)).build(),
+                HttpResponse.BodyHandlers.ofString()
+            );
 
             // Get Meta data
-            JsonObject jsonObject = JsonParser.parseString(body).getAsJsonObject();
+            JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
             latestVersion = jsonObject.get("tag_name").getAsString();
             latestVersionHtmUrl = jsonObject.get("html_url").getAsString();
 
@@ -52,8 +55,7 @@ public class UpdateChecker extends Thread {
                     "{} has new version {}. You can see: {}", QuickBackupMulti.modName, latestVersion, latestVersionHtmUrl
                 );
             }
-
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException | URISyntaxException e) {
             QuickBackupMulti.LOGGER.error("Check update failed", e);
         }
     }
