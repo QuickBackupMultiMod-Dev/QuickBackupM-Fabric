@@ -1,5 +1,12 @@
 package io.github.skydynamic.quickbackupmulti.mixin.client;
 
+//#if MC<11900
+//$$ import com.mojang.authlib.GameProfileRepository;
+//$$ import com.mojang.authlib.minecraft.MinecraftSessionService;
+//$$ import net.minecraft.util.UserCache;
+//#else
+import net.minecraft.util.ApiServices;
+//#endif
 import com.mojang.datafixers.DataFixer;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
 import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
@@ -11,7 +18,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.SaveLoader;
 import net.minecraft.server.WorldGenerationProgressListenerFactory;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.ApiServices;
 import net.minecraft.util.WorldSavePath;
 import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,6 +37,7 @@ import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils
 @Environment(EnvType.CLIENT)
 @Mixin(IntegratedServer.class)
 public abstract class MinecraftServerMixin extends MinecraftServer {
+    //#if MC>=11900
     public MinecraftServerMixin(
         Thread serverThread, LevelStorage.Session session,
         ResourcePackManager dataPackManager, SaveLoader saveLoader,
@@ -39,6 +46,11 @@ public abstract class MinecraftServerMixin extends MinecraftServer {
     ) {
         super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, apiServices, worldGenerationProgressListenerFactory);
     }
+    //#else
+    //$$ public MinecraftServerMixin(Thread serverThread, LevelStorage.Session session, ResourcePackManager dataPackManager, SaveLoader saveLoader, Proxy proxy, DataFixer dataFixer, MinecraftSessionService sessionService, GameProfileRepository gameProfileRepo, UserCache userCache, WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory) {
+    //$$     super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, sessionService, gameProfileRepo, userCache, worldGenerationProgressListenerFactory);
+    //$$ }
+    //#endif
 
     @Inject(
         method = "setupServer",
