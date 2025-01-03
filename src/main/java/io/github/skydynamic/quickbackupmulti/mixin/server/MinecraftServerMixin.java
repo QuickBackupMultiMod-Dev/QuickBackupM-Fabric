@@ -1,18 +1,26 @@
 package io.github.skydynamic.quickbackupmulti.mixin.server;
 
+import com.mojang.datafixers.DataFixer;
 import io.github.skydynamic.quickbackupmulti.QbmConstant;
 import io.github.skydynamic.quickbackupmulti.QuickBackupMulti;
 import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
+import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.SaveLoader;
+import net.minecraft.server.WorldGenerationProgressListenerFactory;
+import net.minecraft.server.dedicated.MinecraftDedicatedServer;
+import net.minecraft.util.ApiServices;
 import net.minecraft.util.WorldSavePath;
+import net.minecraft.world.level.storage.LevelStorage;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.net.Proxy;
 import java.nio.file.Path;
 
 import static io.github.skydynamic.quickbackupmulti.QuickBackupMulti.getDataBase;
@@ -22,17 +30,31 @@ import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils
 import static io.github.skydynamic.quickbackupmulti.utils.schedule.ScheduleUtils.startSchedule;
 
 @Environment(EnvType.SERVER)
-@Mixin(MinecraftServer.class)
-public abstract class MinecraftServerMixin {
-    @Shadow public abstract Path getSavePath(WorldSavePath worldSavePath);
+@Mixin(MinecraftDedicatedServer.class)
+public abstract class MinecraftServerMixin extends MinecraftServer {
+    public MinecraftServerMixin(
+        Thread serverThread, LevelStorage.Session session,
+        ResourcePackManager dataPackManager, SaveLoader saveLoader,
+        Proxy proxy, DataFixer dataFixer, ApiServices apiServices,
+        WorldGenerationProgressListenerFactory worldGenerationProgressListenerFactory
+    ) {
+        super(serverThread, session, dataPackManager, saveLoader, proxy, dataFixer, apiServices, worldGenerationProgressListenerFactory);
+    }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void setServer(CallbackInfo ci) {
-        QuickBackupMulti.TEMP_CONFIG.setServerValue((MinecraftServer)(Object)this);
+        QuickBackupMulti.TEMP_CONFIG.setServerValue(this);
     }
 
-    @Inject(method = "loadWorld", at = @At("RETURN"))
-    private void initQuickBackupMulti(CallbackInfo ci) {
+    @Inject(
+        method = "setupServer",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/dedicated/MinecraftDedicatedServer;loadWorld()V",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void initQuickBackupMulti(CallbackInfoReturnable<Boolean> cir) {
         Path backupDir = Path.of(QbmConstant.pathGetter.getGamePath() + "/QuickBackupMulti/");
         QuickBackupMulti.TEMP_CONFIG.setWorldName("");
         QbmManager.savePath = this.getSavePath(WorldSavePath.ROOT);

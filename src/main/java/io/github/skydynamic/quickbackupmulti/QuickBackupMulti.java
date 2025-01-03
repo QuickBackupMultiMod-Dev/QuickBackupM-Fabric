@@ -100,7 +100,6 @@ public class QuickBackupMulti implements ModInitializer {
 			if (env == EnvType.SERVER) {
 				if (TEMP_CONFIG.isBackup) {
 					QbmManager.restore(TEMP_CONFIG.backupSlot);
-					getDataBase().stopInternalMongoServer();
 					TEMP_CONFIG.setIsBackupValue(false);
 					switch (config.getAutoRestartMode()) {
 						case DISABLE -> {}

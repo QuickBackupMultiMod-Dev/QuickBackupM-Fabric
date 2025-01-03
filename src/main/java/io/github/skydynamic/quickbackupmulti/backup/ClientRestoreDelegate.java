@@ -41,7 +41,6 @@ public class ClientRestoreDelegate {
                 minecraftClient.execute(() -> minecraftClient.setScreen(null));
                 restore(slot);
                 QuickBackupMulti.TEMP_CONFIG.setIsBackupValue(false);
-                getDataBase().stopInternalMongoServer();
                 minecraftClient.execute(() -> {
                     Text title = Text.of(Translate.tr("quickbackupmulti.toast.end_title"));
                     Text content = Text.of(Translate.tr("quickbackupmulti.toast.end_content"));
