@@ -75,11 +75,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    implementation('commons-io:commons-io:2.15.1')
+    implementation('commons-io:commons-io')
 
     include(implementation('org.yaml:snakeyaml:2.0'))
 
-    include(implementation('io.github.skydynamic:incremental-storage-lib:1.0.7'))
+    include(implementation('io.github.skydynamic:incremental-storage-lib:1.0.8'))
 
     include(implementation('org.quartz-scheduler:quartz:2.3.2'))
 

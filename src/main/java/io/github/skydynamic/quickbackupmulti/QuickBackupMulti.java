@@ -128,6 +128,7 @@ public class QuickBackupMulti implements ModInitializer {
 
 		dataBase = new DataBase(dataBaseManager, config);
 
+		IndexUtil.setConfig(config);
 		IndexUtil.setDataBase(dataBase);
 	}
 
