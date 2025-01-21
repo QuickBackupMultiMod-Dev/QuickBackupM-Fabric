@@ -32,19 +32,19 @@ public class PermissionManager {
         }
     }
 
-    public void setPermissionByPermissionLevelInt(int level, ServerPlayerEntity player) {
-        this.permissionConfig.setByPermissionType(PermissionType.getByLevelInt(level), player);
+    public void setPermissionByPermissionLevelInt(int level, String playerName) {
+        this.permissionConfig.setByPermissionType(PermissionType.getByLevelInt(level), playerName);
     }
 
-    public void setPermissionByPermissionType(PermissionType permission, ServerPlayerEntity player) {
-        this.permissionConfig.setByPermissionType(permission, player);
+    public void setPermissionByPermissionType(PermissionType permission, String playerName) {
+        this.permissionConfig.setByPermissionType(permission, playerName);
     }
 
-    public PermissionType getPlayerPermission(ServerPlayerEntity player) {
-        return permissionConfig.perm.getOrDefault(player.getName().getString(), PermissionType.USER);
+    public PermissionType getPlayerPermission(String name) {
+        return permissionConfig.perm.getOrDefault(name, PermissionType.USER);
     }
 
-    public int getPlayerPermissionLevel(ServerPlayerEntity player) {
+    public int getPlayerPermissionLevel(String player) {
         return getPlayerPermission(player).level;
     }
 
@@ -97,7 +97,7 @@ public class PermissionManager {
                 return true;
             } else {
                 return source.hasPermissionLevel(mcPermission)
-                    || permissionManager.getPlayerPermissionLevel(player) >= modPermission.level;
+                    || permissionManager.getPlayerPermissionLevel(player.getName().getString()) >= modPermission.level;
             }
         }
         return true;
@@ -123,8 +123,8 @@ public class PermissionManager {
 
     static class PermissionConfig {
         private final Map<String, PermissionType> perm = new HashMap<>();
-        public void setByPermissionType(PermissionType type, ServerPlayerEntity player) {
-            perm.put(player.getName().getString(), type);
+        public void setByPermissionType(PermissionType type, String name) {
+            perm.put(name, type);
             permissionManager.savePermissionToFile();
         }
     }
