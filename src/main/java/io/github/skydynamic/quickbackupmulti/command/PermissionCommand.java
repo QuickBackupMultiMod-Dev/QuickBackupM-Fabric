@@ -1,5 +1,6 @@
 package io.github.skydynamic.quickbackupmulti.command;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager;
@@ -8,11 +9,11 @@ import io.github.skydynamic.quickbackupmulti.utils.Messenger;
 import net.minecraft.command.argument.GameProfileArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+
+import java.util.Collection;
 
 import static io.github.skydynamic.quickbackupmulti.QbmConstant.permissionManager;
 import static io.github.skydynamic.quickbackupmulti.i18n.Translate.tr;
-import static io.github.skydynamic.quickbackupmulti.utils.QbmManager.getPlayerFromCommandSource;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class PermissionCommand {
@@ -21,39 +22,48 @@ public class PermissionCommand {
         .then(literal("set")
             .then(CommandManager.argument("player", GameProfileArgumentType.gameProfile())
                 .then(CommandManager.argument("level", IntegerArgumentType.integer(0, 2))
-                    .executes(it -> setPermission(it.getSource(), IntegerArgumentType.getInteger(it, "level")))
+                    .executes(it -> setPermission(
+                            it.getSource(),
+                            GameProfileArgumentType.getProfileArgument(it, "player"),
+                            IntegerArgumentType.getInteger(it, "level")
+                    ))
                 )
             )
         )
         .then(literal("get")
             .then(CommandManager.argument("player", GameProfileArgumentType.gameProfile())
-                .executes(it -> getPermission(it.getSource()))
+                .executes(it -> getPermission(
+                    it.getSource(),
+                    GameProfileArgumentType.getProfileArgument(it, "player")
+                ))
             )
         )
         .then(literal("reload")
             .executes(it -> reloadPermission(it.getSource()))
         );
 
-    private static int setPermission(ServerCommandSource commandSource, int level) {
-        ServerPlayerEntity player = getPlayerFromCommandSource(commandSource);
-        permissionManager.setPermissionByPermissionLevelInt(level, player);
-        Messenger.sendMessage(commandSource,
+    private static int setPermission(ServerCommandSource commandSource, Collection<GameProfile> players, int level) {
+        players.forEach(player -> {
+            permissionManager.setPermissionByPermissionLevelInt(level, player.getName());
+            Messenger.sendMessage(commandSource,
             Messenger.literal(
                 tr("quickbackupmulti.permission.set",
-                    player.getName().getString(),
+                    player.getName(),
                     PermissionType.getByLevelInt(level).name()))
         );
+        });
         return 1;
     }
 
-    private static int getPermission(ServerCommandSource commandSource) {
-        ServerPlayerEntity player = getPlayerFromCommandSource(commandSource);
-        Messenger.sendMessage(commandSource,
-            Messenger.literal(
-                tr("quickbackupmulti.permission.get",
-                    player.getName().getString(),
-                    permissionManager.getPlayerPermission(player).name()))
-        );
+    private static int getPermission(ServerCommandSource commandSource, Collection<GameProfile> players) {
+        players.forEach(player -> {
+            Messenger.sendMessage(commandSource,
+                Messenger.literal(
+                    tr("quickbackupmulti.permission.get",
+                        player.getName(),
+                        permissionManager.getPlayerPermission(player.getName()).name()))
+            );
+        });
         return 1;
     }
 
