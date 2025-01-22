@@ -3,7 +3,6 @@ package io.github.skydynamic.quickbackupmulti;
 import io.github.skydynamic.increment.storage.lib.util.IndexUtil;
 import io.github.skydynamic.increment.storage.lib.util.Storager;
 import io.github.skydynamic.increment.storage.lib.database.DataBase;
-import io.github.skydynamic.quickbackupmulti.command.permission.PermissionType;
 import io.github.skydynamic.quickbackupmulti.config.QbmTempConfig;
 import io.github.skydynamic.quickbackupmulti.config.QuickBackupMultiConfig;
 import io.github.skydynamic.quickbackupmulti.i18n.Translate;
@@ -12,8 +11,6 @@ import io.github.skydynamic.quickbackupmulti.utils.QbmManager;
 import io.github.skydynamic.quickbackupmulti.utils.UpdateChecker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 //#if MC>=11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -25,7 +22,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 //#if MC>=12005
 //$$ import net.minecraft.server.network.ServerPlayerEntity;
 //#endif
-import net.minecraft.network.PacketByteBuf;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +32,6 @@ import org.slf4j.LoggerFactory;
 //$$ import org.apache.logging.log4j.Logger;
 //#endif
 import java.nio.file.Path;
-
-import static io.github.skydynamic.quickbackupmulti.QbmConstant.GSON;
-import static io.github.skydynamic.quickbackupmulti.command.permission.PermissionManager.hasPermission;
 
 
 public class QuickBackupMulti implements ModInitializer {
@@ -70,9 +63,6 @@ public class QuickBackupMulti implements ModInitializer {
 		FabricLoader.getInstance().getModContainer(modId).ifPresent(modContainer ->
 			TEMP_CONFIG.setModVersion(modContainer.getMetadata().getVersion().getFriendlyString()));
 
-		//#if MC>=12005
-		//$$ Packets.registerPacketCodec();
-		//#endif
 		final JavaUtilLog4jFilter filter = new JavaUtilLog4jFilter();
 		java.util.logging.Logger.getLogger("").setFilter(filter);
 		((org.apache.logging.log4j.core.Logger) LogManager.getRootLogger()).addFilter(filter);
@@ -90,7 +80,7 @@ public class QuickBackupMulti implements ModInitializer {
 		//$$ 	(dispatcher, registryAccess) -> QuickBackupMultiCommand.RegisterCommand(dispatcher)
 		//$$ );
 		//#endif
-		registerPacketHandler();
+
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			TEMP_CONFIG.setServerValue(server);
 			TEMP_CONFIG.setEnv(env);
@@ -130,51 +120,6 @@ public class QuickBackupMulti implements ModInitializer {
 
 		IndexUtil.setConfig(config);
 		IndexUtil.setDataBase(dataBase);
-	}
-
-	public static void registerPacketHandler() {
-		//#if MC>=12005
-		//$$ ServerPlayNetworking.registerGlobalReceiver(
-		//$$ Packets.RequestOpenConfigGuiPacket.ID, (payload, context) -> {
-		//#else
-		ServerPlayNetworking.registerGlobalReceiver(
-			QbmConstant.REQUEST_OPEN_CONFIG_GUI_PACKET_ID, (server, player, handler, buf, responseSender) -> {
-		//#endif
-			//#if MC>=12005
-			//$$ ServerPlayerEntity player = context.player();
-			//$$ if (player.hasPermissionLevel(2)) ServerPlayNetworking.send(
-			//$$ 	player, new Packets.OpenConfigGuiPacket(GSON.toJson(config.getConfig()))
-			//$$ );
-			//#else
-			if (hasPermission(player.getCommandSource(), 2, PermissionType.HELPER)) {
-				PacketByteBuf sendBuf = PacketByteBufs.create();
-				sendBuf.writeString(GSON.toJson(config.getConfig()));
-				ServerPlayNetworking.send(player, QbmConstant.OPEN_CONFIG_GUI_PACKET_ID, sendBuf);
-			}
-			//#endif
-		});
-
-		//#if MC>=12005
-		//$$ ServerPlayNetworking.registerGlobalReceiver(Packets.SaveConfigPacket.ID, (payload, context) -> {
-		//#else
-		ServerPlayNetworking.registerGlobalReceiver(
-			QbmConstant.SAVE_CONFIG_PACKET_ID, (server, player, handler, buf, responseSender) -> {
-		//#endif
-			//#if MC>=12005
-			//$$ ServerPlayerEntity player = context.player();
-			//#endif
-			if (player.hasPermissionLevel(2)) {
-				//#if MC>=12005
-				//$$ String configStorage = payload.config();
-				//#else
-				String configStorage = buf.readString();
-				//#endif
-				QuickBackupMultiConfig.ConfigStorage c = QbmConstant.GSON.fromJson(configStorage, QuickBackupMultiConfig.ConfigStorage.class);
-				// Verify config
-				QuickBackupMultiConfig.ConfigStorage result = QbmManager.verifyConfig(c, player);
-				config.setConfig(result);
-			}
-		});
 	}
 
 	public static boolean shouldFilterMessage(Level level, String packetName) {

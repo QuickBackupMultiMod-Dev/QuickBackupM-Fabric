@@ -14,7 +14,9 @@ on:
         description: The tag of the release you want to append the artifact to
         type: string
         required: true
-
+  release:
+    types:
+      - published
 
 jobs:
   show_action_parameters:
@@ -45,8 +47,6 @@ jobs:
       - build
     runs-on: ubuntu-latest
 
-    # allow the mod publish step to add asserts to release
-    # https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token
     permissions:
       contents: write
 

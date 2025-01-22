@@ -10,7 +10,4 @@ public final class QbmConstant {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static final ServerPathUtils pathGetter = new ServerPathUtils();
     public static final PermissionManager permissionManager = new PermissionManager();
-    public static final Identifier REQUEST_OPEN_CONFIG_GUI_PACKET_ID = Identifier.tryParse("quickbackupmulti:request_open_config_gui");
-    public static final Identifier OPEN_CONFIG_GUI_PACKET_ID = Identifier.tryParse("quickbackupmulti:open_config_gui");
-    public static final Identifier SAVE_CONFIG_PACKET_ID = Identifier.tryParse("quickbackupmulti:save_config");
 }
