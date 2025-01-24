@@ -16,7 +16,9 @@ public class ScheduleUtils {
     public static void startSchedule(ServerCommandSource commandSource) {
         String nextBackupTimeString = "";
         try {
-            QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
+            if (QuickBackupMulti.TEMP_CONFIG.scheduler != null) {
+                QuickBackupMulti.TEMP_CONFIG.scheduler.shutdown();
+            }
             // 照顾Java8
             switch (QuickBackupMulti.config.getScheduleMode()) {
                 case "cron": {
